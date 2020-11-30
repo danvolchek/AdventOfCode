@@ -38,8 +38,8 @@ func Parse() (int, int) {
 func digits(val int) []int {
 	ret := []int{0, 0, 0, 0, 0, 0}
 
-	for i := 0; i < 6; i++ {
-		ret[5-i] = val % 10
+	for i := 5; i >= 0; i-- {
+		ret[i] = val % 10
 		val /= 10
 	}
 
