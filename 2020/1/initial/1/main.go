@@ -1,19 +1,28 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
+	"path"
 )
 
-func parse() {
-	input, err := os.Open("input.txt")
+func parse(r io.Reader) {
+	csvReader := csv.NewReader(r)
+
+	rows, err := csvReader.ReadAll()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(input)
+	fmt.Println(rows)
 }
 
 func main() {
-	parse()
+	input, err := os.Open(path.Join("2020", "1", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+	parse(input)
 }
