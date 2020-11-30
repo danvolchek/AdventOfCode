@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"path"
 	"strconv"
 )
 
@@ -24,7 +25,7 @@ func mass(val int) int {
 }
 
 func parse() []int {
-	input, err := os.Open("input.txt")
+	input, err := os.Open(path.Join("2019", "1", "input.txt"))
 	if err != nil {
 		panic(err)
 	}

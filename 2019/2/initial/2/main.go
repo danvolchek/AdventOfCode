@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"strconv"
 )
 
@@ -47,7 +48,7 @@ func vm(tape []int) []int {
 }
 
 func main() {
-	input, err := os.Open("input.txt")
+	input, err := os.Open(path.Join("2019", "2", "input.txt"))
 	if err != nil {
 		panic(err)
 	}

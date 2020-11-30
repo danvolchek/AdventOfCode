@@ -6,13 +6,29 @@ import (
 )
 
 func BenchmarkNumPasswords(b *testing.B) {
+	min, max := main.Parse()
+	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
-		main.NumPasswords(382345, 843167)
+		main.NumPasswords(min, max)
 	}
 }
 
 func BenchmarkNumPasswordsGoroutines(b *testing.B) {
+	min, max := main.Parse()
+	b.ResetTimer()
+
 	for i := 0; i < b.N; i++ {
-		main.NumPasswordsGoroutines(382345, 843167, 16)
+		main.NumPasswordsGoroutines(min, max, 2)
 	}
 }
+
+/*
+goos: windows
+goarch: amd64
+pkg: github.com/danvolchek/AdventOfCode/2019/4/final/2
+BenchmarkNumPasswords
+BenchmarkNumPasswords-16              	  153708	      7586 ns/op
+BenchmarkNumPasswordsGoroutines
+BenchmarkNumPasswordsGoroutines-16    	  108009	     11167 ns/op
+ */

@@ -22,8 +22,10 @@ Where:
   - not all puzzles have one; i.e. if I didn't want to continue work on the puzzle
 - `1`/`2` indicate the first/second puzzle for that day
 - `input.txt` is my puzzle input
-  - not all puzzles have one; i.e. if the input is small it's instead embedded in the code directly
-  - to run solutions that do: set your working directory to the containing folder, e.g. `AdventOfCode/2019/1`.
+
+Solution files are self-contained so there's some code duplication between the first and second solution files.
+
+Set your working directory to the root folder, i.e. `AdventOfCode`, before running the solutions.
 
 # Status
 

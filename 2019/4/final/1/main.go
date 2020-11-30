@@ -1,8 +1,38 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"os"
+	"path"
+	"strconv"
 )
+
+// parse input
+func Parse() (int, int) {
+	input, err := os.Open(path.Join("2019", "4", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+	csvReader := csv.NewReader(input)
+
+	row, err := csvReader.Read()
+	if err != nil {
+		panic(err)
+	}
+
+	min, err := strconv.Atoi(row[0])
+	if err != nil {
+		panic(err)
+	}
+
+	max, err := strconv.Atoi(row[1])
+	if err != nil {
+		panic(err)
+	}
+
+	return min, max
+}
 
 // returns the digits that make up value
 func digits(val int) []int {
@@ -16,7 +46,7 @@ func digits(val int) []int {
 	return ret
 }
 
-// returns the value after digs which still has all digits non-decreasing
+// modifies digs to represent the next value after the one digs represents which still has all digits non-decreasing
 func increment(digs []int) {
 	// increase by 1
 	for i := 5; i >= 0; i-- {
@@ -53,7 +83,7 @@ func isLessThanOrEqual(a, b []int) bool {
 	return true
 }
 
-// solves the problem
+// solves the puzzle
 func NumPasswords(min, max int) int {
 	result := 0
 	maxDigs := digits(max)
@@ -85,7 +115,7 @@ func NumPasswords(min, max int) int {
 	return result
 }
 
-// splits the work to solve the passwords problem into chunks and spawns goroutines to solve each one
+// splits the work to solve the puzzle into chunks and spawns goroutines to solve each one
 func NumPasswordsGoroutines(min, max, numGoroutines int) int {
 	results := make(chan int, numGoroutines)
 	step := (max - min) / numGoroutines
@@ -125,6 +155,8 @@ func main() {
 	fmt.Println(NumPasswords(223450, 223450))
 	fmt.Println(NumPasswords(123789, 123789))
 
-	fmt.Println(NumPasswords(382345, 843167))
-	fmt.Println(NumPasswordsGoroutines(382345, 843167, 2))
+	min, max := Parse()
+
+	fmt.Println(NumPasswords(min, max))
+	fmt.Println(NumPasswordsGoroutines(min, max, 2))
 }

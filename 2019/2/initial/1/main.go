@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 )
@@ -53,7 +54,7 @@ func main() {
 	fmt.Println(vm(parse(strings.NewReader("2,2,2,5,99,0"))))
 	fmt.Println(vm(parse(strings.NewReader("1,1,1,2,99,5,6,0,99"))))
 
-	input, err := os.Open("input.txt")
+	input, err := os.Open(path.Join("2019", "2", "input.txt"))
 	if err != nil {
 		panic(err)
 	}
