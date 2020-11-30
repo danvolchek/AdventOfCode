@@ -17,13 +17,13 @@ This repo contains my solutions to the [Advent of Code](https://adventofcode.com
 ```
 
 Where:
-- `initial` is my first attempt at solving the puzzle; usually as quickly as possible to get on leaderboards
-- `final` is the end result of cleaning up code/optimizing the actual solution runtime and may include benchmarks
+- `initial` is my first attempt at solving the puzzle; usually as quickly as possible (in real time) to get on leaderboards
+- `final` is the end result of cleaning up code/optimizing the solution (time/space complexity) and may include benchmarks
   - not all puzzles have one; i.e. if I didn't want to continue work on the puzzle
 - `1`/`2` indicate the first/second puzzle for that day
 - `input.txt` is my puzzle input
 
-Solution files are self-contained so there's some code duplication between the first and second solution files.
+Solution files are self-contained so there's some duplication between the first and second solution files.
 
 Set your working directory to the root folder, i.e. `AdventOfCode`, before running the solutions.
 
