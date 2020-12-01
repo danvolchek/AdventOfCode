@@ -62,8 +62,8 @@ func create() error {
 		return err
 	}
 
-	stubWriter := &multiWriteCloser{}
-	defer warn(stubWriter.Close)
+	stubsWriter := &multiWriteCloser{}
+	defer warn(stubsWriter.Close)
 
 	for _, solutionType := range solutionTypes {
 		for _, puzzleType := range puzzleTypes {
@@ -73,11 +73,11 @@ func create() error {
 				return fmt.Errorf("couldn't create stub %s: %s", path.Join(stubDir, templateFileName), err)
 			}
 
-			stubWriter.Add(stubFile)
+			stubsWriter.Add(stubFile)
 		}
 	}
 
-	err = tmpl.Execute(stubWriter, args)
+	err = tmpl.Execute(stubsWriter, args)
 	if err != nil {
 		return fmt.Errorf("couldn't write template to stubs: %s", err)
 	}

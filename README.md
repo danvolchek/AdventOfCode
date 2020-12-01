@@ -10,17 +10,20 @@ This repo contains my solutions to the [Advent of Code](https://adventofcode.com
     ├───initial
     │   ├───1
     │   └───2
-    ├───final
+    ├───clean
     │   ├───1
     │   └───2
     └───input.txt
 ```
 
 Where:
+- `year` and `day` indicate the year and day of the puzzle
 - `initial` is my first attempt at solving the puzzle; usually as quickly as possible (in real time) to get on leaderboards
 - `clean` is the end result of cleaning up code/optimizing the solution (time/space complexity) and may include benchmarks
-- `1`/`2` indicate the first/second puzzle for that day
+- `1` and `2` indicate the first and second puzzle for that day
 - `input.txt` is my puzzle input
+
+## Notes
 
 Solution files are self-contained so there's some duplication between the first and second solution files.
 
