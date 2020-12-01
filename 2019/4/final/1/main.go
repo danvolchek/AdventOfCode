@@ -50,26 +50,26 @@ func digits(val int) []int {
 // faster, but requires the input to already be non-decreasing
 func incrementFast(digs []int) {
 	if digs[5] != 9 {
-		digs[5] +=1
+		digs[5] += 1
 	} else if digs[4] != 9 {
 		digs[4] += 1
 		digs[5] = digs[4]
-	}else if digs[3] != 9 {
+	} else if digs[3] != 9 {
 		digs[3] += 1
 		digs[4] = digs[3]
 		digs[5] = digs[3]
-	}else if digs[2] != 9 {
+	} else if digs[2] != 9 {
 		digs[2] += 1
 		digs[3] = digs[2]
 		digs[4] = digs[2]
 		digs[5] = digs[2]
-	}else if digs[1] != 9 {
+	} else if digs[1] != 9 {
 		digs[1] += 1
 		digs[2] = digs[1]
 		digs[3] = digs[1]
 		digs[4] = digs[1]
 		digs[5] = digs[1]
-	}else if digs[0] != 9 {
+	} else if digs[0] != 9 {
 		digs[0] += 1
 		digs[1] = digs[0]
 		digs[2] = digs[0]

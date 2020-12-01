@@ -31,4 +31,4 @@ BenchmarkNumPasswords
 BenchmarkNumPasswords-16              	  428180	      2709 ns/op
 BenchmarkNumPasswordsGoroutines
 BenchmarkNumPasswordsGoroutines-16    	  217981	      5599 ns/op
- */
+*/
