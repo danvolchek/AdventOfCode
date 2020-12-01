@@ -28,7 +28,7 @@ goos: windows
 goarch: amd64
 pkg: github.com/danvolchek/AdventOfCode/2019/4/final/1
 BenchmarkNumPasswords
-BenchmarkNumPasswords-16              	  193372	      6041 ns/op
+BenchmarkNumPasswords-16              	  428180	      2709 ns/op
 BenchmarkNumPasswordsGoroutines
-BenchmarkNumPasswordsGoroutines-16    	  146208	      8513 ns/op
+BenchmarkNumPasswordsGoroutines-16    	  217981	      5599 ns/op
  */

@@ -47,7 +47,43 @@ func digits(val int) []int {
 }
 
 // modifies digs to represent the next value after the one digs represents which still has all digits non-decreasing
-func increment(digs []int) {
+// faster, but requires the input to already be non-decreasing
+func incrementFast(digs []int) {
+	if digs[5] != 9 {
+		digs[5] +=1
+	} else if digs[4] != 9 {
+		digs[4] += 1
+		digs[5] = digs[4]
+	}else if digs[3] != 9 {
+		digs[3] += 1
+		digs[4] = digs[3]
+		digs[5] = digs[3]
+	}else if digs[2] != 9 {
+		digs[2] += 1
+		digs[3] = digs[2]
+		digs[4] = digs[2]
+		digs[5] = digs[2]
+	}else if digs[1] != 9 {
+		digs[1] += 1
+		digs[2] = digs[1]
+		digs[3] = digs[1]
+		digs[4] = digs[1]
+		digs[5] = digs[1]
+	}else if digs[0] != 9 {
+		digs[0] += 1
+		digs[1] = digs[0]
+		digs[2] = digs[0]
+		digs[3] = digs[0]
+		digs[4] = digs[0]
+		digs[5] = digs[0]
+	} else {
+		panic("can't increment 999999")
+	}
+}
+
+// modifies digs to represent the next value after the one digs represents which still has all digits non-decreasing
+// slower, but has no preconditions on the input
+func incrementSlow(digs []int) {
 	// increase by 1
 	for i := 5; i >= 0; i-- {
 		digs[i] += 1
@@ -90,7 +126,7 @@ func NumPasswords(min, max int) int {
 
 	// start with digits that meet the non-decreasing rule
 	digs := digits(min - 1)
-	increment(digs)
+	incrementSlow(digs)
 
 	// check range rule
 	for isLessThanOrEqual(digs, maxDigs) {
@@ -109,7 +145,7 @@ func NumPasswords(min, max int) int {
 		}
 
 		// get next non-decreasing rule following number
-		increment(digs)
+		incrementFast(digs)
 	}
 
 	return result
