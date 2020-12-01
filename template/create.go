@@ -59,7 +59,7 @@ func create() error {
 
 	tmpl, err := loadTemplate(path.Join(templateDirectory, templateFileName))
 	if err != nil {
-		return err
+		return fmt.Errorf("couldn't load template: %s", err)
 	}
 
 	stubsWriter := &multiWriteCloser{}
@@ -68,9 +68,10 @@ func create() error {
 	for _, solutionType := range solutionTypes {
 		for _, puzzleType := range puzzleTypes {
 			stubDir := path.Join(solutionFolder, solutionType, puzzleType)
-			stubFile, err := createStubFile(stubDir, templateFileName)
+
+			stubFile, err := createFileAndDirectories(stubDir, templateFileName)
 			if err != nil {
-				return fmt.Errorf("couldn't create stub %s: %s", path.Join(stubDir, templateFileName), err)
+				return fmt.Errorf("couldn't create stub file %s: %s", path.Join(stubDir, templateFileName), err)
 			}
 
 			stubsWriter.Add(stubFile)
@@ -141,26 +142,26 @@ func exists(path string) (bool, error) {
 func loadTemplate(path string) (*template.Template, error) {
 	contents, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't read stub template: %s", err)
+		return nil, fmt.Errorf("couldn't read template file: %s", err)
 	}
 
 	tmpl, err := template.New("main").Parse(string(contents))
 	if err != nil {
-		return nil, fmt.Errorf("couldn't parse stub template: %s", err)
+		return nil, fmt.Errorf("couldn't parse template: %s", err)
 	}
 
 	return tmpl, nil
 }
 
-func createStubFile(stubDir string, stub string) (*os.File, error) {
-	err := os.MkdirAll(stubDir, os.ModePerm)
+func createFileAndDirectories(parent string, child string) (*os.File, error) {
+	err := os.MkdirAll(parent, os.ModePerm)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't make folder for stub: %s", err)
+		return nil, fmt.Errorf("couldn't make directories: %s", err)
 	}
 
-	file, err := os.Create(path.Join(stubDir, stub))
+	file, err := os.Create(path.Join(parent, child))
 	if err != nil {
-		return nil, fmt.Errorf("couldn't create stub file: %s", err)
+		return nil, fmt.Errorf("couldn't create file: %s", err)
 	}
 
 	return file, nil
