@@ -93,8 +93,8 @@ type args struct {
 func parseArgs() (args, error) {
 	var parsed args
 
-	flag.StringVar(&parsed.Year, "Year", "", "the year to add")
-	flag.StringVar(&parsed.Day, "Day", "", "the day to add")
+	flag.StringVar(&parsed.Year, "year", "", "the year to add")
+	flag.StringVar(&parsed.Day, "day", "", "the day to add")
 	flag.Parse()
 
 	if parsed.Year == "" {
