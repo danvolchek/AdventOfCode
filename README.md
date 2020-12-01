@@ -26,6 +26,8 @@ Solution files are self-contained so there's some duplication between the first 
 
 Set your working directory to the root folder, i.e. `AdventOfCode`, before running the solutions.
 
+There's also a `template` folder which contains a script to create new day folders.
+
 # Status
 
 ## 2019
@@ -40,4 +42,4 @@ Set your working directory to the root folder, i.e. `AdventOfCode`, before runni
 |         | 1                                                           | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 |
 |---------|-------------------------------------------------------------|---|---|---|---|---|---|---|---|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
 | initial | [1](2020/1/initial/1/main.go),[2](2020/1/initial/2/main.go) |   |   |   |   |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
-| final   | [1](2020/1/clean/1/main.go),[2](2020/1/clean/2/main.go) |   |   |   |   |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
+| final   | [1](2020/1/clean/1/main.go),[2](2020/1/clean/2/main.go)     |   |   |   |   |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
