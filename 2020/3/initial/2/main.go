@@ -20,7 +20,7 @@ func solve(r io.Reader) {
 }
 
 func main() {
-	input, err := os.Open(path.Join("{{.Year}}", "{{.Day}}", "input.txt"))
+	input, err := os.Open(path.Join("2020", "3", "input.txt"))
 	if err != nil {
 		panic(err)
 	}
