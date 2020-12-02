@@ -157,39 +157,6 @@ func NumPasswords(min, max int) int {
 	return result
 }
 
-// splits the work to solve the puzzle into chunks and spawns goroutines to solve each one
-func NumPasswordsGoroutines(min, max, numGoroutines int) int {
-	results := make(chan int, numGoroutines)
-	step := (max - min) / numGoroutines
-
-	for {
-		// create max
-		newMax := min + step
-		if newMax > max {
-			newMax = max
-		}
-
-		// start goroutine
-		go func(a, b int) {
-			results <- NumPasswords(a, b)
-		}(min, newMax)
-
-		// set new min and check to exit
-		min = newMax + 1
-		if min > max {
-			break
-		}
-	}
-
-	// aggregate results
-	sum := 0
-	for i := 0; i < numGoroutines; i++ {
-		sum += <-results
-	}
-
-	return sum
-}
-
 func main() {
 	fmt.Printf("%v\n", digits(123456))
 
@@ -204,5 +171,4 @@ func main() {
 	min, max := Parse()
 
 	fmt.Println(NumPasswords(min, max))
-	fmt.Println(NumPasswordsGoroutines(min, max, 2))
 }
