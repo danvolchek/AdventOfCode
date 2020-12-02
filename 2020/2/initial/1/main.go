@@ -12,8 +12,8 @@ import (
 
 type thingy struct {
 	min, max int
-	char uint8
-	pass string
+	char     uint8
+	pass     string
 }
 
 func parse(r io.Reader) {
@@ -68,7 +68,7 @@ func parse(r io.Reader) {
 
 func count(char uint8, pass string) int {
 	num := 0
-	for i := 0; i < len(pass); i++{
+	for i := 0; i < len(pass); i++ {
 		if pass[i] == char {
 			num++
 		}

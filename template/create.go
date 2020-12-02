@@ -13,16 +13,16 @@ import (
 )
 
 const (
-	solutionTypeInitial = "initial"
-	solutionTypeOptimized   = "optimized"
-	puzzleTypeFirst     = "1"
-	puzzleTypeSecond    = "2"
+	solutionTypeInitial   = "initial"
+	solutionTypeOptimized = "optimized"
+	puzzleTypeFirst       = "1"
+	puzzleTypeSecond      = "2"
 
 	inputFileName = "input.txt"
 
 	templateDirectory = "template"
 	templateStubName  = "main.txt"
-	stubTargetName  = "main.go"
+	stubTargetName    = "main.go"
 )
 
 var (

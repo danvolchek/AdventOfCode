@@ -12,8 +12,8 @@ import (
 
 type thingy struct {
 	min, max int
-	char uint8
-	pass string
+	char     uint8
+	pass     string
 }
 
 func parse(r io.Reader) {
@@ -55,9 +55,8 @@ func parse(r io.Reader) {
 
 		t.pass = strings.TrimSpace(row[1])
 
-
-		a := t.pass[t.min - 1] == t.char
-		b := t.pass[t.max - 1] == t.char
+		a := t.pass[t.min-1] == t.char
+		b := t.pass[t.max-1] == t.char
 
 		if a && !b || b && !a {
 			matching++

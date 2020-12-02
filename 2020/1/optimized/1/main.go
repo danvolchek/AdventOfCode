@@ -35,7 +35,7 @@ func findEntries(expenses map[int]bool) int {
 	const target = 2020
 
 	for expense := range expenses {
-		if _, ok := expenses[target - expense]; ok {
+		if _, ok := expenses[target-expense]; ok {
 			return expense * (target - expense)
 		}
 	}
