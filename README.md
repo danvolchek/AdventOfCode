@@ -25,9 +25,9 @@ Where:
 
 ## Notes
 
-Solution files are self-contained so there's some duplication between the first and second solution files.
+Each solution is self-contained so there's intentional duplication between the initial/optimized first/second solution files.
 
-Set your working directory to the root folder, i.e. `AdventOfCode`, before running the solutions.
+Set your working directory to the root folder, i.e. `AdventOfCode`, before running a solution.
 
 There's also a `template` folder which contains a script to create new day folders.
 
