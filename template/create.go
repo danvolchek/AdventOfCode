@@ -21,7 +21,8 @@ const (
 	inputFileName = "input.txt"
 
 	templateDirectory = "template"
-	templateFileName  = "main.go"
+	templateStubName  = "main.txt"
+	stubTargetName  = "main.go"
 )
 
 var (
@@ -57,7 +58,7 @@ func create() error {
 		return fmt.Errorf("couldn't create input file: %s", err)
 	}
 
-	tmpl, err := loadTemplate(path.Join(templateDirectory, templateFileName))
+	tmpl, err := loadTemplate(path.Join(templateDirectory, templateStubName))
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %s", err)
 	}
@@ -69,9 +70,9 @@ func create() error {
 		for _, puzzleType := range puzzleTypes {
 			stubDir := path.Join(solutionFolder, solutionType, puzzleType)
 
-			stubFile, err := createFileAndDirectories(stubDir, templateFileName)
+			stubFile, err := createFileAndDirectories(stubDir, stubTargetName)
 			if err != nil {
-				return fmt.Errorf("couldn't create stub file %s: %s", path.Join(stubDir, templateFileName), err)
+				return fmt.Errorf("couldn't create stub file %s: %s", path.Join(stubDir, stubTargetName), err)
 			}
 
 			stubsWriter.Add(stubFile)

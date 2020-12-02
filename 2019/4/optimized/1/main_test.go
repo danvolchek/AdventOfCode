@@ -1,7 +1,7 @@
 package main_test
 
 import (
-	main "github.com/danvolchek/AdventOfCode/2019/4/clean/1"
+	main "github.com/danvolchek/AdventOfCode/2019/4/optimized/1"
 	"testing"
 )
 
@@ -26,7 +26,7 @@ func BenchmarkNumPasswordsGoroutines(b *testing.B) {
 /*
 goos: windows
 goarch: amd64
-pkg: github.com/danvolchek/AdventOfCode/2019/4/clean/1
+pkg: github.com/danvolchek/AdventOfCode/2019/4/optimized/1
 BenchmarkNumPasswords
 BenchmarkNumPasswords-16              	  428180	      2709 ns/op
 BenchmarkNumPasswordsGoroutines
