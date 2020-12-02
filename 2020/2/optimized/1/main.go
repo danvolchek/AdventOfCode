@@ -18,7 +18,7 @@ type dbEntry struct {
 
 type policy struct {
 	min, max int
-	char     uint8
+	char     byte
 }
 
 const (
