@@ -8,7 +8,6 @@ import (
 	"strconv"
 )
 
-// parse input
 func Parse() (int, int) {
 	input, err := os.Open(path.Join("2019", "4", "input.txt"))
 	if err != nil {

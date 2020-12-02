@@ -31,12 +31,16 @@ func parse(r io.Reader) map[int]bool {
 
 }
 
+// solves the puzzle
 func findEntries(expenses map[int]bool) int {
 	const target = 2020
 
 	for expense := range expenses {
-		if _, ok := expenses[target-expense]; ok {
-			return expense * (target - expense)
+		// look for whether the other needed value exists
+		needed := target - expense
+
+		if _, ok := expenses[needed]; ok {
+			return expense * (needed)
 		}
 	}
 
