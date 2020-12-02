@@ -14,7 +14,7 @@ import (
 
 const (
 	solutionTypeInitial = "initial"
-	solutionTypeClean   = "clean"
+	solutionTypeOptimized   = "optimized"
 	puzzleTypeFirst     = "1"
 	puzzleTypeSecond    = "2"
 
@@ -26,7 +26,7 @@ const (
 )
 
 var (
-	solutionTypes = []string{solutionTypeInitial, solutionTypeClean}
+	solutionTypes = []string{solutionTypeInitial, solutionTypeOptimized}
 	puzzleTypes   = []string{puzzleTypeFirst, puzzleTypeSecond}
 )
 
