@@ -33,7 +33,7 @@ func parse(r io.Reader) []dbEntry {
 		panic(err)
 	}
 
-	rows := bytes.Split(bytes.TrimSpace(raw), []byte("\r\n"))
+	rows := bytes.Split(bytes.TrimSpace(raw), []byte{'\r', '\n'})
 	dbEntries := make([]dbEntry, len(rows))
 
 	for i, row := range rows {
@@ -51,8 +51,8 @@ func parse(r io.Reader) []dbEntry {
 
 		dbEntries[i] = dbEntry{
 			policy: policy{
-				min: min,
-				max: max,
+				min:  min,
+				max:  max,
 				char: result[3][0],
 			},
 			password: string(result[4]),

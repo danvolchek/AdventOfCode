@@ -1,25 +1,26 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 	"strconv"
+	"strings"
 )
 
 func parse(r io.Reader) map[int]bool {
-	csvReader := csv.NewReader(r)
-
-	rows, err := csvReader.ReadAll()
+	raw, err := ioutil.ReadAll(r)
 	if err != nil {
 		panic(err)
 	}
 
-	expenses := make(map[int]bool, len(rows))
-	for _, row := range rows {
-		expense, err := strconv.Atoi(row[0])
+	rawExpenses := strings.Split(strings.TrimSpace(string(raw)), "\r\n")
+
+	expenses := make(map[int]bool, len(rawExpenses))
+	for _, row := range rawExpenses {
+		expense, err := strconv.Atoi(row)
 		if err != nil {
 			panic(err)
 		}
@@ -40,7 +41,7 @@ func findEntries(expenses map[int]bool) int {
 
 		for expense2 := range expenses {
 			// look for whether the other needed value exists
-			needed := newTarget-expense2
+			needed := newTarget - expense2
 
 			if _, ok := expenses[needed]; ok {
 				return expense * expense2 * needed
