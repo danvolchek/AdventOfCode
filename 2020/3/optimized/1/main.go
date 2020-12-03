@@ -33,13 +33,14 @@ func parse(r io.Reader) [][]bool {
 func findTrees(geology [][]bool) int {
 	trees := 0
 	col := 0
+	numCols := len(geology[0])
 
 	for row := 0; row < len(geology); row++ {
-		if geology[row][col%len(geology[row])] {
+		if geology[row][col] {
 			trees += 1
 		}
 
-		col += 3
+		col = (col + 3) % numCols
 	}
 
 	return trees
