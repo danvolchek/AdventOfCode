@@ -1,22 +1,46 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 )
 
 func solve(r io.Reader) {
-	csvReader := csv.NewReader(r)
-
-	rows, err := csvReader.ReadAll()
+	raw, err := ioutil.ReadAll(r)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(rows)
+	rows := strings.Split(string(raw), "\r\n")
+
+	valid := 0
+
+	curr := make(map[string]bool)
+
+	for _, row := range rows {
+		if len(row) == 0 {
+			_, hasCid := curr["cid"]
+			if len(curr) == 8 || (len(curr) == 7 && !hasCid) {
+				valid += 1
+			}
+
+			curr = make(map[string]bool)
+			continue
+		}
+
+		items := strings.Split(row, " ")
+		for _, item := range items {
+			parts := strings.Split(item, ":")
+
+			curr[parts[0]] = true
+		}
+	}
+
+	fmt.Println(valid)
 }
 
 func main() {
