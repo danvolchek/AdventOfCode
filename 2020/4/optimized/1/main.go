@@ -1,22 +1,78 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
+	"strings"
 )
 
-func parse(r io.Reader) {
-	csvReader := csv.NewReader(r)
+const (
+	CountryID = "cid"
+)
 
-	rows, err := csvReader.ReadAll()
+type passport struct {
+	fields map[string]bool
+}
+
+func newPassport() passport {
+	return passport{
+		fields: make(map[string]bool),
+	}
+}
+
+func (p passport) AddField(name string) {
+	p.fields[name] = true
+}
+
+func (p passport) IsValid() bool {
+	_, hasCid := p.fields[CountryID]
+	return len(p.fields) == 8 || (len(p.fields) == 7 && !hasCid)
+}
+
+func parse(r io.Reader) []passport {
+	raw, err := ioutil.ReadAll(r)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(rows)
+	rows := strings.Split(string(raw), "\r\n")
+
+	var passports []passport
+
+	currentPassport := newPassport()
+
+	for _, row := range rows {
+		if len(row) == 0 {
+			passports = append(passports, currentPassport)
+
+			currentPassport = newPassport()
+			continue
+		}
+
+		rawFields := strings.Split(row, " ")
+		for _, rawField := range rawFields {
+			rawFieldParts := strings.Split(rawField, ":")
+
+			currentPassport.AddField(rawFieldParts[0])
+		}
+	}
+
+	return passports
+}
+
+func getValidPassports(passports []passport) int {
+	valid := 0
+
+	for _, passport := range passports {
+		if passport.IsValid() {
+			valid += 1
+		}
+	}
+
+	return valid
 }
 
 func main() {
@@ -25,5 +81,5 @@ func main() {
 		panic(err)
 	}
 
-	parse(input)
+	fmt.Println(getValidPassports(parse(input)))
 }
