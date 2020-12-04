@@ -54,7 +54,7 @@ func findTreesInSlope(geology [][]bool, slope slope) int {
 	col := 0
 	numCols := len(geology[0])
 
-	for row := 0; row < len(geology); row+=slope.deltaY {
+	for row := 0; row < len(geology); row += slope.deltaY {
 		if geology[row][col] {
 			trees += 1
 		}
