@@ -44,12 +44,7 @@ type mapValidator struct {
 func (m mapValidator) IsValid(value string) bool {
 	key, newValue := m.keyFunc(value)
 
-	validator, ok := m.validators[key]
-	if !ok {
-		return false
-	}
-
-	return validator.IsValid(newValue)
+	return m.validators[key].IsValid(newValue)
 }
 
 type regexValidator struct {
@@ -109,7 +104,7 @@ var validatorForField = map[string]fieldValueValidator{
 			max: 2002,
 		},
 	},
-	IssueYear: &andValidator{
+	IssueYear: andValidator{
 		a: lengthValidator{
 			length: 4,
 		},
@@ -127,24 +122,25 @@ var validatorForField = map[string]fieldValueValidator{
 			max: 2030,
 		},
 	},
-	Height: mapValidator{
-		keyFunc: func(value string) (string, string) {
-			if len(value) <= 2 {
-				return "", ""
-			}
-
-			num, unit := value[:len(value)-2], value[len(value)-2:]
-
-			return unit, num
+	Height: andValidator{
+		a: regexValidator{
+			reg: regexp.MustCompile(`^\d+(cm|in)$`),
 		},
-		validators: map[string]fieldValueValidator{
-			"cm": integerValidator{
-				min: 150,
-				max: 193,
+		b: mapValidator{
+			keyFunc: func(value string) (string, string) {
+				num, unit := value[:len(value)-2], value[len(value)-2:]
+
+				return unit, num
 			},
-			"in": integerValidator{
-				min: 59,
-				max: 76,
+			validators: map[string]fieldValueValidator{
+				"cm": integerValidator{
+					min: 150,
+					max: 193,
+				},
+				"in": integerValidator{
+					min: 59,
+					max: 76,
+				},
 			},
 		},
 	},
