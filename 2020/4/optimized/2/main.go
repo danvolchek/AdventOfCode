@@ -15,19 +15,19 @@ type fieldValueValidator interface {
 	IsValid(value string) bool
 }
 
-type lengthValidator struct {
+type length struct {
 	length int
 }
 
-func (l lengthValidator) IsValid(value string) bool {
+func (l length) IsValid(value string) bool {
 	return len(value) == l.length
 }
 
-type integerValidator struct {
+type between struct {
 	min, max int
 }
 
-func (i integerValidator) IsValid(value string) bool {
+func (i between) IsValid(value string) bool {
 	intVal, err := strconv.Atoi(value)
 	if err != nil {
 		return false
@@ -36,30 +36,30 @@ func (i integerValidator) IsValid(value string) bool {
 	return intVal >= i.min && intVal <= i.max
 }
 
-type mapValidator struct {
-	keyFunc    func(value string) (string, string)
-	validators map[string]fieldValueValidator
+type conditional struct {
+	keyFunc       func(value string) (string, string)
+	keyValidators map[string]fieldValueValidator
 }
 
-func (m mapValidator) IsValid(value string) bool {
+func (m conditional) IsValid(value string) bool {
 	key, newValue := m.keyFunc(value)
 
-	return m.validators[key].IsValid(newValue)
+	return m.keyValidators[key].IsValid(newValue)
 }
 
-type regexValidator struct {
+type matches struct {
 	reg *regexp.Regexp
 }
 
-func (r regexValidator) IsValid(value string) bool {
+func (r matches) IsValid(value string) bool {
 	return r.reg.MatchString(value)
 }
 
-type oneOfValidator struct {
+type oneOf struct {
 	values []string
 }
 
-func (o oneOfValidator) IsValid(value string) bool {
+func (o oneOf) IsValid(value string) bool {
 	for _, allowed := range o.values {
 		if allowed == value {
 			return true
@@ -69,18 +69,18 @@ func (o oneOfValidator) IsValid(value string) bool {
 	return false
 }
 
-type alwaysValidValidator struct{}
+type alwaysValid struct{}
 
-func (a alwaysValidValidator) IsValid(_ string) bool {
+func (a alwaysValid) IsValid(_ string) bool {
 	return true
 }
 
-type andValidator struct {
-	a, b fieldValueValidator
+type both struct {
+	first, second fieldValueValidator
 }
 
-func (s andValidator) IsValid(value string) bool {
-	return s.a.IsValid(value) && s.b.IsValid(value)
+func (s both) IsValid(value string) bool {
+	return s.first.IsValid(value) && s.second.IsValid(value)
 }
 
 const (
@@ -95,65 +95,36 @@ const (
 )
 
 var validatorForField = map[string]fieldValueValidator{
-	BirthYear: andValidator{
-		a: lengthValidator{
-			length: 4,
-		},
-		b: integerValidator{
-			min: 1920,
-			max: 2002,
-		},
+	BirthYear: both{
+		first:  length{4},
+		second: between{min: 1920, max: 2002},
 	},
-	IssueYear: andValidator{
-		a: lengthValidator{
-			length: 4,
-		},
-		b: integerValidator{
-			min: 2010,
-			max: 2020,
-		},
+	IssueYear: both{
+		first:  length{4},
+		second: between{min: 2010, max: 2020},
 	},
-	ExpirationYear: andValidator{
-		a: lengthValidator{
-			length: 4,
-		},
-		b: integerValidator{
-			min: 2020,
-			max: 2030,
-		},
+	ExpirationYear: both{
+		first:  length{4},
+		second: between{min: 2020, max: 2030},
 	},
-	Height: andValidator{
-		a: regexValidator{
-			reg: regexp.MustCompile(`^\d+(cm|in)$`),
-		},
-		b: mapValidator{
+	Height: both{
+		first: matches{regexp.MustCompile(`^\d+(cm|in)$`)},
+		second: conditional{
 			keyFunc: func(value string) (string, string) {
 				num, unit := value[:len(value)-2], value[len(value)-2:]
 
 				return unit, num
 			},
-			validators: map[string]fieldValueValidator{
-				"cm": integerValidator{
-					min: 150,
-					max: 193,
-				},
-				"in": integerValidator{
-					min: 59,
-					max: 76,
-				},
+			keyValidators: map[string]fieldValueValidator{
+				"cm": between{min: 150, max: 193},
+				"in": between{min: 59, max: 76},
 			},
 		},
 	},
-	HairColor: regexValidator{
-		reg: regexp.MustCompile(`^#[0-9a-f]{6}$`),
-	},
-	EyeColor: oneOfValidator{
-		values: []string{"amb", "blu", "brn", "gry", "grn", "hzl", "oth"},
-	},
-	PassportID: regexValidator{
-		reg: regexp.MustCompile(`^\d{9}$`),
-	},
-	CountryID: alwaysValidValidator{},
+	HairColor:  matches{regexp.MustCompile(`^#[0-9a-f]{6}$`)},
+	EyeColor:   oneOf{[]string{"amb", "blu", "brn", "gry", "grn", "hzl", "oth"}},
+	PassportID: matches{regexp.MustCompile(`^\d{9}$`)},
+	CountryID:  alwaysValid{},
 }
 
 type passport struct {
