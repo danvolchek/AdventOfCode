@@ -21,7 +21,7 @@ This repo contains my solutions to the [Advent of Code](https://adventofcode.com
 | `year`      | The year the puzzle was released.                                                                                          |
 | `day`       | The day the puzzle was released.                                                                                           |
 | `initial`   | My first attempt at solving the puzzle; usually as quickly as possible (in real time) to get on leaderboards.              |
-| `optimized` | The end result of optimizing the solution (for readability, and usually time/space complexity) and may include benchmarks. |
+| `optimized` | The end result of optimizing the solution. Primarily for readability, secondarily for time/space complexity.               |
 | `1`         | The first part of the puzzle.                                                                                              |
 | `2`         | The second part of the puzzle.                                                                                             |
 |`template`   | Contains a script to generate new day folders.                                                                             |
@@ -31,18 +31,11 @@ This repo contains my solutions to the [Advent of Code](https://adventofcode.com
 
 ## Running
 
-Set your working directory to the root folder, i.e. `AdventOfCode`, before running a solution or benchmark.
+Set your working directory to the root folder, i.e. `AdventOfCode`, before running a solution.
 
 ## Organization
 
 Each solution is self-contained so there's intentional duplication between the initial/optimized first/second solution files.
-
-## Benchmarks
-
-  - Benchmarks exclude the time to load and parse the input because I don't find that particularly interesting.
-    - This usually means early day puzzles (which are usually parsing focused) run very fast.
-  - The benchmarks measure time/space complexity, but not all solutions have been optimized for time and space complexity.
-  - The benchmarks exist mainly because they're fun to look at, not to measure solution quality.
 
 # Completion
 
