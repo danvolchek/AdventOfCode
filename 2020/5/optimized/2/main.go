@@ -9,57 +9,25 @@ import (
 	"path"
 )
 
-type boardingPass struct {
-	row []bool
-	col []bool
-}
+func decode(encoded []byte) int {
+	decoded := 0
 
-func (b boardingPass) id() int {
-	return decode(b.row)*8 + decode(b.col)
-}
-
-func decode(indicator []bool) int {
-	value := 0
-	step := 1 << (len(indicator) - 1)
-
-	for _, frontHalf := range indicator {
-		if !frontHalf {
-			value += step
+	for i := 0; i < len(encoded); i++ {
+		if encoded[i] == 'B' || encoded[i] == 'R' {
+			decoded |= 1 << (len(encoded) - i - 1)
 		}
-
-		step /= 2
 	}
 
-	return value
+	return decoded
 }
 
-func elementsMatch(input []byte, target byte) []bool {
-	result := make([]bool, len(input))
-
-	for i := 0; i < len(input); i++ {
-		result[i] = input[i] == target
-	}
-
-	return result
-}
-
-func parse(r io.Reader) []boardingPass {
+func parse(r io.Reader) [][]byte {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
 		panic(err)
 	}
 
-	rows := bytes.Split(bytes.TrimSpace(raw), []byte{'\r', '\n'})
-
-	boardingPasses := make([]boardingPass, len(rows))
-	for i, row := range rows {
-		boardingPasses[i] = boardingPass{
-			row: elementsMatch(row[:7], 'F'),
-			col: elementsMatch(row[7:], 'L'),
-		}
-	}
-
-	return boardingPasses
+	return bytes.Split(bytes.TrimSpace(raw), []byte{'\r', '\n'})
 }
 
 func contains(m map[int]bool, val int) bool {
@@ -67,11 +35,11 @@ func contains(m map[int]bool, val int) bool {
 	return ok
 }
 
-func solve(boardingPasses []boardingPass) int {
+func solve(boardingPasses [][]byte) int {
 	ids := make(map[int]bool, len(boardingPasses))
 
 	for _, boardingPass := range boardingPasses {
-		ids[boardingPass.id()] = true
+		ids[decode(boardingPass)] = true
 	}
 
 	for i := range ids {
