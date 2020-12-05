@@ -13,11 +13,6 @@ import (
 )
 
 const (
-	solutionTypeInitial   = "initial"
-	solutionTypeOptimized = "optimized"
-	puzzleTypeFirst       = "1"
-	puzzleTypeSecond      = "2"
-
 	inputFileName = "input.txt"
 
 	templateDirectory = "template"
@@ -26,8 +21,8 @@ const (
 )
 
 var (
-	solutionTypes = []string{solutionTypeInitial, solutionTypeOptimized}
-	puzzleTypes   = []string{puzzleTypeFirst, puzzleTypeSecond}
+	solutionTypes = []string{"naughty", "nice"}
+	puzzleParts   = []string{"1", "2"}
 )
 
 func main() {
@@ -67,7 +62,7 @@ func create() error {
 	defer warn(stubsWriter.Close)
 
 	for _, solutionType := range solutionTypes {
-		for _, puzzleType := range puzzleTypes {
+		for _, puzzleType := range puzzleParts {
 			stubDir := path.Join(solutionFolder, solutionType, puzzleType)
 
 			stubFile, err := createFileAndDirectories(stubDir, stubTargetName)

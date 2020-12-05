@@ -7,25 +7,24 @@ This repo contains my solutions to the [Advent of Code](https://adventofcode.com
 ```
 ┌───<year>
 │   └───<day>
-│       ├───initial
+│       ├───naughty
 │       │   ├───1
 │       │   └───2
-│       └───optimized
+│       └───nice
 │           ├───1
 │           └───2
 └───template
 ```
 
-| Directory   | Meaning                                                                                                                    |
-|-------------|----------------------------------------------------------------------------------------------------------------------------|
-| `year`      | The year the puzzle was released.                                                                                          |
-| `day`       | The day the puzzle was released.                                                                                           |
-| `initial`   | My first attempt at solving the puzzle; usually as quickly as possible (in real time) to get on leaderboards.              |
-| `optimized` | The end result of optimizing the solution. Primarily for readability, secondarily for time/space complexity.               |
-| `1`         | The first part of the puzzle.                                                                                              |
-| `2`         | The second part of the puzzle.                                                                                             |
-|`template`   | Contains a script to generate new day folders.                                                                             |
-
+| Directory  | Meaning                                                                                                       |
+|------------|---------------------------------------------------------------------------------------------------------------|
+| `year`     | The year the puzzle was released.                                                                             |
+| `day`      | The day the puzzle was released.                                                                              |
+| `naughty`  | My first attempt at solving the puzzle; usually as quickly as possible (in real time) to get on leaderboards. |
+| `nice`     | The end result of optimizing the solution. Primarily for readability, secondarily for time/space complexity.  |
+| `1`        | The first part of the puzzle.                                                                                 |
+| `2`        | The second part of the puzzle.                                                                                |
+| `template` | Contains a script to generate new day folders.                                                                |
 
 # Notes
 
@@ -37,18 +36,24 @@ Set your working directory to the root folder, i.e. `AdventOfCode`, before runni
 
 Each solution is self-contained so there's intentional duplication between the initial/optimized first/second solution files.
 
+## Naming
+
+The naughty and nice folders reference the Christmas song `Santa Claus Is Coming to Town`; AoC is also Christmas themed.
+ 
+The naughty solutions are hard to read and inefficient, hence naughty. The nice solutions read well and are efficient, hence nice. 
+
 # Completion
 
 ## 2020
 
-|           | 1                                                               | 2                                                               | 3                                                               | 4                                                               | 5                                                               | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 |
-|-----------|-----------------------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------------------------|---|---|---|---|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
-| initial   | [1](2020/1/initial/1/main.go),[2](2020/1/initial/2/main.go)     | [1](2020/2/initial/1/main.go),[2](2020/2/initial/2/main.go)     | [1](2020/3/initial/1/main.go),[2](2020/3/initial/2/main.go)     | [1](2020/4/initial/1/main.go),[2](2020/4/initial/2/main.go)     | [1](2020/5/initial/1/main.go),[2](2020/5/initial/2/main.go)     |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
-| optimized | [1](2020/1/optimized/1/main.go),[2](2020/1/optimized/2/main.go) | [1](2020/2/optimized/1/main.go),[2](2020/2/optimized/2/main.go) | [1](2020/3/optimized/1/main.go),[2](2020/3/optimized/2/main.go) | [1](2020/4/optimized/1/main.go),[2](2020/4/optimized/2/main.go) | [1](2020/5/optimized/1/main.go),[2](2020/5/optimized/2/main.go) |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
+|         | 1                                                           | 2                                                           | 3                                                           | 4                                                           | 5                                                           | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 |
+|---------|-------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------|---|---|---|---|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| naughty | [1](2020/1/naughty/1/main.go),[2](2020/1/naughty/2/main.go) | [1](2020/2/naughty/1/main.go),[2](2020/2/naughty/2/main.go) | [1](2020/3/naughty/1/main.go),[2](2020/3/naughty/2/main.go) | [1](2020/4/naughty/1/main.go),[2](2020/4/naughty/2/main.go) | [1](2020/5/naughty/1/main.go),[2](2020/5/naughty/2/main.go) |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
+| nice    | [1](2020/1/nice/1/main.go),[2](2020/1/nice/2/main.go)       | [1](2020/2/nice/1/main.go),[2](2020/2/nice/2/main.go)       | [1](2020/3/nice/1/main.go),[2](2020/3/nice/2/main.go)       | [1](2020/4/nice/1/main.go),[2](2020/4/nice/2/main.go)       | [1](2020/5/nice/1/main.go),[2](2020/5/nice/2/main.go)       |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
 
 ## 2019
 
-|           | 1                                                           | 2                                                           | 3                                                           | 4                                                               | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 |
-|-----------|-------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------|-----------------------------------------------------------------|---|---|---|---|---|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
-| initial   | [1](2019/1/initial/1/main.go),[2](2019/1/initial/2/main.go) | [1](2019/2/initial/1/main.go),[2](2019/2/initial/2/main.go) | [1](2019/3/initial/1/main.go),[2](2019/3/initial/2/main.go) | [1](2019/4/initial/1/main.go),[2](2019/4/initial/2/main.go)     |   |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
-| optimized |                                                             |                                                             |                                                             | [1](2019/4/optimized/1/main.go),[2](2019/4/optimized/2/main.go) |   |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
+|         | 1                                                           | 2                                                           | 3                                                           | 4                                                           | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 |
+|---------|-------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------|---|---|---|---|---|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| naughty | [1](2019/1/naughty/1/main.go),[2](2019/1/naughty/2/main.go) | [1](2019/2/naughty/1/main.go),[2](2019/2/naughty/2/main.go) | [1](2019/3/naughty/1/main.go),[2](2019/3/naughty/2/main.go) | [1](2019/4/naughty/1/main.go),[2](2019/4/naughty/2/main.go) |   |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
+| nice    |                                                             |                                                             |                                                             | [1](2019/4/nice/1/main.go),[2](2019/4/nice/2/main.go)       |   |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
