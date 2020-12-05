@@ -9,12 +9,12 @@ import (
 )
 
 func input() *os.File {
-    input, err := os.Open(path.Join("2020", "6", "input.txt"))
-    if err != nil {
-        panic(err)
-    }
+	input, err := os.Open(path.Join("2020", "6", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
 
-    return input
+	return input
 }
 
 func solve(r io.Reader) {
