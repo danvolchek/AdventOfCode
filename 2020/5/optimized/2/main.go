@@ -68,15 +68,19 @@ func contains(m map[int]bool, val int) bool {
 }
 
 func solve(boardingPasses []boardingPass) int {
-	ids := make(map[int]bool)
+	ids := make(map[int]bool, len(boardingPasses))
 
 	for _, boardingPass := range boardingPasses {
 		ids[boardingPass.id()] = true
 	}
 
-	for i := 0; i < 128*8; i++ {
-		if !contains(ids, i) && contains(ids, i-1) && contains(ids, i+1) {
-			return i
+	for i := range ids {
+		if !contains(ids, i-1) && contains(ids, i-2) {
+			return i - 1
+		}
+
+		if !contains(ids, i+1) && contains(ids, i+2) {
+			return i + 1
 		}
 	}
 
