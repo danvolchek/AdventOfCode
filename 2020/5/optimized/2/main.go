@@ -9,6 +9,24 @@ import (
 	"path"
 )
 
+func parseFile() [][]byte {
+	input, err := os.Open(path.Join("2020", "5", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return parse(input)
+}
+
+func parse(r io.Reader) [][]byte {
+	raw, err := ioutil.ReadAll(r)
+	if err != nil {
+		panic(err)
+	}
+
+	return bytes.Split(bytes.TrimSpace(raw), []byte{'\r', '\n'})
+}
+
 func decode(encoded []byte) int {
 	decoded := 0
 
@@ -19,15 +37,6 @@ func decode(encoded []byte) int {
 	}
 
 	return decoded
-}
-
-func parse(r io.Reader) [][]byte {
-	raw, err := ioutil.ReadAll(r)
-	if err != nil {
-		panic(err)
-	}
-
-	return bytes.Split(bytes.TrimSpace(raw), []byte{'\r', '\n'})
 }
 
 func contains(m map[int]bool, val int) bool {
@@ -56,10 +65,5 @@ func solve(boardingPasses [][]byte) int {
 }
 
 func main() {
-	input, err := os.Open(path.Join("2020", "5", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(solve(parse(input)))
+	fmt.Println(solve(parseFile()))
 }

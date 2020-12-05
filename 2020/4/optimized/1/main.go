@@ -13,25 +13,6 @@ const (
 	CountryID = "cid"
 )
 
-type passport struct {
-	fields map[string]bool
-}
-
-func newPassport() passport {
-	return passport{
-		fields: make(map[string]bool),
-	}
-}
-
-func (p passport) AddField(name string) {
-	p.fields[name] = true
-}
-
-func (p passport) IsValid() bool {
-	_, hasCid := p.fields[CountryID]
-	return len(p.fields) == 8 || (len(p.fields) == 7 && !hasCid)
-}
-
 func parse(r io.Reader) []passport {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -63,7 +44,35 @@ func parse(r io.Reader) []passport {
 	return passports
 }
 
-func getValidPassports(passports []passport) int {
+func parseFile() []passport {
+	input, err := os.Open(path.Join("2020", "4", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return parse(input)
+}
+
+type passport struct {
+	fields map[string]bool
+}
+
+func newPassport() passport {
+	return passport{
+		fields: make(map[string]bool),
+	}
+}
+
+func (p passport) AddField(name string) {
+	p.fields[name] = true
+}
+
+func (p passport) IsValid() bool {
+	_, hasCid := p.fields[CountryID]
+	return len(p.fields) == 8 || (len(p.fields) == 7 && !hasCid)
+}
+
+func solve(passports []passport) int {
 	valid := 0
 
 	for _, passport := range passports {
@@ -76,10 +85,5 @@ func getValidPassports(passports []passport) int {
 }
 
 func main() {
-	input, err := os.Open(path.Join("2020", "4", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(getValidPassports(parse(input)))
+	fmt.Println(solve(parseFile()))
 }

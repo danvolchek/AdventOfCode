@@ -3,34 +3,46 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"strconv"
 )
 
-func Parse() (int, int) {
+type intRange struct {
+	min, max int
+}
+
+func parseFile() intRange {
 	input, err := os.Open(path.Join("2019", "4", "input.txt"))
 	if err != nil {
 		panic(err)
 	}
-	csvReader := csv.NewReader(input)
+
+	return parse(input)
+}
+
+func parse(r io.Reader) intRange {
+	csvReader := csv.NewReader(r)
 
 	row, err := csvReader.Read()
 	if err != nil {
 		panic(err)
 	}
 
-	min, err := strconv.Atoi(row[0])
+	var ir intRange
+
+	ir.min, err = strconv.Atoi(row[0])
 	if err != nil {
 		panic(err)
 	}
 
-	max, err := strconv.Atoi(row[1])
+	ir.max, err = strconv.Atoi(row[1])
 	if err != nil {
 		panic(err)
 	}
 
-	return min, max
+	return ir
 }
 
 // returns the digits that make up value
@@ -118,13 +130,12 @@ func isLessThanOrEqual(a, b []int) bool {
 	return true
 }
 
-// solves the puzzle
-func NumPasswords(min, max int) int {
+func solve(ir intRange) int {
 	result := 0
-	maxDigs := digits(max)
+	maxDigs := digits(ir.max)
 
 	// start with digits that meet the non-decreasing rule
-	digs := digits(min - 1)
+	digs := digits(ir.min - 1)
 	incrementSlow(digs)
 
 	// check range rule
@@ -163,11 +174,9 @@ func main() {
 	//incrementFast(d)
 	//fmt.Println(d)
 
-	fmt.Println(NumPasswords(112233, 112233))
-	fmt.Println(NumPasswords(123444, 123444))
-	fmt.Println(NumPasswords(111122, 111122))
+	fmt.Println(solve(intRange{112233, 112233}))
+	fmt.Println(solve(intRange{123444, 123444}))
+	fmt.Println(solve(intRange{111122, 111122}))
 
-	min, max := Parse()
-
-	fmt.Println(NumPasswords(min, max))
+	fmt.Println(solve(parseFile()))
 }

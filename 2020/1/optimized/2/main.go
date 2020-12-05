@@ -32,8 +32,16 @@ func parse(r io.Reader) map[int]bool {
 
 }
 
-// solves the puzzle
-func findEntries(expenses map[int]bool) int {
+func parseFile() map[int]bool {
+	input, err := os.Open(path.Join("2020", "1", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return parse(input)
+}
+
+func solve(expenses map[int]bool) int {
 	const target = 2020
 
 	for expense := range expenses {
@@ -53,12 +61,5 @@ func findEntries(expenses map[int]bool) int {
 }
 
 func main() {
-	input, err := os.Open(path.Join("2020", "1", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	expenses := parse(input)
-
-	fmt.Println(findEntries(expenses))
+	fmt.Println(solve(parseFile()))
 }

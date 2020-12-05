@@ -11,6 +11,12 @@ import (
 	"strconv"
 )
 
+const (
+	rowEntryPattern = `(\d+)-(\d+) (.): (.+)`
+)
+
+var rowEntry = regexp.MustCompile(rowEntryPattern)
+
 type dbEntry struct {
 	policy   policy
 	password string
@@ -20,12 +26,6 @@ type policy struct {
 	min, max int
 	char     byte
 }
-
-const (
-	rowEntryPattern = `(\d+)-(\d+) (.): (.+)`
-)
-
-var rowEntry = regexp.MustCompile(rowEntryPattern)
 
 func parse(r io.Reader) []dbEntry {
 	raw, err := ioutil.ReadAll(r)
@@ -63,7 +63,16 @@ func parse(r io.Reader) []dbEntry {
 	return dbEntries
 }
 
-func getValidPasswords(dbEntries []dbEntry) int {
+func parseFile() []dbEntry {
+	input, err := os.Open(path.Join("2020", "2", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return parse(input)
+}
+
+func solve(dbEntries []dbEntry) int {
 	valid := 0
 
 	for _, dbEntry := range dbEntries {
@@ -88,12 +97,5 @@ func countOccurrences(needle byte, haystack string) int {
 }
 
 func main() {
-	input, err := os.Open(path.Join("2020", "2", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	entries := parse(input)
-
-	fmt.Println(getValidPasswords(entries))
+	fmt.Println(solve(parseFile()))
 }

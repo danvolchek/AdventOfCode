@@ -30,11 +30,20 @@ func parse(r io.Reader) [][]bool {
 	return geology
 }
 
+func parseFile() [][]bool {
+	input, err := os.Open(path.Join("2020", "3", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return parse(input)
+}
+
 type slope struct {
 	deltaX, deltaY int
 }
 
-func findTrees(geology [][]bool) int {
+func solve(geology [][]bool) int {
 	answer := 1
 
 	for _, slope := range []slope{
@@ -66,10 +75,5 @@ func findTreesInSlope(geology [][]bool, slope slope) int {
 }
 
 func main() {
-	input, err := os.Open(path.Join("2020", "3", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(findTrees(parse(input)))
+	fmt.Println(solve(parseFile()))
 }

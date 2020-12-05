@@ -63,7 +63,7 @@ func parse(r io.Reader) []dbEntry {
 	return dbEntries
 }
 
-func getValidPasswords(dbEntries []dbEntry) int {
+func solve(dbEntries []dbEntry) int {
 	valid := 0
 
 	for _, dbEntry := range dbEntries {
@@ -77,13 +77,15 @@ func getValidPasswords(dbEntries []dbEntry) int {
 	return valid
 }
 
-func main() {
+func parseFile() []dbEntry {
 	input, err := os.Open(path.Join("2020", "2", "input.txt"))
 	if err != nil {
 		panic(err)
 	}
 
-	entries := parse(input)
+	return parse(input)
+}
 
-	fmt.Println(getValidPasswords(entries))
+func main() {
+	fmt.Println(solve(parseFile()))
 }

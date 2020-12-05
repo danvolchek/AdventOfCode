@@ -11,6 +11,46 @@ import (
 	"strings"
 )
 
+func parse(r io.Reader) []passport {
+	raw, err := ioutil.ReadAll(r)
+	if err != nil {
+		panic(err)
+	}
+
+	rows := strings.Split(string(raw), "\r\n")
+
+	var passports []passport
+
+	currentPassport := newPassport()
+
+	for _, row := range rows {
+		if len(row) == 0 {
+			passports = append(passports, currentPassport)
+
+			currentPassport = newPassport()
+			continue
+		}
+
+		rawFields := strings.Split(row, " ")
+		for _, rawField := range rawFields {
+			rawFieldParts := strings.Split(rawField, ":")
+
+			currentPassport.AddField(rawFieldParts[0], rawFieldParts[1])
+		}
+	}
+
+	return passports
+}
+
+func parseFile() []passport {
+	input, err := os.Open(path.Join("2020", "4", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return parse(input)
+}
+
 type fieldValueValidator interface {
 	IsValid(value string) bool
 }
@@ -160,38 +200,7 @@ func (p passport) hasRequiredFields() bool {
 	return len(p.fields) == 8 || (len(p.fields) == 7 && !hasCid)
 }
 
-func parse(r io.Reader) []passport {
-	raw, err := ioutil.ReadAll(r)
-	if err != nil {
-		panic(err)
-	}
-
-	rows := strings.Split(string(raw), "\r\n")
-
-	var passports []passport
-
-	currentPassport := newPassport()
-
-	for _, row := range rows {
-		if len(row) == 0 {
-			passports = append(passports, currentPassport)
-
-			currentPassport = newPassport()
-			continue
-		}
-
-		rawFields := strings.Split(row, " ")
-		for _, rawField := range rawFields {
-			rawFieldParts := strings.Split(rawField, ":")
-
-			currentPassport.AddField(rawFieldParts[0], rawFieldParts[1])
-		}
-	}
-
-	return passports
-}
-
-func getValidPassports(passports []passport) int {
+func solve(passports []passport) int {
 	valid := 0
 
 	for _, passport := range passports {
@@ -204,10 +213,5 @@ func getValidPassports(passports []passport) int {
 }
 
 func main() {
-	input, err := os.Open(path.Join("2020", "4", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(getValidPassports(parse(input)))
+	fmt.Println(solve(parseFile()))
 }

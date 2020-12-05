@@ -30,7 +30,16 @@ func parse(r io.Reader) [][]bool {
 	return geology
 }
 
-func findTrees(geology [][]bool) int {
+func parseFile() [][]bool {
+	input, err := os.Open(path.Join("2020", "3", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return parse(input)
+}
+
+func solve(geology [][]bool) int {
 	trees := 0
 	col := 0
 	numCols := len(geology[0])
@@ -47,10 +56,5 @@ func findTrees(geology [][]bool) int {
 }
 
 func main() {
-	input, err := os.Open(path.Join("2020", "3", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(findTrees(parse(input)))
+	fmt.Println(solve(parseFile()))
 }

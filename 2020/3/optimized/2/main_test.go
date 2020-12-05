@@ -15,5 +15,5 @@ func BenchmarkSolution(b *testing.B) {
 
 /*
 BenchmarkSolution
-BenchmarkSolution-16              	  428180	      2709 ns/op
+BenchmarkSolution-16    	  249771	      4660 ns/op
 */

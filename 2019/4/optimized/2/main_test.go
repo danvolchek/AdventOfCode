@@ -1,23 +1,19 @@
-package main_test
+package main
 
 import (
-	main "github.com/danvolchek/AdventOfCode/2019/4/optimized/2"
 	"testing"
 )
 
-func BenchmarkNumPasswords(b *testing.B) {
-	min, max := main.Parse()
+func BenchmarkSolution(b *testing.B) {
+	input := parseFile()
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		main.NumPasswords(min, max)
+		solve(input)
 	}
 }
 
 /*
-goos: windows
-goarch: amd64
-pkg: github.com/danvolchek/AdventOfCode/2019/4/optimized/2
-BenchmarkNumPasswords
-BenchmarkNumPasswords-16              	  285454	      4081 ns/op
+BenchmarkSolution
+BenchmarkSolution-16              	  285454	      4081 ns/op
 */
