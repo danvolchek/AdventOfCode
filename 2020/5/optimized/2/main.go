@@ -15,7 +15,7 @@ type boardingPass struct {
 }
 
 func (b boardingPass) id() int {
-	return decode(b.row) * 8 + decode(b.col)
+	return decode(b.row)*8 + decode(b.col)
 }
 
 func decode(indicator []bool) int {
@@ -33,11 +33,10 @@ func decode(indicator []bool) int {
 	return value
 }
 
-
 func elementsMatch(input []byte, target byte) []bool {
 	result := make([]bool, len(input))
 
-	for i:= 0; i < len(input); i++ {
+	for i := 0; i < len(input); i++ {
 		result[i] = input[i] == target
 	}
 
@@ -75,8 +74,8 @@ func solve(boardingPasses []boardingPass) int {
 		ids[boardingPass.id()] = true
 	}
 
-	for i := 0; i < 128 * 8; i++ {
-		if !contains(ids, i) && contains(ids, i - 1) && contains(ids, i + 1) {
+	for i := 0; i < 128*8; i++ {
+		if !contains(ids, i) && contains(ids, i-1) && contains(ids, i+1) {
 			return i
 		}
 	}
