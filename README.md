@@ -5,15 +5,15 @@ This repo contains my solutions to the [Advent of Code](https://adventofcode.com
 # Format
 
 ```
-<year>
-└───<day>
-│   ├───initial
-│   │   ├───1
-│   │   └───2
-│   └───optimized
-│       ├───1
-│       └───2
-template
+┌───<year>
+│   └───<day>
+│       ├───initial
+│       │   ├───1
+│       │   └───2
+│       └───optimized
+│           ├───1
+│           └───2
+└───template
 ```
 
 | Directory   | Meaning                                                                                                                    |
