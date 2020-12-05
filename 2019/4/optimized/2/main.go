@@ -13,13 +13,13 @@ type intRange struct {
 	min, max int
 }
 
-func parseFile() intRange {
+func input() *os.File {
 	input, err := os.Open(path.Join("2019", "4", "input.txt"))
 	if err != nil {
 		panic(err)
 	}
 
-	return parse(input)
+	return input
 }
 
 func parse(r io.Reader) intRange {
@@ -178,5 +178,5 @@ func main() {
 	fmt.Println(solve(intRange{123444, 123444}))
 	fmt.Println(solve(intRange{111122, 111122}))
 
-	fmt.Println(solve(parseFile()))
+	fmt.Println(solve(parse(input())))
 }

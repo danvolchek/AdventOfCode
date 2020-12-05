@@ -11,6 +11,15 @@ import (
 	"strings"
 )
 
+func input() *os.File {
+	input, err := os.Open(path.Join("2020", "4", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return input
+}
+
 func parse(r io.Reader) []map[string]string {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -40,15 +49,6 @@ func parse(r io.Reader) []map[string]string {
 	}
 
 	return passports
-}
-
-func parseFile() []map[string]string {
-	input, err := os.Open(path.Join("2020", "4", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return parse(input)
 }
 
 type fieldValueValidator interface {
@@ -199,5 +199,5 @@ func solve(passports []map[string]string) int {
 }
 
 func main() {
-	fmt.Println(solve(parseFile()))
+	fmt.Println(solve(parse(input())))
 }

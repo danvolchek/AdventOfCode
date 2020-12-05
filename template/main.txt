@@ -8,6 +8,15 @@ import (
 	"path"
 )
 
+func input() *os.File {
+    input, err := os.Open(path.Join("{{.Year}}", "{{.Day}}", "input.txt"))
+    if err != nil {
+        panic(err)
+    }
+
+    return input
+}
+
 func solve(r io.Reader) {
 	csvReader := csv.NewReader(r)
 
@@ -20,10 +29,5 @@ func solve(r io.Reader) {
 }
 
 func main() {
-	input, err := os.Open(path.Join("{{.Year}}", "{{.Day}}", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	solve(input)
+	solve(input())
 }

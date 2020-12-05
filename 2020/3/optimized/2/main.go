@@ -9,6 +9,15 @@ import (
 	"path"
 )
 
+func input() *os.File {
+	input, err := os.Open(path.Join("2020", "3", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return input
+}
+
 func parse(r io.Reader) [][]bool {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -28,15 +37,6 @@ func parse(r io.Reader) [][]bool {
 	}
 
 	return geology
-}
-
-func parseFile() [][]bool {
-	input, err := os.Open(path.Join("2020", "3", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return parse(input)
 }
 
 type slope struct {
@@ -75,5 +75,5 @@ func findTreesInSlope(geology [][]bool, slope slope) int {
 }
 
 func main() {
-	fmt.Println(solve(parseFile()))
+	fmt.Println(solve(parse(input())))
 }

@@ -10,6 +10,15 @@ import (
 	"strings"
 )
 
+func input() *os.File {
+	input, err := os.Open(path.Join("2020", "1", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return input
+}
+
 func parse(r io.Reader) map[int]bool {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -31,15 +40,6 @@ func parse(r io.Reader) map[int]bool {
 	return expenses
 }
 
-func parseFile() map[int]bool {
-	input, err := os.Open(path.Join("2020", "1", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return parse(input)
-}
-
 func solve(expenses map[int]bool) int {
 	const target = 2020
 
@@ -56,5 +56,5 @@ func solve(expenses map[int]bool) int {
 }
 
 func main() {
-	fmt.Println(solve(parseFile()))
+	fmt.Println(solve(parse(input())))
 }

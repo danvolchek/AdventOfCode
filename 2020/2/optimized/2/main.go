@@ -27,6 +27,15 @@ const (
 
 var rowEntry = regexp.MustCompile(rowEntryPattern)
 
+func input() *os.File {
+	input, err := os.Open(path.Join("2020", "2", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return input
+}
+
 func parse(r io.Reader) []dbEntry {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -77,15 +86,6 @@ func solve(dbEntries []dbEntry) int {
 	return valid
 }
 
-func parseFile() []dbEntry {
-	input, err := os.Open(path.Join("2020", "2", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return parse(input)
-}
-
 func main() {
-	fmt.Println(solve(parseFile()))
+	fmt.Println(solve(parse(input())))
 }

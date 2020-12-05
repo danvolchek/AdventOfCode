@@ -27,6 +27,15 @@ type policy struct {
 	char     byte
 }
 
+func input() *os.File {
+	input, err := os.Open(path.Join("2020", "2", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return input
+}
+
 func parse(r io.Reader) []dbEntry {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -63,15 +72,6 @@ func parse(r io.Reader) []dbEntry {
 	return dbEntries
 }
 
-func parseFile() []dbEntry {
-	input, err := os.Open(path.Join("2020", "2", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return parse(input)
-}
-
 func solve(dbEntries []dbEntry) int {
 	valid := 0
 
@@ -97,5 +97,5 @@ func countOccurrences(needle byte, haystack string) int {
 }
 
 func main() {
-	fmt.Println(solve(parseFile()))
+	fmt.Println(solve(parse(input())))
 }

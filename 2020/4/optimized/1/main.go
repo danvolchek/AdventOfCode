@@ -13,6 +13,15 @@ const (
 	CountryID = "cid"
 )
 
+func input() *os.File {
+	input, err := os.Open(path.Join("2020", "4", "input.txt"))
+	if err != nil {
+		panic(err)
+	}
+
+	return input
+}
+
 func parse(r io.Reader) []map[string]bool {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -44,15 +53,6 @@ func parse(r io.Reader) []map[string]bool {
 	return passports
 }
 
-func parseFile() []map[string]bool {
-	input, err := os.Open(path.Join("2020", "4", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return parse(input)
-}
-
 func isValid(passport map[string]bool) bool {
 	_, hasCid := passport[CountryID]
 	return len(passport) == 8 || (len(passport) == 7 && !hasCid)
@@ -71,5 +71,5 @@ func solve(passports []map[string]bool) int {
 }
 
 func main() {
-	fmt.Println(solve(parseFile()))
+	fmt.Println(solve(parse(input())))
 }
