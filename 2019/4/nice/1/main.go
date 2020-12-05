@@ -9,10 +9,6 @@ import (
 	"strconv"
 )
 
-type intRange struct {
-	min, max int
-}
-
 func input() *os.File {
 	input, err := os.Open(path.Join("2019", "4", "input.txt"))
 	if err != nil {
@@ -22,7 +18,7 @@ func input() *os.File {
 	return input
 }
 
-func parse(r io.Reader) intRange {
+func parse(r io.Reader) (int, int) {
 	csvReader := csv.NewReader(r)
 
 	row, err := csvReader.Read()
@@ -30,19 +26,17 @@ func parse(r io.Reader) intRange {
 		panic(err)
 	}
 
-	var ir intRange
-
-	ir.min, err = strconv.Atoi(row[0])
+	min, err := strconv.Atoi(row[0])
 	if err != nil {
 		panic(err)
 	}
 
-	ir.max, err = strconv.Atoi(row[1])
+	max, err := strconv.Atoi(row[1])
 	if err != nil {
 		panic(err)
 	}
 
-	return ir
+	return min, max
 }
 
 // returns the digits that make up value
@@ -60,36 +54,19 @@ func digits(val int) []int {
 // modifies digs to represent the next value after the one digs represents which still has all digits non-decreasing
 // faster, but requires the input to already be non-decreasing
 func incrementFast(digs []int) {
-	if digs[5] != 9 {
-		digs[5] += 1
-	} else if digs[4] != 9 {
-		digs[4] += 1
-		digs[5] = digs[4]
-	} else if digs[3] != 9 {
-		digs[3] += 1
-		digs[4] = digs[3]
-		digs[5] = digs[3]
-	} else if digs[2] != 9 {
-		digs[2] += 1
-		digs[3] = digs[2]
-		digs[4] = digs[2]
-		digs[5] = digs[2]
-	} else if digs[1] != 9 {
-		digs[1] += 1
-		digs[2] = digs[1]
-		digs[3] = digs[1]
-		digs[4] = digs[1]
-		digs[5] = digs[1]
-	} else if digs[0] != 9 {
-		digs[0] += 1
-		digs[1] = digs[0]
-		digs[2] = digs[0]
-		digs[3] = digs[0]
-		digs[4] = digs[0]
-		digs[5] = digs[0]
-	} else {
-		panic("can't increment 999999")
+	for i := len(digs) - 1; i > -1; i-- {
+		if digs[i] != 9 {
+			digs[i] += 1
+
+			for j := i + 1; j < len(digs); j++ {
+				digs[j] = digs[i]
+			}
+
+			return
+		}
 	}
+
+	panic("can't increment 999999")
 }
 
 // modifies digs to represent the next value after the one digs represents which still has all digits non-decreasing
@@ -130,12 +107,12 @@ func isLessThanOrEqual(a, b []int) bool {
 	return true
 }
 
-func solve(ir intRange) int {
+func solve(min, max int) int {
 	result := 0
-	maxDigs := digits(ir.max)
+	maxDigs := digits(max)
 
 	// start with digits that meet the non-decreasing rule
-	digs := digits(ir.min - 1)
+	digs := digits(min - 1)
 	incrementSlow(digs)
 
 	// check range rule
@@ -164,9 +141,9 @@ func solve(ir intRange) int {
 func main() {
 	fmt.Printf("%v\n", digits(123456))
 
-	fmt.Println(solve(intRange{111111, 111111}))
-	fmt.Println(solve(intRange{223450, 223450}))
-	fmt.Println(solve(intRange{123789, 123789}))
+	fmt.Println(solve(111111, 111111))
+	fmt.Println(solve(223450, 223450))
+	fmt.Println(solve(123789, 123789))
 
 	fmt.Println(solve(parse(input())))
 }
