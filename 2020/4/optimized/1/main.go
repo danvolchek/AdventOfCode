@@ -13,7 +13,7 @@ const (
 	CountryID = "cid"
 )
 
-func parse(r io.Reader) []passport {
+func parse(r io.Reader) []map[string]bool {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
 		panic(err)
@@ -21,15 +21,15 @@ func parse(r io.Reader) []passport {
 
 	rows := strings.Split(string(raw), "\r\n")
 
-	var passports []passport
+	var passports []map[string]bool
 
-	currentPassport := newPassport()
+	currentPassport := make(map[string]bool)
 
 	for _, row := range rows {
 		if len(row) == 0 {
 			passports = append(passports, currentPassport)
 
-			currentPassport = newPassport()
+			currentPassport = make(map[string]bool)
 			continue
 		}
 
@@ -37,14 +37,14 @@ func parse(r io.Reader) []passport {
 		for _, rawField := range rawFields {
 			rawFieldParts := strings.Split(rawField, ":")
 
-			currentPassport.AddField(rawFieldParts[0])
+			currentPassport[rawFieldParts[0]] = true
 		}
 	}
 
 	return passports
 }
 
-func parseFile() []passport {
+func parseFile() []map[string]bool {
 	input, err := os.Open(path.Join("2020", "4", "input.txt"))
 	if err != nil {
 		panic(err)
@@ -53,30 +53,16 @@ func parseFile() []passport {
 	return parse(input)
 }
 
-type passport struct {
-	fields map[string]bool
+func isValid(passport map[string]bool) bool {
+	_, hasCid := passport[CountryID]
+	return len(passport) == 8 || (len(passport) == 7 && !hasCid)
 }
 
-func newPassport() passport {
-	return passport{
-		fields: make(map[string]bool),
-	}
-}
-
-func (p passport) AddField(name string) {
-	p.fields[name] = true
-}
-
-func (p passport) IsValid() bool {
-	_, hasCid := p.fields[CountryID]
-	return len(p.fields) == 8 || (len(p.fields) == 7 && !hasCid)
-}
-
-func solve(passports []passport) int {
+func solve(passports []map[string]bool) int {
 	valid := 0
 
 	for _, passport := range passports {
-		if passport.IsValid() {
+		if isValid(passport) {
 			valid += 1
 		}
 	}

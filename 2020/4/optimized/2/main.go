@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func parse(r io.Reader) []passport {
+func parse(r io.Reader) []map[string]string {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
 		panic(err)
@@ -19,15 +19,15 @@ func parse(r io.Reader) []passport {
 
 	rows := strings.Split(string(raw), "\r\n")
 
-	var passports []passport
+	var passports []map[string]string
 
-	currentPassport := newPassport()
+	currentPassport := make(map[string]string)
 
 	for _, row := range rows {
 		if len(row) == 0 {
 			passports = append(passports, currentPassport)
 
-			currentPassport = newPassport()
+			currentPassport = make(map[string]string)
 			continue
 		}
 
@@ -35,14 +35,14 @@ func parse(r io.Reader) []passport {
 		for _, rawField := range rawFields {
 			rawFieldParts := strings.Split(rawField, ":")
 
-			currentPassport.AddField(rawFieldParts[0], rawFieldParts[1])
+			currentPassport[rawFieldParts[0]] = rawFieldParts[1]
 		}
 	}
 
 	return passports
 }
 
-func parseFile() []passport {
+func parseFile() []map[string]string {
 	input, err := os.Open(path.Join("2020", "4", "input.txt"))
 	if err != nil {
 		panic(err)
@@ -167,26 +167,12 @@ var validatorForField = map[string]fieldValueValidator{
 	CountryID:  alwaysValid{},
 }
 
-type passport struct {
-	fields map[string]string
-}
-
-func newPassport() passport {
-	return passport{
-		fields: make(map[string]string),
-	}
-}
-
-func (p passport) AddField(name, value string) {
-	p.fields[name] = value
-}
-
-func (p passport) IsValid() bool {
-	if !p.hasRequiredFields() {
+func isValid(passport map[string]string) bool {
+	if !hasRequiredFields(passport) {
 		return false
 	}
 
-	for fieldName, fieldValue := range p.fields {
+	for fieldName, fieldValue := range passport {
 		if !validatorForField[fieldName].IsValid(fieldValue) {
 			return false
 		}
@@ -195,16 +181,16 @@ func (p passport) IsValid() bool {
 	return true
 }
 
-func (p passport) hasRequiredFields() bool {
-	_, hasCid := p.fields[CountryID]
-	return len(p.fields) == 8 || (len(p.fields) == 7 && !hasCid)
+func hasRequiredFields(passport map[string]string) bool {
+	_, hasCid := passport[CountryID]
+	return len(passport) == 8 || (len(passport) == 7 && !hasCid)
 }
 
-func solve(passports []passport) int {
+func solve(passports []map[string]string) int {
 	valid := 0
 
 	for _, passport := range passports {
-		if passport.IsValid() {
+		if isValid(passport) {
 			valid += 1
 		}
 	}
