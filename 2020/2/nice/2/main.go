@@ -1,10 +1,9 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
@@ -37,36 +36,35 @@ func input() *os.File {
 }
 
 func parse(r io.Reader) []dbEntry {
-	raw, err := ioutil.ReadAll(r)
-	if err != nil {
-		panic(err)
-	}
+	var dbEntries []dbEntry
 
-	rows := bytes.Split(bytes.TrimSpace(raw), []byte{'\r', '\n'})
-	dbEntries := make([]dbEntry, len(rows))
+	scanner := bufio.NewScanner(r)
 
-	for i, row := range rows {
-		result := rowEntry.FindAllSubmatch(row, -1)[0]
+	for scanner.Scan() {
+		result := rowEntry.FindAllStringSubmatch(scanner.Text(), -1)[0]
 
-		firstPosition, err := strconv.Atoi(string(result[1]))
+		firstPosition, err := strconv.Atoi(result[1])
 		if err != nil {
 			panic(err)
 		}
 
-		secondPosition, err := strconv.Atoi(string(result[2]))
+		secondPosition, err := strconv.Atoi(result[2])
 		if err != nil {
 			panic(err)
 		}
 
-		dbEntries[i] = dbEntry{
+		dbEntries = append(dbEntries, dbEntry{
 			policy: policy{
 				firstPosition:  firstPosition - 1,
 				secondPosition: secondPosition - 1,
 				char:           result[3][0],
 			},
-			password: string(result[4]),
-		}
+			password: result[4],
+		})
+	}
 
+	if scanner.Err() != nil {
+		panic(scanner.Err())
 	}
 
 	return dbEntries

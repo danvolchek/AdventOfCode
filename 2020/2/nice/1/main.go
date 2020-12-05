@@ -1,10 +1,9 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
@@ -37,36 +36,35 @@ func input() *os.File {
 }
 
 func parse(r io.Reader) []dbEntry {
-	raw, err := ioutil.ReadAll(r)
-	if err != nil {
-		panic(err)
-	}
+	var dbEntries []dbEntry
 
-	rows := bytes.Split(bytes.TrimSpace(raw), []byte{'\r', '\n'})
-	dbEntries := make([]dbEntry, len(rows))
+	scanner := bufio.NewScanner(r)
 
-	for i, row := range rows {
-		result := rowEntry.FindAllSubmatch(row, -1)[0]
+	for scanner.Scan() {
+		result := rowEntry.FindAllStringSubmatch(scanner.Text(), -1)[0]
 
-		min, err := strconv.Atoi(string(result[1]))
+		min, err := strconv.Atoi(result[1])
 		if err != nil {
 			panic(err)
 		}
 
-		max, err := strconv.Atoi(string(result[2]))
+		max, err := strconv.Atoi(result[2])
 		if err != nil {
 			panic(err)
 		}
 
-		dbEntries[i] = dbEntry{
+		dbEntries = append(dbEntries, dbEntry{
 			policy: policy{
 				min:  min,
 				max:  max,
 				char: result[3][0],
 			},
-			password: string(result[4]),
-		}
+			password: result[4],
+		})
+	}
 
+	if scanner.Err() != nil {
+		panic(scanner.Err())
 	}
 
 	return dbEntries
