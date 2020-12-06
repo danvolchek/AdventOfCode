@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/csv"
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -18,14 +18,17 @@ func input() *os.File {
 }
 
 func solve(r io.Reader) {
-	csvReader := csv.NewReader(r)
+	scanner := bufio.NewScanner(r)
 
-	rows, err := csvReader.ReadAll()
-	if err != nil {
-		panic(err)
+	for scanner.Scan() {
+		row := scanner.Bytes()
+
+		fmt.Println(row)
 	}
 
-	fmt.Println(rows)
+	if scanner.Err() != nil {
+		panic(scanner.Err())
+	}
 }
 
 func main() {
