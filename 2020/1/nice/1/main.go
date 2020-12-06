@@ -1,13 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"strconv"
-	"strings"
 )
 
 func input() *os.File {
@@ -20,21 +19,21 @@ func input() *os.File {
 }
 
 func parse(r io.Reader) map[int]bool {
-	raw, err := ioutil.ReadAll(r)
-	if err != nil {
-		panic(err)
-	}
+	expenses := make(map[int]bool)
 
-	rawExpenses := strings.Split(strings.TrimSpace(string(raw)), "\r\n")
+	scanner := bufio.NewScanner(r)
 
-	expenses := make(map[int]bool, len(rawExpenses))
-	for _, row := range rawExpenses {
-		expense, err := strconv.Atoi(row)
+	for scanner.Scan() {
+		expense, err := strconv.Atoi(scanner.Text())
 		if err != nil {
 			panic(err)
 		}
 
 		expenses[expense] = true
+	}
+
+	if scanner.Err() != nil {
+		panic(scanner.Err())
 	}
 
 	return expenses
@@ -48,7 +47,7 @@ func solve(expenses map[int]bool) int {
 		needed := target - expense
 
 		if _, ok := expenses[needed]; ok {
-			return expense * (needed)
+			return expense * needed
 		}
 	}
 
