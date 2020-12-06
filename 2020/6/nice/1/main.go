@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/csv"
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -17,17 +17,51 @@ func input() *os.File {
 	return input
 }
 
-func solve(r io.Reader) {
-	csvReader := csv.NewReader(r)
+func parse(r io.Reader) []map[byte]bool {
+	var groups []map[byte]bool
 
-	rows, err := csvReader.ReadAll()
-	if err != nil {
-		panic(err)
+	currentGroup := make(map[byte]bool)
+	finishGroup := func() {
+		groups = append(groups, currentGroup)
+
+		currentGroup = make(map[byte]bool)
 	}
 
-	fmt.Println(rows)
+	scanner := bufio.NewScanner(r)
+
+	for scanner.Scan() {
+		row := scanner.Bytes()
+
+		if len(row) == 0 {
+			finishGroup()
+			continue
+		}
+
+		for i := 0; i < len(row); i++ {
+			currentGroup[row[i]] = true
+		}
+
+	}
+
+	finishGroup()
+
+	if scanner.Err() != nil {
+		panic(scanner.Err())
+	}
+
+	return groups
+}
+
+func solve(groups []map[byte]bool) int {
+	total := 0
+
+	for _, group := range groups {
+		total += len(group)
+	}
+
+	return total
 }
 
 func main() {
-	solve(input())
+	fmt.Println(solve(parse(input())))
 }

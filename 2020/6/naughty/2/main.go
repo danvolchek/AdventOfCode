@@ -1,9 +1,10 @@
 package main
 
 import (
-	"encoding/csv"
+	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 )
@@ -18,14 +19,40 @@ func input() *os.File {
 }
 
 func solve(r io.Reader) {
-	csvReader := csv.NewReader(r)
-
-	rows, err := csvReader.ReadAll()
+	raw, err := ioutil.ReadAll(r)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(rows)
+	rows := bytes.Split(raw, []byte{'\r', '\n'})
+	total := 0
+
+	counter := 0
+	answered := make(map[byte]int)
+	for _, row := range rows {
+		if len(row) == 0 {
+			for _, v := range answered {
+				if v == counter {
+					total += 1
+				}
+			}
+			counter = 0
+			answered = make(map[byte]int)
+			continue
+		}
+
+		counter += 1
+		for i := 0; i < len(row); i++ {
+			answered[row[i]] += 1
+		}
+	}
+	for _, v := range answered {
+		if v == counter {
+			total += 1
+		}
+	}
+	fmt.Println(total)
+
 }
 
 func main() {
