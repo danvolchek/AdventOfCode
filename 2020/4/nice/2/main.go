@@ -1,9 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
@@ -21,22 +21,22 @@ func input() *os.File {
 }
 
 func parse(r io.Reader) []map[string]string {
-	raw, err := ioutil.ReadAll(r)
-	if err != nil {
-		panic(err)
-	}
-
-	rows := strings.Split(string(raw), "\r\n")
-
 	var passports []map[string]string
 
 	currentPassport := make(map[string]string)
+	finishPassport := func() {
+		passports = append(passports, currentPassport)
 
-	for _, row := range rows {
+		currentPassport = make(map[string]string)
+	}
+
+	scanner := bufio.NewScanner(r)
+
+	for scanner.Scan() {
+		row := scanner.Text()
+
 		if len(row) == 0 {
-			passports = append(passports, currentPassport)
-
-			currentPassport = make(map[string]string)
+			finishPassport()
 			continue
 		}
 
@@ -46,6 +46,12 @@ func parse(r io.Reader) []map[string]string {
 
 			currentPassport[rawFieldParts[0]] = rawFieldParts[1]
 		}
+	}
+
+	finishPassport()
+
+	if scanner.Err() != nil {
+		panic(scanner.Err())
 	}
 
 	return passports
