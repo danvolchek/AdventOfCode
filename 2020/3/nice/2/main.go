@@ -1,10 +1,9 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 )
@@ -19,21 +18,24 @@ func input() *os.File {
 }
 
 func parse(r io.Reader) [][]bool {
-	raw, err := ioutil.ReadAll(r)
-	if err != nil {
-		panic(err)
+	var geology [][]bool
+
+	scanner := bufio.NewScanner(r)
+
+	for scanner.Scan() {
+		row := scanner.Text()
+
+		trees := make([]bool, len(row))
+
+		for i := 0; i < len(row); i++ {
+			trees[i] = row[i] == '#'
+		}
+
+		geology = append(geology, trees)
 	}
 
-	rows := bytes.Split(bytes.TrimSpace(raw), []byte{'\r', '\n'})
-
-	geology := make([][]bool, len(rows))
-
-	for i, row := range rows {
-		geology[i] = make([]bool, len(row))
-
-		for j := 0; j < len(row); j++ {
-			geology[i][j] = row[j] == '#'
-		}
+	if scanner.Err() != nil {
+		panic(scanner.Err())
 	}
 
 	return geology
