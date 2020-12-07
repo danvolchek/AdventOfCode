@@ -20,13 +20,13 @@ func input() *os.File {
 }
 
 const (
-	targetBag = "shiny gold"
+	targetBag  = "shiny gold"
+	noContents = "no other bags"
 )
 
 var (
-	innerBag      = regexp.MustCompile(`(\d+?) (.+?) bags?`)
-	hasNoContents = regexp.MustCompile(`^(.+?) bags contain no other bags\.$`)
-	hasContents   = regexp.MustCompile(`^(.+?) bags contain (.+?)\.$`)
+	innerBag = regexp.MustCompile(`(\d+?) (.+?) bags?`)
+	ruleRegex = regexp.MustCompile(`^(.+?) bags contain (.+?)\.$`)
 )
 
 func parse(r io.Reader) map[string]map[string]bool {
@@ -50,25 +50,27 @@ func parse(r io.Reader) map[string]map[string]bool {
 }
 
 func parseRule(raw string) (string, map[string]bool) {
-	noContents := hasNoContents.FindStringSubmatch(raw)
-	if noContents != nil {
-		return noContents[1], nil
+	ruleMatches := ruleRegex.FindStringSubmatch(raw)
+	if ruleMatches == nil {
+		panic(fmt.Sprintf("don't know how to parse rule %s", raw))
 	}
 
-	contents := hasContents.FindStringSubmatch(raw)
-	if contents == nil {
-		panic(fmt.Sprintf("don't know how to parse %s", raw))
+	outer := ruleMatches[1]
+
+	if ruleMatches[2] == noContents {
+		return outer, nil
 	}
 
-	outer := contents[1]
 	inner := make(map[string]bool)
-
-	rawContents := strings.Split(contents[2], ",")
+	rawContents := strings.Split(ruleMatches[2], ",")
 
 	for _, rawBag := range rawContents {
-		innerBag := innerBag.FindStringSubmatch(rawBag)
+		innerBagMatches := innerBag.FindStringSubmatch(rawBag)
+		if innerBagMatches == nil {
+			panic(fmt.Sprintf("don't know how to parse inner bag %s", rawBag))
+		}
 
-		inner[innerBag[2]] = true
+		inner[innerBagMatches[2]] = true
 	}
 
 	return outer, inner
