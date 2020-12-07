@@ -30,6 +30,26 @@ var (
 	hasContents   = regexp.MustCompile(`^(.+?) bags contain (.+?)\.$`)
 )
 
+func parse(r io.Reader) map[string]map[string]int {
+	scanner := bufio.NewScanner(r)
+
+	rules := make(map[string]map[string]int)
+
+	for scanner.Scan() {
+		row := scanner.Text()
+
+		outer, inner := parseRule(row)
+
+		rules[outer] = inner
+	}
+
+	if scanner.Err() != nil {
+		panic(scanner.Err())
+	}
+
+	return rules
+}
+
 func parseRule(raw string) (string, map[string]int) {
 	noContents := hasNoContents.FindStringSubmatch(raw)
 	if noContents != nil {
@@ -73,26 +93,6 @@ func numContents(color string, cache map[string]int, rules map[string]map[string
 	cache[color] = sum
 
 	return sum
-}
-
-func parse(r io.Reader) map[string]map[string]int {
-	scanner := bufio.NewScanner(r)
-
-	rules := make(map[string]map[string]int)
-
-	for scanner.Scan() {
-		row := scanner.Text()
-
-		outer, inner := parseRule(row)
-
-		rules[outer] = inner
-	}
-
-	if scanner.Err() != nil {
-		panic(scanner.Err())
-	}
-
-	return rules
 }
 
 func solve(rules map[string]map[string]int) int {
