@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
@@ -26,14 +25,14 @@ const (
 
 var (
 	innerBag      = regexp.MustCompile(`(\d+?) (.+?) bags?`)
-	hasNoContents = regexp.MustCompile(`^(.+?) bags contain no other bags.$`)
-	hasContents   = regexp.MustCompile(`^(.+?) bags contain (.+?).$`)
+	hasNoContents = regexp.MustCompile(`^(.+?) bags contain no other bags\.$`)
+	hasContents   = regexp.MustCompile(`^(.+?) bags contain (.+?)\.$`)
 )
 
-func parse(r io.Reader) map[string]map[string]int {
+func parse(r io.Reader) map[string]map[string]bool {
 	scanner := bufio.NewScanner(r)
 
-	rules := make(map[string]map[string]int)
+	rules := make(map[string]map[string]bool)
 
 	for scanner.Scan() {
 		row := scanner.Text()
@@ -50,7 +49,7 @@ func parse(r io.Reader) map[string]map[string]int {
 	return rules
 }
 
-func parseRule(raw string) (string, map[string]int) {
+func parseRule(raw string) (string, map[string]bool) {
 	noContents := hasNoContents.FindStringSubmatch(raw)
 	if noContents != nil {
 		return noContents[1], nil
@@ -61,25 +60,21 @@ func parseRule(raw string) (string, map[string]int) {
 		panic(fmt.Sprintf("don't know how to parse %s", raw))
 	}
 
-	inner := make(map[string]int)
+	outer := contents[1]
+	inner := make(map[string]bool)
 
 	rawContents := strings.Split(contents[2], ",")
 
 	for _, rawBag := range rawContents {
 		innerBag := innerBag.FindStringSubmatch(rawBag)
 
-		numInner, err := strconv.Atoi(innerBag[1])
-		if err != nil {
-			panic(err)
-		}
-		inner[innerBag[2]] = numInner
+		inner[innerBag[2]] = true
 	}
 
-	return contents[1], inner
-
+	return outer, inner
 }
 
-func solve(rules map[string]map[string]int) int {
+func solve(rules map[string]map[string]bool) int {
 	sum := 0
 
 	cache := make(map[string]bool)
@@ -92,7 +87,7 @@ func solve(rules map[string]map[string]int) int {
 	return sum
 }
 
-func containsTargetBag(color string, cache map[string]bool, rules map[string]map[string]int) bool {
+func containsTargetBag(color string, cache map[string]bool, rules map[string]map[string]bool) bool {
 	if containsBag, ok := cache[color]; ok {
 		return containsBag
 	}

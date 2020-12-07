@@ -26,8 +26,8 @@ const (
 
 var (
 	innerBag      = regexp.MustCompile(`(\d+?) (.+?) bags?`)
-	hasNoContents = regexp.MustCompile(`^(.+) bags contain no other bags.$`)
-	hasContents   = regexp.MustCompile(`^(.+?) bags contain (.+?).$`)
+	hasNoContents = regexp.MustCompile(`^(.+) bags contain no other bags\.$`)
+	hasContents   = regexp.MustCompile(`^(.+?) bags contain (.+?)\.$`)
 )
 
 func parseRule(raw string) (string, map[string]int) {
@@ -41,6 +41,7 @@ func parseRule(raw string) (string, map[string]int) {
 		panic(fmt.Sprintf("don't know how to parse %s", raw))
 	}
 
+	outer := contents[1]
 	inner := make(map[string]int)
 
 	rawContents := strings.Split(contents[2], ",")
@@ -55,8 +56,7 @@ func parseRule(raw string) (string, map[string]int) {
 		inner[innerBag[2]] = numInner
 	}
 
-	return contents[1], inner
-
+	return outer, inner
 }
 
 func numContents(color string, cache map[string]int, rules map[string]map[string]int) int {
