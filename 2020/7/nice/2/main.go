@@ -26,7 +26,7 @@ const (
 )
 
 var (
-	innerBag = regexp.MustCompile(`(\d+?) (.+?) bags?`)
+	innerBag  = regexp.MustCompile(`(\d+?) (.+?) bags?`)
 	ruleRegex = regexp.MustCompile(`^(.+?) bags contain (.+?)\.$`)
 )
 
