@@ -44,7 +44,7 @@ func parse(r io.Reader) []instruction {
 
 		instruction := instruction{
 			code: parts[0],
-			arg: arg,
+			arg:  arg,
 		}
 
 		instructions = append(instructions, instruction)
