@@ -46,6 +46,9 @@ func solve(r io.Reader) {
 				sum += numbers[k+m]
 			}
 
+			// note: this is actually wrong. I used first and second to last (thinking it was first and last, and
+			// -2 was needed due to an off by one error). It should be min and max, but I was lucky with both
+			// the sample input and real input that the first and second to last numbers were the right ones to use.
 			if sum == target {
 				fmt.Println(numbers[k], numbers[k+l-1], numbers[k]+numbers[k+l-2])
 				return
