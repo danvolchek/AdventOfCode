@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 )
 
@@ -47,49 +48,25 @@ func parse(r io.Reader) []int {
 }
 
 func solve(adapters []int) int {
-	// convert the slice of adapter joltages to map for faster lookup, while also finding maximum
-	max := 0
-	adaptersMap := make(map[int]bool, len(adapters))
+	sort.Ints(adapters)
 
-	for _, adapter := range adapters {
-		adaptersMap[adapter] = true
-
-		if adapter > max {
-			max = adapter
-		}
-	}
-
-	return numArrangements(adaptersMap, max)
-}
-
-func numArrangements(adapters map[int]bool, maximumAdapter int) int {
-	// a map of joltage level -> the number of distinct ways that joltage level can be reached
-	arrangements := make(map[int]int)
+	// a map of joltage adapter -> the number of distinct ways that joltage can be reached
+	arrangements := make(map[int]int, len(adapters))
 
 	// there's only one way to reach the outlet's joltage: to use the outlet
 	arrangements[outletJoltage] = 1
 
-	for target := 1; target <= maximumAdapter; target++ {
-		// if there's no adapter for this target joltage then it cannot be reached
-		if !adapters[target] {
-			continue
-		}
-
-		// if there are adapters at a joltage lower than but still supported by this one,
-		// we can reach this joltage using any of those adapters
+	for _, target := range adapters {
+		// we can reach this joltage using any smaller supported joltage adapter
 		for step := minAdapterDifference; step <= maxAdapterDifference; step++ {
-			lowerJoltage := target - step
-
-			if adapters[lowerJoltage] {
-				arrangements[target] += arrangements[lowerJoltage]
-			}
+			arrangements[target] += arrangements[target-step]
 		}
 	}
 
 	// once we're at the highest joltage, there's only one way to reach the device's joltage: to use the device
 	// this doesn't affect the number of arrangements, so we can just return the number of ways to reach the largest adapter
 
-	return arrangements[maximumAdapter]
+	return arrangements[adapters[len(adapters) - 1]]
 }
 
 func main() {
