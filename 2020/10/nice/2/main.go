@@ -78,7 +78,7 @@ func solve2(adapters []int) int {
 	// initialized to the number of ways to reach joltage 0, -1, -2, -3
 	arrangements := [maxAdapterDifference - minAdapterDifference + 2]int{}
 
-	// there's only one way to reach the outlet's joltage: to use the outlet
+	// same comment as in solve
 	arrangements[outletJoltage] = 1
 
 	// the joltage level that the first item in the window represents
@@ -87,9 +87,12 @@ func solve2(adapters []int) int {
 
 	// shifts the sliding window one step
 	shift := func() {
+		// move elements one to the right
 		for i := 0; i < maxAdapterDifference; i++ {
 			arrangements[maxAdapterDifference-i] = arrangements[maxAdapterDifference-i-1]
 		}
+
+		// reset first element
 		arrangements[0] = 0
 
 		windowIndex += 1
@@ -107,7 +110,7 @@ func solve2(adapters []int) int {
 		}
 	}
 
-	// same comment on highest adapter joltage as the other solver
+	// same comment as in solve
 	return arrangements[0]
 }
 
