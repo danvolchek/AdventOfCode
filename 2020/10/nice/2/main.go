@@ -60,7 +60,7 @@ func numArrangements(adapters map[int]bool, maximumAdapter int) int {
 	// a map of joltage level -> number of ways the joltage level can be reached
 	ways := make(map[int]int)
 
-	// there's only 1 way to reach 0 joltage: to use the outlet
+	// there's only one way to reach zero joltage: to use the outlet
 	ways[0] = 1
 
 	for target := 1; target <= maximumAdapter; target++ {
@@ -72,14 +72,16 @@ func numArrangements(adapters map[int]bool, maximumAdapter int) int {
 		// if there are adapters at a joltage lower than but still supported by this one,
 		// we can reach this joltage using any of those adapters
 		for step := 1; step <= 3; step++ {
-			if adapters[target - step] {
-				ways[target] += ways[target-step]
+			lowerJoltage := target - step
+
+			if adapters[lowerJoltage] {
+				ways[target] += ways[lowerJoltage]
 			}
 		}
 	}
 
 	// once we're at the highest joltage, there's only one more way to reach the device: to use the device
-	// this doesn't affect the number of combinations
+	// this doesn't affect the number of combinations, so we can just return the number of ways to reach the highest adapter
 
 	return ways[maximumAdapter]
 }
