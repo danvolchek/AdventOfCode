@@ -9,6 +9,12 @@ import (
 	"strconv"
 )
 
+const (
+	outletJoltage        = 0
+	minAdapterDifference = 1
+	maxAdapterDifference = 3
+)
+
 func input() *os.File {
 	input, err := os.Open(path.Join("2020", "10", "input.txt"))
 	if err != nil {
@@ -19,7 +25,7 @@ func input() *os.File {
 }
 
 func parse(r io.Reader) []int {
-	// start with outlet
+	// start with the outlet
 	adapters := []int{0}
 
 	scanner := bufio.NewScanner(r)
@@ -41,7 +47,7 @@ func parse(r io.Reader) []int {
 }
 
 func solve(adapters []int) int {
-	// convert slice of adapters to map for faster lookup, while also finding maximum
+	// convert the slice of adapter joltages to map for faster lookup, while also finding maximum
 	max := 0
 	adaptersMap := make(map[int]bool, len(adapters))
 
@@ -57,11 +63,11 @@ func solve(adapters []int) int {
 }
 
 func numArrangements(adapters map[int]bool, maximumAdapter int) int {
-	// a map of joltage level -> number of ways the joltage level can be reached
-	ways := make(map[int]int)
+	// a map of joltage level -> the number of distinct ways that joltage level can be reached
+	arrangements := make(map[int]int)
 
-	// there's only one way to reach zero joltage: to use the outlet
-	ways[0] = 1
+	// there's only one way to reach the outlet's joltage: to use the outlet
+	arrangements[outletJoltage] = 1
 
 	for target := 1; target <= maximumAdapter; target++ {
 		// if there's no adapter for this target joltage then it cannot be reached
@@ -71,19 +77,19 @@ func numArrangements(adapters map[int]bool, maximumAdapter int) int {
 
 		// if there are adapters at a joltage lower than but still supported by this one,
 		// we can reach this joltage using any of those adapters
-		for step := 1; step <= 3; step++ {
+		for step := minAdapterDifference; step <= maxAdapterDifference; step++ {
 			lowerJoltage := target - step
 
 			if adapters[lowerJoltage] {
-				ways[target] += ways[lowerJoltage]
+				arrangements[target] += arrangements[lowerJoltage]
 			}
 		}
 	}
 
-	// once we're at the highest joltage, there's only one more way to reach the device: to use the device
-	// this doesn't affect the number of combinations, so we can just return the number of ways to reach the highest adapter
+	// once we're at the highest joltage, there's only one way to reach the device's joltage: to use the device
+	// this doesn't affect the number of arrangements, so we can just return the number of ways to reach the largest adapter
 
-	return ways[maximumAdapter]
+	return arrangements[maximumAdapter]
 }
 
 func main() {

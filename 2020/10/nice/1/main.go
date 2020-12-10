@@ -20,7 +20,7 @@ func input() *os.File {
 }
 
 func parse(r io.Reader) []int {
-	// start with outlet
+	// start with the outlet
 	adapters := []int{0}
 
 	scanner := bufio.NewScanner(r)
@@ -58,7 +58,7 @@ func solve(adapters []int) int {
 		}
 	}
 
-	// add device
+	// add the device, which is always a 3 joltage difference
 	diff3 += 1
 
 	return diff1 * diff3
