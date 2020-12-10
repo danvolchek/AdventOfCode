@@ -115,8 +115,9 @@ func solve2(adapters []int) int {
 }
 
 func main() {
-	fmt.Print(solve(parse(strings.NewReader("16\n10\n15\n5\n1\n11\n7\n19\n6\n12\n4"))), " ")
-	fmt.Println(solve2(parse(strings.NewReader("16\n10\n15\n5\n1\n11\n7\n19\n6\n12\n4"))))
+	smallTestInput := "16\n10\n15\n5\n1\n11\n7\n19\n6\n12\n4"
+	fmt.Print(solve(parse(strings.NewReader(smallTestInput))), " ")
+	fmt.Println(solve2(parse(strings.NewReader(smallTestInput))))
 
 	fmt.Print(solve(parse(input())), " ")
 	fmt.Println(solve2(parse(input())))
