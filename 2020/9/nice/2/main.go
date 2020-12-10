@@ -68,7 +68,7 @@ func solve(numbers []int, preambleSize int) int {
 	target := findTarget(numbers, preambleSize)
 
 	for minIndex := 0; minIndex < len(numbers)-1; minIndex++ {
-		outer:
+	outer:
 		for length := 1; length < len(numbers)-minIndex; length++ {
 			sum := 0
 			for i := 0; i < length; i++ {
