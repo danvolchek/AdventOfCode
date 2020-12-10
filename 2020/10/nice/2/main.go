@@ -58,7 +58,7 @@ func solve(adapters []int) int {
 	arrangements[outletJoltage] = 1
 
 	for _, target := range adapters {
-		// we can reach this joltage level using any smaller supported joltage adapter
+		// we can reach the target joltage using any smaller supported joltage adapter
 		for step := minAdapterDifference; step <= maxAdapterDifference; step++ {
 			arrangements[target] += arrangements[target-step]
 		}
@@ -70,7 +70,7 @@ func solve(adapters []int) int {
 }
 
 // optimized for space complexity: besides the input, this uses constant space
-// this works because we only ever need to check the last 3 joltage levels
+// it's the same algorithm as solve, but only stores the last 3 joltages as none are needed beyond that
 func solve2(adapters []int) int {
 	sort.Ints(adapters)
 
@@ -81,8 +81,8 @@ func solve2(adapters []int) int {
 	// same comment as in solve
 	arrangements[outletJoltage] = 1
 
-	// the joltage level that the first item in the window represents
-	// used to shift the sliding window the proper number of steps on non-contiguous adapter sequences
+	// the joltage that the first item in the window represents
+	// used to shift the sliding window the proper number of steps to get to the current adapter
 	windowIndex := 0
 
 	// shifts the sliding window one step
@@ -104,7 +104,7 @@ func solve2(adapters []int) int {
 			shift()
 		}
 
-		// calculate ways to reach the target (using any smaller supported joltage adapter)
+		// same comment as in solve
 		for step := minAdapterDifference; step <= maxAdapterDifference; step++ {
 			arrangements[0] += arrangements[step]
 		}
