@@ -43,7 +43,6 @@ func solve(r io.Reader) {
 		})
 	}
 
-
 	currX := 0
 	currY := 0
 
@@ -58,70 +57,70 @@ func solve(r io.Reader) {
 			amount -= 90
 			switch direction {
 			case 1:
-				if wayPointOffsetX == 0 {
+				/* clockwise
 
-					wayPointOffsetX = wayPointOffsetY
-					wayPointOffsetY = 0
+				top right
+				1,  10 -> 10, -1
+				10,   1 -> 1, -10
 
-				} else if wayPointOffsetY == 0{
+				x, y -> y, -x
 
-					wayPointOffsetY = -wayPointOffsetX
-					wayPointOffsetX = 0
+				bottom right
+				1, -10 -> -10, -1
+				10, -1 -> -1, -10
 
-				} else if (wayPointOffsetX > 0 && wayPointOffsetY > 0) || (wayPointOffsetX < 0 && wayPointOffsetY > 0) {
-					tmp := wayPointOffsetX
-					wayPointOffsetX = wayPointOffsetY
-					wayPointOffsetY = tmp
+				x, y -> y, -x
 
+				bottom left
+				-1, -10 -> -10, 1
+				-10, -1 -> -1, 10
 
-					// 10, 1 -> 1, -10
+				x, y - > y, -x
 
-					// -10, 1 -> 1, 10
+				top left
+				-1,  10 -> 10, 1
+				-10, 1  -> 1, 10
 
-					wayPointOffsetX *= -1
-				} else if (wayPointOffsetX > 0 && wayPointOffsetY < 0) || (wayPointOffsetX < 0 && wayPointOffsetY < 0) {
-					tmp := wayPointOffsetX
-					wayPointOffsetX = wayPointOffsetY
-					wayPointOffsetY = tmp
+				x, y -> y, -x
 
-					// 10, -1 -> -1, -10
+				north
+				0, 10 -> 10, 0
 
-					// -10, 1 -> 1, 10
-					wayPointOffsetY *= -1
-				} else {
-					panic(fmt.Sprintf("%d %d", wayPointOffsetX, wayPointOffsetY))
-				}
+				x, y -> y, -x
+
+				east
+				10, 0 -> 0, -10
+
+				x, y -> y, -x
+
+				south
+				0, -10 -> -10, 0
+
+				x, y -> y, -x
+
+				west
+				-10, 0 -> 0, 10
+
+				x, y -> y, -x
+				*/
+
+				tmp := wayPointOffsetX
+				wayPointOffsetX = wayPointOffsetY
+				wayPointOffsetY = -tmp
+
 			case -1:
-				if wayPointOffsetX == 0 {
+				/* counter clockwise
 
-					wayPointOffsetX = -wayPointOffsetY
-					wayPointOffsetY = 0
+				top right
+				1,  10 -> -10, 1
+				10,   1 -> -1, 10
 
-				} else if wayPointOffsetY == 0{
+				x, y -> -y, x
 
-					wayPointOffsetY = wayPointOffsetX
-					wayPointOffsetX = 0
-
-				} else if (wayPointOffsetX > 0 && wayPointOffsetY > 0) || (wayPointOffsetX < 0 && wayPointOffsetY < 0) {
-					tmp := wayPointOffsetX
-					wayPointOffsetX = wayPointOffsetY
-					wayPointOffsetY = tmp
-
-					// 10, 1 -> -1, 10
-
-					// -10, - 1 ->
-
-					wayPointOffsetY *= -1
-				} else if (wayPointOffsetX > 0 && wayPointOffsetY < 0) || (wayPointOffsetX < 0 && wayPointOffsetY > 0) {
-					tmp := wayPointOffsetX
-					wayPointOffsetX = wayPointOffsetY
-					wayPointOffsetY = tmp
-
-
-					wayPointOffsetX *= -1
-				} else {
-					panic(fmt.Sprintf("%d %d", wayPointOffsetX, wayPointOffsetY))
-				}
+				*/
+				tmp := wayPointOffsetX
+				wayPointOffsetX = -wayPointOffsetY
+				wayPointOffsetY = tmp
 			default:
 				panic(direction)
 			}
