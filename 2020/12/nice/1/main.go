@@ -130,8 +130,8 @@ func solve(instructions []instr) int {
 	}
 
 	for _, instruction := range instructions {
-		handler := instructionHandlers[instruction.action]
-		if handler == nil {
+		handler, ok := instructionHandlers[instruction.action]
+		if !ok {
 			panic(instruction)
 		}
 
