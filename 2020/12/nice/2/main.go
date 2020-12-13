@@ -72,13 +72,13 @@ func handleCardinalMovement(ship *ferryState, instruction instr) {
 	case west:
 		ship.waypointOffsetX -= instruction.value
 	default:
-		panic(instruction)
+		panic(instruction.action)
 	}
 }
 
 func handleTurn(ship *ferryState, instruction instr) {
 	if instruction.value%90 != 0 {
-		panic(instruction)
+		panic(instruction.value)
 	}
 
 	turns := instruction.value / 90
@@ -94,7 +94,7 @@ func handleTurn(ship *ferryState, instruction instr) {
 			ship.waypointOffsetX = ship.waypointOffsetY
 			ship.waypointOffsetY = -tmp
 		default:
-			panic(instruction)
+			panic(instruction.action)
 		}
 	}
 }
@@ -132,7 +132,7 @@ func solve(instructions []instr) int {
 	for _, instruction := range instructions {
 		handler, ok := instructionHandlers[instruction.action]
 		if !ok {
-			panic(instruction)
+			panic(instruction.action)
 		}
 
 		handler(ship, instruction)
