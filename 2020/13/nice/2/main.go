@@ -20,53 +20,6 @@ func input() *os.File {
 	return input
 }
 
-// represents x = a mod n
-type equation struct {
-	a, n *big.Int
-}
-
-// solves the system of equations x = a1 mod n1 and x = a2 mod n2 for x
-// https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Case_of_two_moduli
-func solveDualEquations(eq1, eq2 equation) *big.Int {
-	// compute bezout coefficients
-	m1 := big.NewInt(0)
-	m2 := big.NewInt(0)
-
-	big.NewInt(0).GCD(m1, m2, eq1.n, eq2.n)
-
-	// calculate x
-	m2.Mul(m2, eq1.a)
-	m2.Mul(m2, eq2.n)
-
-	m1.Mul(m1, eq2.a)
-	m1.Mul(m1, eq1.n)
-
-	return m2.Add(m2, m1)
-}
-
-// solves the system of equations x = ai mod ni for all eqs
-// returns the smallest positive x which satisfies all equations
-// https://en.wikipedia.org/wiki/Chinese_remainder_theorem#General_case
-func solveEquations(eqs []equation) *big.Int {
-	// solve first two
-	N := big.NewInt(0).Mul(eqs[0].n, eqs[1].n)
-	x := solveDualEquations(eqs[0], eqs[1])
-
-	// solve the rest without modifying the moduli of the existing equations
-	for i := 2; i < len(eqs); i++ {
-		x = solveDualEquations(equation{
-			a: x,
-			n: N,
-		}, eqs[i])
-
-		N.Mul(N, eqs[i].n)
-	}
-
-	// convert x to the smallest positive value, maintaining all moduli
-	// equivalent to x -= (x / N) * N (the integer division makes this work)
-	return x.Sub(x, big.NewInt(0).Mul(big.NewInt(0).Div(x, N), N))
-}
-
 func parse(r io.Reader) map[int64]int64 {
 	scanner := bufio.NewScanner(r)
 
@@ -98,6 +51,53 @@ func parse(r io.Reader) map[int64]int64 {
 	}
 
 	return busses
+}
+
+// represents x = a mod n
+type equation struct {
+	a, n *big.Int
+}
+
+// solves the system of equations x = a1 mod n1 and x = a2 mod n2 for x
+// https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Case_of_two_moduli
+func solveDualEquations(eq1, eq2 equation) *big.Int {
+	// compute bezout coefficients
+	m1 := big.NewInt(0)
+	m2 := big.NewInt(0)
+
+	big.NewInt(0).GCD(m1, m2, eq1.n, eq2.n)
+
+	// calculate x
+	m2.Mul(m2, eq1.a)
+	m2.Mul(m2, eq2.n)
+
+	m1.Mul(m1, eq2.a)
+	m1.Mul(m1, eq1.n)
+
+	return m2.Add(m2, m1)
+}
+
+// solves the system of equations x = ai mod ni for all eqs
+// returns the smallest positive x which satisfies all equations
+// https://en.wikipedia.org/wiki/Chinese_remainder_theorem#General_case
+func solveEquations(eqs []equation) *big.Int {
+	// solve first two
+	x := solveDualEquations(eqs[0], eqs[1])
+	N := big.NewInt(0).Mul(eqs[0].n, eqs[1].n)
+
+	// solve the rest without modifying the moduli of the existing equations
+	for i := 2; i < len(eqs); i++ {
+		x = solveDualEquations(equation{
+			a: x,
+			n: N,
+		}, eqs[i])
+
+		N.Mul(N, eqs[i].n)
+	}
+
+	// convert x to the smallest positive value, maintaining all moduli
+	// equivalent to x -= (x / N) * N (the integer division makes this work)
+	return x.Sub(x, big.NewInt(0).Mul(big.NewInt(0).Div(x, N), N))
 }
 
 func solve(busses map[int64]int64) *big.Int {
