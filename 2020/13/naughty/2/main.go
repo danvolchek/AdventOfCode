@@ -40,7 +40,6 @@ func findX2(eq1, eq2 equation) *big.Int {
 
 	return m2.Add(m2, m1)
 
-
 	//m1, m2 := euclid.x, euclid.y
 
 	//return eq1.a * m2 * eq2.n + eq2.a*m1 * eq1.n
@@ -55,7 +54,7 @@ func findX(eqs []equation) (*big.Int, *big.Int) {
 		sol = findX2(equation{
 			a: sol,
 			n: currentN,
-		},eqs[i])
+		}, eqs[i])
 
 		currentN.Mul(currentN, eqs[i].n)
 	}
@@ -165,7 +164,6 @@ func solve(r io.Reader) {
 	actualSol := toSmallestPositive(negSol, n)
 
 	fmt.Printf("%d %+v\n", actualSol, busses)
-
 
 	if scanner.Err() != nil {
 		panic(scanner.Err())

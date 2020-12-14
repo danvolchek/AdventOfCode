@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"path"
+	"strconv"
+	"strings"
 )
 
 func input() *os.File {
@@ -17,20 +19,57 @@ func input() *os.File {
 	return input
 }
 
-func solve(r io.Reader) {
+func parse(r io.Reader) (int, []int) {
 	scanner := bufio.NewScanner(r)
 
-	for scanner.Scan() {
-		row := scanner.Text()
-
-		fmt.Println(row)
+	chomp := func() string {
+		if !scanner.Scan() {
+			if scanner.Err() != nil {
+				panic(scanner.Err())
+			}
+		}
+		return scanner.Text()
 	}
 
-	if scanner.Err() != nil {
-		panic(scanner.Err())
+	earliestTime, err := strconv.Atoi(chomp())
+	if err != nil {
+		panic(err)
 	}
+
+	var busses []int
+	rawBusses := chomp()
+	for _, item := range strings.Split(rawBusses, ",") {
+		if item == "x" {
+			continue
+		}
+
+		val, err := strconv.Atoi(item)
+		if err != nil {
+			panic(err)
+		}
+
+		busses = append(busses, val)
+	}
+
+	return earliestTime, busses
+}
+
+func solve(earliestTime int, busses []int) int {
+	earliestBus := 0
+	minimumWaitTime := -1
+
+	for _, bus := range busses {
+		waitTime := bus - earliestTime%bus
+		if minimumWaitTime == -1 || waitTime < minimumWaitTime {
+			earliestBus = bus
+			minimumWaitTime = waitTime
+		}
+	}
+
+	return earliestBus * minimumWaitTime
 }
 
 func main() {
-	solve(input())
+	fmt.Println(solve(parse(strings.NewReader("939\n7,13,x,x,59,x,31,19"))))
+	fmt.Println(solve(parse(input())))
 }
