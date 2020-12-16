@@ -22,7 +22,6 @@ func input() *os.File {
 func solve(r io.Reader) {
 	scanner := bufio.NewScanner(r)
 
-
 	chomp := func() string {
 		if !scanner.Scan() {
 			if scanner.Err() != nil {
@@ -53,7 +52,7 @@ func game(starting []int, limit int) int {
 
 	next := 0
 
-	for i:= 0; i < limit - 1; i++ {
+	for i := 0; i < limit-1; i++ {
 		if i < len(starting) {
 			next = starting[i]
 		}
