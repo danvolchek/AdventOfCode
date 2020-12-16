@@ -24,7 +24,7 @@ type validRange struct {
 }
 
 func parseRange(r string) validRange {
-	parts :=  strings.Split(r, "-")
+	parts := strings.Split(r, "-")
 
 	min, err := strconv.Atoi(parts[0])
 	if err != nil {
@@ -43,7 +43,7 @@ func parseRange(r string) validRange {
 
 }
 
-func parseTicket (row string)[]int {
+func parseTicket(row string) []int {
 	parts := strings.Split(row, ",")
 
 	ret := make([]int, len(parts))
@@ -61,7 +61,7 @@ func parseTicket (row string)[]int {
 }
 
 func isValidVal(val int, rule []validRange) bool {
-	for _, r := range rule{
+	for _, r := range rule {
 		if val >= r.min && val <= r.max {
 			return true
 		}
@@ -70,7 +70,7 @@ func isValidVal(val int, rule []validRange) bool {
 	return false
 }
 
-func isValid (ticket []int, rules map[string][]validRange) (bool, int) {
+func isValid(ticket []int, rules map[string][]validRange) (bool, int) {
 
 	for _, value := range ticket {
 		foundValid := false
@@ -133,8 +133,6 @@ func solve(r io.Reader) {
 		default:
 			panic(zone)
 		}
-
-
 
 	}
 

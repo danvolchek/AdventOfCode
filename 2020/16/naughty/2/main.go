@@ -24,7 +24,7 @@ type validRange struct {
 }
 
 func parseRange(r string) validRange {
-	parts :=  strings.Split(r, "-")
+	parts := strings.Split(r, "-")
 
 	min, err := strconv.Atoi(parts[0])
 	if err != nil {
@@ -43,7 +43,7 @@ func parseRange(r string) validRange {
 
 }
 
-func parseTicket (row string)[]int {
+func parseTicket(row string) []int {
 	parts := strings.Split(row, ",")
 
 	ret := make([]int, len(parts))
@@ -61,7 +61,7 @@ func parseTicket (row string)[]int {
 }
 
 func isValidVal(val int, rule []validRange) bool {
-	for _, r := range rule{
+	for _, r := range rule {
 		if val >= r.min && val <= r.max {
 			return true
 		}
@@ -70,7 +70,7 @@ func isValidVal(val int, rule []validRange) bool {
 	return false
 }
 
-func isValid (ticket []int, rules map[string][]validRange) (bool, int) {
+func isValid(ticket []int, rules map[string][]validRange) (bool, int) {
 
 	for _, value := range ticket {
 		foundValid := false
@@ -93,8 +93,7 @@ func isValid (ticket []int, rules map[string][]validRange) (bool, int) {
 func getOptions(tickets [][]int, rules map[string][]validRange) []map[string]bool {
 	ret := make([]map[string]bool, len(rules))
 
-
-	for index := 0; index < len(rules); index += 1{
+	for index := 0; index < len(rules); index += 1 {
 		for name, ranges := range rules {
 			allValid := true
 
@@ -162,8 +161,6 @@ func solve(r io.Reader) {
 			panic(zone)
 		}
 
-
-
 	}
 
 	if scanner.Err() != nil {
@@ -173,7 +170,6 @@ func solve(r io.Reader) {
 	fmt.Println(fields, myTicket, nearbyTickets)
 
 	var validTickets [][]int
-
 
 	for _, nearby := range nearbyTickets {
 		if valid, _ := isValid(nearby, fields); valid {
