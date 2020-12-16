@@ -226,7 +226,7 @@ func removePossibility(fieldIndex int, fieldName string, possibleOrderings []map
 	}
 }
 
-func getDefiniteFieldOrderigns(possibleOrderings []map[string]bool) []string {
+func getDefiniteFieldOrderings(possibleOrderings []map[string]bool) []string {
 	processedCollapsedFields := make(map[string]bool)
 
 	definiteOrdering := make([]string, len(possibleOrderings))
@@ -251,7 +251,7 @@ func solve(rules map[string][]valueRange, myTicket []int, nearbyTickets [][]int)
 
 	possibleOrderings := getPossibleFieldOrderings(rules, validNearbyTickets)
 
-	definiteOrderings := getDefiniteFieldOrderigns(possibleOrderings)
+	definiteOrderings := getDefiniteFieldOrderings(possibleOrderings)
 
 	solution := 1
 
