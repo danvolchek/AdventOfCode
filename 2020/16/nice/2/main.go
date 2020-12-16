@@ -29,8 +29,8 @@ func input() *os.File {
 	return input
 }
 
-func parse(r io.Reader) (map[string][]valueRange, []int, [][]int) {
-	rules := make(map[string][]valueRange)
+func parse(r io.Reader) ([]rule, []int, [][]int) {
+	var rules []rule
 	var myTicket []int
 	var nearbyTickets [][]int
 
@@ -46,15 +46,7 @@ func parse(r io.Reader) (map[string][]valueRange, []int, [][]int) {
 
 		switch parsingZone {
 		case 0: // rules
-			parts := strings.Split(row, ruleSeparator)
-			if len(parts) != 2 {
-				panic(row)
-			}
-
-			ranges := strings.Split(strings.TrimSpace(parts[1]), valueRangesSeparator)
-
-			rules[parts[0]] = []valueRange{newRange(ranges[0]), newRange(ranges[1])}
-			continue
+			rules = append(rules, newRule(row))
 		case 1: // my ticket
 			// discard header
 			if row == myTicketHeader {
@@ -80,6 +72,40 @@ func parse(r io.Reader) (map[string][]valueRange, []int, [][]int) {
 	}
 
 	return rules, myTicket, nearbyTickets
+}
+
+type rule struct {
+	name        string
+	valueRanges []valueRange
+}
+
+func newRule(raw string) rule {
+	parts := strings.Split(raw, ruleSeparator)
+	if len(parts) != 2 {
+		panic(raw)
+	}
+
+	rawRanges := strings.Split(strings.TrimSpace(parts[1]), valueRangesSeparator)
+
+	valueRanges := make([]valueRange, len(rawRanges))
+	for i, rawRange := range rawRanges {
+		valueRanges[i] = newRange(rawRange)
+	}
+
+	return rule{
+		name:        parts[0],
+		valueRanges: valueRanges,
+	}
+}
+
+func (r rule) matches(value int) bool {
+	for _, valueRange := range r.valueRanges {
+		if valueRange.matches(value) {
+			return true
+		}
+	}
+
+	return false
 }
 
 type valueRange struct {
@@ -127,9 +153,9 @@ func newTicket(raw string) []int {
 	return ticket
 }
 
-func valueMatchesAnyRange(value int, valueRanges []valueRange) bool {
-	for _, valueRange := range valueRanges {
-		if valueRange.matches(value) {
+func valueMatchesAnyRule(value int, rules []rule) bool {
+	for _, rule := range rules {
+		if rule.matches(value) {
 			return true
 		}
 	}
@@ -137,17 +163,7 @@ func valueMatchesAnyRange(value int, valueRanges []valueRange) bool {
 	return false
 }
 
-func valueMatchesAnyRule(value int, rules map[string][]valueRange) bool {
-	for _, valueRanges := range rules {
-		if valueMatchesAnyRange(value, valueRanges) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func findInvalidValues(ticket []int, rules map[string][]valueRange) []int {
+func findInvalidValues(ticket []int, rules []rule) []int {
 	var invalidValues []int
 
 	for _, value := range ticket {
@@ -159,7 +175,7 @@ func findInvalidValues(ticket []int, rules map[string][]valueRange) []int {
 	return invalidValues
 }
 
-func findValidTickets(rules map[string][]valueRange, tickets [][]int) [][]int {
+func findValidTickets(rules []rule, tickets [][]int) [][]int {
 	var validTickets [][]int
 
 	for _, ticket := range tickets {
@@ -171,15 +187,15 @@ func findValidTickets(rules map[string][]valueRange, tickets [][]int) [][]int {
 	return validTickets
 }
 
-func getPossibleFieldOrderings(rules map[string][]valueRange, tickets [][]int) []map[string]bool {
+func getPossibleFieldOrderings(rules []rule, tickets [][]int) []map[string]bool {
 	possibilities := make([]map[string]bool, len(rules))
 
 	for index := 0; index < len(rules); index += 1 {
-		for name, ranges := range rules {
+		for _, rule := range rules {
 			allValid := true
 
 			for _, ticket := range tickets {
-				if !valueMatchesAnyRange(ticket[index], ranges) {
+				if !rule.matches(ticket[index]) {
 					allValid = false
 					break
 				}
@@ -189,7 +205,7 @@ func getPossibleFieldOrderings(rules map[string][]valueRange, tickets [][]int) [
 				if possibilities[index] == nil {
 					possibilities[index] = make(map[string]bool)
 				}
-				possibilities[index][name] = true
+				possibilities[index][rule.name] = true
 			}
 		}
 	}
@@ -246,7 +262,7 @@ func getDefiniteFieldOrderings(possibleOrderings []map[string]bool) []string {
 	return definiteOrdering
 }
 
-func solve(rules map[string][]valueRange, myTicket []int, nearbyTickets [][]int) int {
+func solve(rules []rule, myTicket []int, nearbyTickets [][]int) int {
 	validNearbyTickets := findValidTickets(rules, nearbyTickets)
 
 	possibleOrderings := getPossibleFieldOrderings(rules, validNearbyTickets)
