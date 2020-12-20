@@ -89,7 +89,7 @@ func solve(r io.Reader) {
 	scanner := bufio.NewScanner(r)
 
 	coords := make(map[coord]bool)
-	y:= 0
+	y := 0
 	for scanner.Scan() {
 		row := scanner.Text()
 
