@@ -31,7 +31,7 @@ func (c constMatcher) matches(value string) (bool, int) {
 }
 
 type referenceMatcher struct {
-	name string
+	name  string
 	rules map[string]rule
 }
 
@@ -42,7 +42,6 @@ func (r referenceMatcher) matches(value string) (bool, int) {
 type sequentialMatcher struct {
 	rules []rule
 }
-
 
 func (s sequentialMatcher) matches(value string) (bool, int) {
 	// how much to first/second?
@@ -61,7 +60,7 @@ func (s sequentialMatcher) matches(value string) (bool, int) {
 }
 
 type orMatcher struct {
-	first rule
+	first  rule
 	second rule
 }
 
@@ -118,7 +117,7 @@ func parseRule(raw string, rules map[string]rule) (string, rule) {
 		parts := strings.Split(body, " | ")
 
 		rule = orMatcher{
-			first: parseRuleWithoutPipe(parts[0], rules),
+			first:  parseRuleWithoutPipe(parts[0], rules),
 			second: parseRuleWithoutPipe(parts[1], rules),
 		}
 
@@ -146,7 +145,7 @@ func solve(r io.Reader) {
 
 		switch zone {
 		case 0:
-			name, rule  := parseRule(row, rules)
+			name, rule := parseRule(row, rules)
 			rules[name] = rule
 		case 1:
 			inputs = append(inputs, row)
@@ -158,7 +157,6 @@ func solve(r io.Reader) {
 	if scanner.Err() != nil {
 		panic(scanner.Err())
 	}
-
 
 	sum := 0
 	for _, input := range inputs {

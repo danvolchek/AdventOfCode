@@ -24,7 +24,7 @@ type constMatcher struct {
 }
 
 func (c constMatcher) matches(value string) []matchResult {
-	if len(value) < len(c.value) || c.value != value[:len(c.value)]{
+	if len(value) < len(c.value) || c.value != value[:len(c.value)] {
 		return []matchResult{}
 	}
 
@@ -51,8 +51,7 @@ func (s sequentialMatcher) matches(value string) []matchResult {
 
 	lastResults := s.rules[0].matches(value)
 
-
-	for i:= 1; i < len(s.rules) && len(lastResults) > 0; i++{
+	for i := 1; i < len(s.rules) && len(lastResults) > 0; i++ {
 
 		var thisIterationResults []matchResult
 		for _, lastResult := range lastResults {
@@ -63,7 +62,6 @@ func (s sequentialMatcher) matches(value string) []matchResult {
 
 				thisIterationResults = append(thisIterationResults, fixed)
 			}
-
 
 		}
 
@@ -104,7 +102,6 @@ type repeaterMatcher struct {
 func (r repeaterMatcher) matches(value string) []matchResult {
 	newResults := make(map[matchResult]struct{})
 
-
 	currentRule := sequentialMatcher{rules: []rule{r.repeated}}
 
 	for {
@@ -126,23 +123,22 @@ func (r repeaterMatcher) matches(value string) []matchResult {
 	i := 0
 	for newResult := range newResults {
 		container[i] = newResult
-		i+=1
+		i += 1
 	}
 	return container
 }
 
 type sandwichRepeaterMatcher struct {
-	left rule
+	left  rule
 	right rule
 }
 
 func (s sandwichRepeaterMatcher) matches(value string) []matchResult {
 	newResults := make(map[matchResult]struct{})
 
-
 	currentRule := sequentialMatcher{rules: []rule{s.left, s.right}}
 
-	for i := 0; i < 4; i++{
+	for i := 0; i < 4; i++ {
 		matchResults := currentRule.matches(value)
 
 		newRules := []rule{s.left}
@@ -161,7 +157,7 @@ func (s sandwichRepeaterMatcher) matches(value string) []matchResult {
 	i := 0
 	for newResult := range newResults {
 		container[i] = newResult
-		i+=1
+		i += 1
 	}
 	return container
 }
@@ -251,7 +247,7 @@ func solve(r io.Reader) {
 	rules["8"] = repeaterMatcher{repeated: parseRuleWithoutName("42", rules)}
 
 	rules["11"] = sandwichRepeaterMatcher{
-		left: parseRuleWithoutName("42", rules),
+		left:  parseRuleWithoutName("42", rules),
 		right: parseRuleWithoutName("31", rules),
 	}
 
