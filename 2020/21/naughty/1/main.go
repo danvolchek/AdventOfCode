@@ -42,7 +42,8 @@ func (c constraint) invalid(assignments map[string]string) bool {
 		}
 	}
 
-	// don't know yet
+	// not all allergens we care about have assignments yet, so we can't tell if it's invalid
+	// TODO: this can be expanded: e.g. if 1 is left to be assigned and we have 2 missing, it is invalid
 	if len(applicableAllergens) != len(c.allergens) {
 		return false
 	}
@@ -80,6 +81,7 @@ func assign(allIngredients map[string]bool, allAllergens []string, assignments m
 			continue
 		}
 
+		// prepare for future assignment
 		assignments[allergenToAssign] = ingredient
 		delete(allIngredients, ingredient)
 		unassignments[allergenToAssign] = make(map[string]bool)
@@ -98,8 +100,10 @@ func assign(allIngredients map[string]bool, allAllergens []string, assignments m
 			}
 		}
 
+		// only keep going if we:
+		//  - picked an assignment that's possible according to one of the rules
+		//  - didn't invalidate any constraints with this assignment
 		if len(unassignments[allergenToAssign]) != 0 {
-
 			if !constraintsInvalid(constraints, assignments) {
 				if assign(allIngredients, allAllergens[1:], assignments, unassignments, constraints) {
 					return true
@@ -108,6 +112,7 @@ func assign(allIngredients map[string]bool, allAllergens []string, assignments m
 
 		}
 
+		// unsuccessful, so undo
 		delete(assignments, allergenToAssign)
 		delete(unassignments, allergenToAssign)
 		allIngredients[ingredient] = true
