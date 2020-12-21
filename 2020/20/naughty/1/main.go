@@ -21,10 +21,10 @@ func input() *os.File {
 }
 
 const (
-	edgeTop = 0
-	edgeRight = 1
+	edgeTop    = 0
+	edgeRight  = 1
 	edgeBottom = 2
-	edgeLeft = 3
+	edgeLeft   = 3
 )
 
 func getEdge(t [][]byte, which int) []byte {
@@ -40,13 +40,13 @@ func getEdge(t [][]byte, which int) []byte {
 		// right
 		newContainer := make([]byte, len(t))
 		for i := 0; i < len(t); i++ {
-			newContainer[i] = t[i][len(t[i]) - 1]
+			newContainer[i] = t[i][len(t[i])-1]
 		}
 
 		return newContainer
 	case edgeBottom:
 		// bottom
-		return t[len(t) - 1]
+		return t[len(t)-1]
 	case edgeLeft:
 		// left
 		newContainer := make([]byte, len(t))
@@ -87,7 +87,7 @@ func rotate(tile [][]byte) [][]byte {
 
 	for x := 0; x < len(tile); x++ {
 		for y := 0; y < len(tile); y++ {
-			newTile[len(tile) - y - 1][x] = tile[x][y]
+			newTile[len(tile)-y-1][x] = tile[x][y]
 		}
 	}
 
@@ -102,7 +102,7 @@ func flipY(tile [][]byte) [][]byte {
 
 	for x := 0; x < len(tile); x++ {
 		for y := 0; y < len(tile); y++ {
-			newTile[x][y] = tile[len(tile) - x - 1][y]
+			newTile[x][y] = tile[len(tile)-x-1][y]
 		}
 	}
 
@@ -117,13 +117,12 @@ func flipX(tile [][]byte) [][]byte {
 
 	for x := 0; x < len(tile); x++ {
 		for y := 0; y < len(tile); y++ {
-			newTile[x][y] = tile[x][len(tile[x]) - y - 1]
+			newTile[x][y] = tile[x][len(tile[x])-y-1]
 		}
 	}
 
 	return newTile
 }
-
 
 func eq(tileA, tileB [][]byte) bool {
 	for x := 0; x < len(tileA); x++ {
@@ -154,15 +153,15 @@ func generateRotatesFlips(tile [][]byte) [][][]byte {
 			for yFlip := 0; yFlip < 2; yFlip += 1 {
 
 				newTile := tile
-				for r := 0; r < rotation; r+= 1 {
+				for r := 0; r < rotation; r += 1 {
 					newTile = rotate(tile)
 				}
 
-				if xFlip == 1{
+				if xFlip == 1 {
 					newTile = flipY(newTile)
 				}
 
-				if yFlip == 1{
+				if yFlip == 1 {
 					newTile = flipX(newTile)
 				}
 
@@ -177,14 +176,13 @@ func generateRotatesFlips(tile [][]byte) [][][]byte {
 	return retTiles
 }
 
-
 type assignment struct {
 	id int
 
 	tile [][]byte
 }
 
-func (a assignment) getEdge(which int) []byte{
+func (a assignment) getEdge(which int) []byte {
 	return getEdge(a.tile, which)
 }
 
@@ -194,20 +192,20 @@ func possibilities(tiles map[int][][]byte, used map[int]bool, assignments [][]*a
 	var bottomMatch []byte
 	var leftMatch []byte
 
-	if y != 0 && assignments[x][y-1] != nil{
+	if y != 0 && assignments[x][y-1] != nil {
 		topMatch = assignments[x][y-1].getEdge(edgeBottom)
 	}
 
-	if x != len(assignments) - 1 && assignments[x + 1][y] != nil{
-		rightMatch = assignments[x + 1][y].getEdge(edgeLeft)
+	if x != len(assignments)-1 && assignments[x+1][y] != nil {
+		rightMatch = assignments[x+1][y].getEdge(edgeLeft)
 	}
 
-	if y != len(assignments[x]) - 1 && assignments[x][y + 1] != nil {
-		bottomMatch = assignments[x][y + 1].getEdge(edgeTop)
+	if y != len(assignments[x])-1 && assignments[x][y+1] != nil {
+		bottomMatch = assignments[x][y+1].getEdge(edgeTop)
 	}
 
-	if x != 0 && assignments[x - 1][y] != nil {
-		leftMatch = assignments[x - 1][y].getEdge(edgeRight)
+	if x != 0 && assignments[x-1][y] != nil {
+		leftMatch = assignments[x-1][y].getEdge(edgeRight)
 	}
 
 	var possib []*assignment
@@ -277,7 +275,7 @@ func solve(r io.Reader) {
 
 		if strings.Index(row, "Tile ") == 0 {
 			var err error
-			currId, err = strconv.Atoi(row[5:len(row) - 1])
+			currId, err = strconv.Atoi(row[5 : len(row)-1])
 			if err != nil {
 				panic(err)
 			}
@@ -317,8 +315,8 @@ func solve(r io.Reader) {
 		panic("impossible")
 	}
 
-	ret := assignments[0][0].id * assignments[0][size - 1].id * assignments[size - 1][0].id * assignments[size - 1][size - 1].id
-	fmt.Println(assignments[0][0].id,  assignments[0][size - 1].id, assignments[size - 1][0].id, assignments[size - 1][size - 1].id, ret)
+	ret := assignments[0][0].id * assignments[0][size-1].id * assignments[size-1][0].id * assignments[size-1][size-1].id
+	fmt.Println(assignments[0][0].id, assignments[0][size-1].id, assignments[size-1][0].id, assignments[size-1][size-1].id, ret)
 
 	/*for x := 0; x < size; x++ {
 		for y := 0; y < size; y++ {

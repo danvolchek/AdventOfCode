@@ -22,10 +22,10 @@ func input() *os.File {
 }
 
 const (
-	edgeTop = 0
-	edgeRight = 1
+	edgeTop    = 0
+	edgeRight  = 1
 	edgeBottom = 2
-	edgeLeft = 3
+	edgeLeft   = 3
 )
 
 func getEdge(t [][]byte, which int) []byte {
@@ -41,13 +41,13 @@ func getEdge(t [][]byte, which int) []byte {
 		// right
 		newContainer := make([]byte, len(t))
 		for i := 0; i < len(t); i++ {
-			newContainer[i] = t[i][len(t[i]) - 1]
+			newContainer[i] = t[i][len(t[i])-1]
 		}
 
 		return newContainer
 	case edgeBottom:
 		// bottom
-		return t[len(t) - 1]
+		return t[len(t)-1]
 	case edgeLeft:
 		// left
 		newContainer := make([]byte, len(t))
@@ -88,7 +88,7 @@ func rotate(tile [][]byte) [][]byte {
 
 	for x := 0; x < len(tile); x++ {
 		for y := 0; y < len(tile); y++ {
-			newTile[len(tile) - y - 1][x] = tile[x][y]
+			newTile[len(tile)-y-1][x] = tile[x][y]
 		}
 	}
 
@@ -103,7 +103,7 @@ func flipY(tile [][]byte) [][]byte {
 
 	for x := 0; x < len(tile); x++ {
 		for y := 0; y < len(tile); y++ {
-			newTile[x][y] = tile[len(tile) - x - 1][y]
+			newTile[x][y] = tile[len(tile)-x-1][y]
 		}
 	}
 
@@ -118,13 +118,12 @@ func flipX(tile [][]byte) [][]byte {
 
 	for x := 0; x < len(tile); x++ {
 		for y := 0; y < len(tile); y++ {
-			newTile[x][y] = tile[x][len(tile[x]) - y - 1]
+			newTile[x][y] = tile[x][len(tile[x])-y-1]
 		}
 	}
 
 	return newTile
 }
-
 
 func eq(tileA, tileB [][]byte) bool {
 	for x := 0; x < len(tileA); x++ {
@@ -155,15 +154,15 @@ func generateRotatesFlips(tile [][]byte) [][][]byte {
 			for yFlip := 0; yFlip < 2; yFlip += 1 {
 
 				newTile := tile
-				for r := 0; r < rotation; r+= 1 {
+				for r := 0; r < rotation; r += 1 {
 					newTile = rotate(tile)
 				}
 
-				if xFlip == 1{
+				if xFlip == 1 {
 					newTile = flipY(newTile)
 				}
 
-				if yFlip == 1{
+				if yFlip == 1 {
 					newTile = flipX(newTile)
 				}
 
@@ -178,14 +177,13 @@ func generateRotatesFlips(tile [][]byte) [][][]byte {
 	return retTiles
 }
 
-
 type assignment struct {
 	id int
 
 	tile [][]byte
 }
 
-func (a assignment) getEdge(which int) []byte{
+func (a assignment) getEdge(which int) []byte {
 	return getEdge(a.tile, which)
 }
 
@@ -195,20 +193,20 @@ func possibilities(tiles map[int][][]byte, used map[int]bool, assignments [][]*a
 	var bottomMatch []byte
 	var leftMatch []byte
 
-	if y != 0 && assignments[x][y-1] != nil{
+	if y != 0 && assignments[x][y-1] != nil {
 		topMatch = assignments[x][y-1].getEdge(edgeBottom)
 	}
 
-	if x != len(assignments) - 1 && assignments[x + 1][y] != nil{
-		rightMatch = assignments[x + 1][y].getEdge(edgeLeft)
+	if x != len(assignments)-1 && assignments[x+1][y] != nil {
+		rightMatch = assignments[x+1][y].getEdge(edgeLeft)
 	}
 
-	if y != len(assignments[x]) - 1 && assignments[x][y + 1] != nil {
-		bottomMatch = assignments[x][y + 1].getEdge(edgeTop)
+	if y != len(assignments[x])-1 && assignments[x][y+1] != nil {
+		bottomMatch = assignments[x][y+1].getEdge(edgeTop)
 	}
 
-	if x != 0 && assignments[x - 1][y] != nil {
-		leftMatch = assignments[x - 1][y].getEdge(edgeRight)
+	if x != 0 && assignments[x-1][y] != nil {
+		leftMatch = assignments[x-1][y].getEdge(edgeRight)
 	}
 
 	var possib []*assignment
@@ -217,7 +215,7 @@ func possibilities(tiles map[int][][]byte, used map[int]bool, assignments [][]*a
 	i := 0
 	for id := range tiles {
 		tileOrder[i] = id
-		i+=1
+		i += 1
 	}
 
 	sort.Ints(tileOrder)
@@ -288,7 +286,7 @@ func solve(r io.Reader) {
 
 		if strings.Index(row, "Tile ") == 0 {
 			var err error
-			currId, err = strconv.Atoi(row[5:len(row) - 1])
+			currId, err = strconv.Atoi(row[5 : len(row)-1])
 			if err != nil {
 				panic(err)
 			}
@@ -328,8 +326,8 @@ func solve(r io.Reader) {
 		panic("impossible")
 	}
 
-	ret := assignments[0][0].id * assignments[0][size - 1].id * assignments[size - 1][0].id * assignments[size - 1][size - 1].id
-	fmt.Println(assignments[0][0].id,  assignments[0][size - 1].id, assignments[size - 1][0].id, assignments[size - 1][size - 1].id, ret)
+	ret := assignments[0][0].id * assignments[0][size-1].id * assignments[size-1][0].id * assignments[size-1][size-1].id
+	fmt.Println(assignments[0][0].id, assignments[0][size-1].id, assignments[size-1][0].id, assignments[size-1][size-1].id, ret)
 
 	/*for x := 0; x < size; x++ {
 		for y := 0; y < size; y++ {
@@ -344,7 +342,7 @@ func solve(r io.Reader) {
 	}
 	for x := 0; x < size; x++ {
 		for y := 0; y < size; y++ {
-			newAssignments[size - x -1][size - y - 1] = assignments[y][x]
+			newAssignments[size-x-1][size-y-1] = assignments[y][x]
 		}
 	}
 
@@ -352,7 +350,6 @@ func solve(r io.Reader) {
 
 	//ret = assignments[0][0].id * assignments[0][size - 1].id * assignments[size - 1][0].id * assignments[size - 1][size - 1].id
 	//fmt.Println(assignments[0][0].id,  assignments[0][size - 1].id, assignments[size - 1][0].id, assignments[size - 1][size - 1].id, ret)
-
 
 	//fmt.Println("----------------")
 
@@ -374,7 +371,6 @@ func solve(r io.Reader) {
 
 	removed := findAndRemove(picture, monster)
 
-
 	printTile(removed)
 	fmt.Println(count(removed, '#'))
 }
@@ -394,18 +390,18 @@ func count(tile [][]byte, b byte) int {
 }
 
 func find(haystack [][]byte, needle [][]byte) (bool, int, int) {
-	for x := 0; x < len(haystack) - len(needle); x++ {
-		for y := 0; y < len(haystack[x]) - len(needle[x % len(needle)]); y++ {
+	for x := 0; x < len(haystack)-len(needle); x++ {
+		for y := 0; y < len(haystack[x])-len(needle[x%len(needle)]); y++ {
 
 			all := true
 
-			for i:= 0; i < len(needle); i++ {
-				for j:=0; j < len(needle[i]); j++ {
+			for i := 0; i < len(needle); i++ {
+				for j := 0; j < len(needle[i]); j++ {
 					if needle[i][j] == 0 {
 						continue
 					}
 
-					if haystack[x + i][y + j] != needle[i][j] {
+					if haystack[x+i][y+j] != needle[i][j] {
 						all = false
 						break
 					}
@@ -417,27 +413,26 @@ func find(haystack [][]byte, needle [][]byte) (bool, int, int) {
 			}
 
 			if all {
-				return true, x ,y
+				return true, x, y
 			}
 
 		}
 	}
 
-	return false, 0 ,0
+	return false, 0, 0
 }
 
 func remove(haystack [][]byte, needle [][]byte, x, y int) {
-	for i:= 0; i < len(needle); i++ {
-		for j:=0; j < len(needle[i]); j++ {
+	for i := 0; i < len(needle); i++ {
+		for j := 0; j < len(needle[i]); j++ {
 			if needle[i][j] == 0 {
 				continue
 			}
 
-			haystack[x + i][y + j] ='O'
+			haystack[x+i][y+j] = 'O'
 		}
 
 	}
-
 
 }
 
@@ -448,7 +443,7 @@ func findAndRemove(haystack [][]byte, needle [][]byte) [][]byte {
 		var didFind bool
 		for _, way := range ways {
 
-			found, x ,y := find(way, needle)
+			found, x, y := find(way, needle)
 
 			if found {
 				remove(way, needle, x, y)
@@ -501,9 +496,8 @@ func amalgamate(assignments [][]*assignment) [][]byte {
 		ret[i] = make([]byte, size)
 	}
 
-
 	for x := 0; x < len(assignments); x++ {
-		for y := 0;y < len(assignments[x]); y++ {
+		for y := 0; y < len(assignments[x]); y++ {
 			tile := assignments[x][y].tile
 
 			targetX := targetTileSize * x //(len(assignments) - x - 1)
@@ -511,10 +505,9 @@ func amalgamate(assignments [][]*assignment) [][]byte {
 
 			tile = flipX(rotate(tile))
 
-
-			for sourceX := borderSize; sourceX <  len(tile) - borderSize; sourceX ++ {
-				for sourceY := borderSize; sourceY < len(tile[sourceX]) - borderSize; sourceY++ {
-					ret[targetX + sourceX - borderSize][targetY + sourceY - borderSize] = tile[sourceY][sourceX]
+			for sourceX := borderSize; sourceX < len(tile)-borderSize; sourceX++ {
+				for sourceY := borderSize; sourceY < len(tile[sourceX])-borderSize; sourceY++ {
+					ret[targetX+sourceX-borderSize][targetY+sourceY-borderSize] = tile[sourceY][sourceX]
 				}
 			}
 
