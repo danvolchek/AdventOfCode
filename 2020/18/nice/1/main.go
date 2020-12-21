@@ -19,7 +19,7 @@ func input() *os.File {
 	return input
 }
 
-func read(r io.Reader) []string{
+func read(r io.Reader) []string {
 	var lines []string
 
 	scanner := bufio.NewScanner(r)
@@ -115,7 +115,7 @@ func tokenize(raw string) []token {
 			continue
 		}
 
-		isDigit := func(b byte) bool { return b >= '0' && b <= '9'}
+		isDigit := func(b byte) bool { return b >= '0' && b <= '9' }
 
 		if !isDigit(raw[i]) {
 			panic(raw[i])
