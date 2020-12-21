@@ -152,7 +152,7 @@ func (t *tokenStack) Pop() token {
 }
 
 func parse(tokens []token) expression {
-	tokenQueue := make(chan token, 10)
+	//tokenQueue := make(chan token, 10)
 	operatorStack := tokenStack{}
 
 	for _, token := range tokens {
@@ -166,6 +166,8 @@ func parse(tokens []token) expression {
 
 		}
 	}
+
+	return nil
 }
 
 func solve(equations []string) int {
