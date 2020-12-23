@@ -186,7 +186,6 @@ func newGamePool(workers int) gamePool {
 	return pool
 }*/
 
-
 /*func hash2(a, b uint64) uint64 {
 	return ((a+b)*(a+b+1))/2 + b
 }
@@ -222,7 +221,6 @@ func hash(a, b []int) uint64 {
 
 	return curr
 }*/
-
 
 //var pool = newGamePool(16)
 
@@ -308,7 +306,6 @@ func (g *game) round() {
 
 	g.r += 1
 }
-
 
 func (g *game) determineWinnerRecursive(deck11 *deck, toDraw1 int, deck22 *deck, toDraw2 int) player {
 
