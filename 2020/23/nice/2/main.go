@@ -31,7 +31,6 @@ type cup struct {
 	label int
 }
 
-// returns a linked list of cups and a map of labels to cups for efficient access
 func parse(r io.Reader) (*cup, map[int]*cup) {
 	var currentCup *cup
 	labelsToCups := make(map[int]*cup)
@@ -46,7 +45,6 @@ func parse(r io.Reader) (*cup, map[int]*cup) {
 		return scanner.Text()
 	}
 	labels := chomp()
-
 
 	var lastCup *cup
 	var maxLabel int
