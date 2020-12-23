@@ -318,7 +318,7 @@ func (g *game) determineWinnerRecursive(deck11 *deck, toDraw1 int, deck22 *deck,
 	d2.PushMany(deck22.cards[:toDraw2])
 	recursiveGame := newGame(d, d2)
 
-	fmt.Println("new game")
+	//fmt.Println("new game")
 
 	//snapshot := recursiveGame.createSnapshot()
 
@@ -355,17 +355,17 @@ func (g *game) updateDecks(winner player, player1Card, player2Card int) {
 
 func (g *game) runToCompletion() {
 	for !g.over {
-		fmt.Println(g)
+		//fmt.Println(g)
 		g.round()
 	}
 
-	fmt.Println(g)
+	//fmt.Println(g)
 
-	fmt.Println("done")
+	//fmt.Println("done")
 
-	if g.r == 100 {
-		panic(123)
-	}
+	//if g.r == 100 {
+	//	panic(123)
+	//}
 
 }
 
@@ -449,6 +449,6 @@ func score(deck []int) int {
 func main() {
 	//solve(strings.NewReader("Player 1:\n43\n19\n\nPlayer 2:\n2\n29\n14"))
 	//solve(strings.NewReader("Player 1:\n9\n2\n6\n3\n1\n\nPlayer 2:\n5\n8\n4\n7\n10"))
-	solve(strings.NewReader("Player 1:\n48\n23\n9\n34\n37\n36\n40\n26\n49\n7\n12\n20\n6\n45\n14\n42\n18\n31\n39\n47\n44\n15\n43\n10\n35\n\nPlayer 2:\n13\n19\n21\n32\n27\n16\n11\n29\n41\n46\n33\n1\n30\n22\n38\n5\n17\n4\n50\n2\n3\n28\n8\n25\n24"))
+	//solve(strings.NewReader("Player 1:\n48\n23\n9\n34\n37\n36\n40\n26\n49\n7\n12\n20\n6\n45\n14\n42\n18\n31\n39\n47\n44\n15\n43\n10\n35\n\nPlayer 2:\n13\n19\n21\n32\n27\n16\n11\n29\n41\n46\n33\n1\n30\n22\n38\n5\n17\n4\n50\n2\n3\n28\n8\n25\n24"))
 	solve(input())
 }
