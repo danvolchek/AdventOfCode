@@ -97,7 +97,7 @@ func move(curr *cup, labelToCup map[int]*cup) *cup {
 	// first action: pick up cups (by finding the cups after the current cup, and then removing them from the linked list)
 	first, second, third := curr.next, curr.next.next, curr.next.next.next
 
-	curr.next = curr.next.next.next.next
+	curr.next = third.next
 	third.next = nil
 
 	// second action: select destination cup (by finding the right destination value, and then the cup associated with it)
