@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path"
+	"strconv"
 )
 
 func input() *os.File {
@@ -20,15 +22,29 @@ func input() *os.File {
 func solve(r io.Reader) {
 	scanner := bufio.NewScanner(r)
 
+	lastMeasurement := math.MaxInt
+	numIncreases := 0
+
 	for scanner.Scan() {
 		row := scanner.Text()
 
-		fmt.Println(row)
+		measurement, err := strconv.Atoi(row)
+		if err != nil {
+			panic(err)
+		}
+
+		if measurement > lastMeasurement {
+			numIncreases += 1
+		}
+
+		lastMeasurement = measurement
 	}
 
 	if scanner.Err() != nil {
 		panic(scanner.Err())
 	}
+
+	fmt.Println(numIncreases)
 }
 
 func main() {

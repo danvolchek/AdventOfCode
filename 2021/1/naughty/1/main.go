@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"strconv"
 )
 
 func input() *os.File {
@@ -20,16 +21,35 @@ func input() *os.File {
 func solve(r io.Reader) {
 	scanner := bufio.NewScanner(r)
 
+	var last int
+	first := true
+
+	inc := 0
 	for scanner.Scan() {
 		row := scanner.Text()
 
-		fmt.Println(row)
+		v, err := strconv.ParseInt(row, 10, 32)
+		vv := int(v)
+		if err != nil {
+			panic(err)
+		}
+
+		if !first {
+			if vv > last {
+				inc++
+			}
+		}
+
+		first = false
+		last = vv
+
 	}
 
 	if scanner.Err() != nil {
 		panic(scanner.Err())
 	}
 
+	fmt.Println(inc)
 
 }
 
