@@ -7,7 +7,7 @@ import (
 
 type node struct {
 	value int
-	next *node
+	next  *node
 }
 
 type queue struct {
@@ -72,4 +72,3 @@ func (q *queue) String() string {
 
 	return ret.String()
 }
-

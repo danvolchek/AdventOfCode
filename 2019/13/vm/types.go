@@ -63,7 +63,7 @@ func (p positionArg) String() string {
 }
 
 type relativeArg struct {
-	raw int
+	raw  int
 	base int
 
 	back *int

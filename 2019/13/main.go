@@ -42,7 +42,7 @@ func one(tape []int) {
 	v.Run()
 
 	blocks := 0
-	for i := 0; i < len(v.Out); i+= 3 {
+	for i := 0; i < len(v.Out); i += 3 {
 		if v.Out[i+2] == 2 {
 			blocks += 1
 		}
@@ -56,7 +56,7 @@ func two(tape []int) {
 
 	v := vm.VM{
 		Tape:  tape,
-		In:    []int{0,0,0,0,0,0,0,0,0,0,0},
+		In:    []int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		debug: false,
 	}
 
