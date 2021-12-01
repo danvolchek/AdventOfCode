@@ -145,7 +145,7 @@ func (v *VM) checkIncreaseTape(pos int) {
 		return
 	}
 
-	larger := make([]int, pos + 1)
+	larger := make([]int, pos+1)
 	copy(larger, v.Tape)
 	v.Tape = larger
 }
