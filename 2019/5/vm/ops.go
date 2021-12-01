@@ -1,6 +1,5 @@
 package vm
 
-
 func add(vm *VM, arg0, arg1, arg2 arg) {
 	arg2.write(arg0.read() + arg1.read())
 }

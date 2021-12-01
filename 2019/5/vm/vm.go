@@ -57,7 +57,6 @@ func (v *VM) Run() {
 	panic("ran out of tape!")
 }
 
-
 func (v *VM) one(op func(v *VM, arg0 arg), instr instruction) {
 	arg0 := v.parseArg(v.PC, instr, 0)
 
@@ -105,7 +104,6 @@ func (v *VM) three(op func(v *VM, arg0, arg1, arg2 arg), instr instruction) {
 		v.PC += 4
 	}
 }
-
 
 func (v *VM) parseArg(start int, instr instruction, i int) arg {
 	raw := v.Tape[start+1+i]

@@ -34,8 +34,8 @@ func parse(reader io.Reader) []int {
 
 func runPrint(tape, input []int) {
 	v := vm.VM{
-		Tape: tape,
-		In:   input,
+		Tape:  tape,
+		In:    input,
 		Debug: false,
 	}
 
@@ -88,7 +88,6 @@ func main() {
 	runPrint(parse(strings.NewReader(larger)), []int{5})
 	runPrint(parse(strings.NewReader(larger)), []int{8})
 	runPrint(parse(strings.NewReader(larger)), []int{11})*/
-
 
 	input, err := os.Open(path.Join("2019", "5", "input.txt"))
 	if err != nil {

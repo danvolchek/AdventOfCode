@@ -5,15 +5,12 @@ import (
 	"math"
 )
 
-
-
 type argMode int
 
 const (
 	positionMode  argMode = 0
 	immediateMode argMode = 1
 )
-
 
 type instruction int
 
@@ -24,7 +21,7 @@ func (i instruction) Code() int {
 func (i instruction) Mode(p int) argMode {
 	v := int(i)
 
-	return argMode((v / int(math.Pow(10, float64(p + 2)))) % 10)
+	return argMode((v / int(math.Pow(10, float64(p+2)))) % 10)
 }
 
 type arg interface {
@@ -58,7 +55,7 @@ func (p positionArg) read() int {
 	return *p.back
 }
 
-func (p positionArg) write(v int)  {
+func (p positionArg) write(v int) {
 	*p.back = v
 }
 
