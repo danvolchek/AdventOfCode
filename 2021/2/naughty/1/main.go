@@ -29,21 +29,20 @@ func solve(r io.Reader) {
 		row := scanner.Text()
 
 		if strings.Index(row, "down") == 0 {
-			v, _ := strconv.Atoi(row[len("down") + 1:])
+			v, _ := strconv.Atoi(row[len("down")+1:])
 			depth += v
 		}
 
 		if strings.Index(row, "up") == 0 {
-			v, _ := strconv.Atoi(row[len("up") + 1:])
+			v, _ := strconv.Atoi(row[len("up")+1:])
 			depth -= v
 		}
 
 		if strings.Index(row, "forward") == 0 {
-			v, _ := strconv.Atoi(row[len("forward") + 1:])
+			v, _ := strconv.Atoi(row[len("forward")+1:])
 			horiz += v
 		}
 	}
-
 
 	fmt.Printf("%v %v %v\n", depth, horiz, depth*horiz)
 
