@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"path"
+	"regexp"
+	"strconv"
 )
 
 func input() *os.File {
@@ -17,14 +19,42 @@ func input() *os.File {
 	return input
 }
 
+var rowRegex = regexp.MustCompile(`(\w+) (\d+)`)
+
 func solve(r io.Reader) {
 	scanner := bufio.NewScanner(r)
+
+	depth := 0
+	horizontalPosition := 0
+	aim := 0
 
 	for scanner.Scan() {
 		row := scanner.Text()
 
-		fmt.Println(row)
+		parts := rowRegex.FindStringSubmatch(row)
+		if len(parts) != 3 {
+			panic(fmt.Sprintf("bad row %s", row))
+		}
+
+		operation := parts[1]
+		rawValue := parts[2]
+		value, err := strconv.Atoi(rawValue)
+		if err != nil {
+			panic(err)
+		}
+
+		switch operation {
+		case "down":
+			aim += value
+		case "up":
+			aim -= value
+		case "forward":
+			horizontalPosition += value
+			depth += aim * value
+		}
 	}
+
+	fmt.Printf("Depth: %v Horizontal Position: %v Answer: %v\n", depth, horizontalPosition, depth*horizontalPosition)
 
 	if scanner.Err() != nil {
 		panic(scanner.Err())
