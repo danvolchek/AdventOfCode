@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"path"
+	"strconv"
+	"strings"
 )
 
 func input() *os.File {
@@ -20,11 +22,30 @@ func input() *os.File {
 func solve(r io.Reader) {
 	scanner := bufio.NewScanner(r)
 
+	depth := 0
+	horiz := 0
+
 	for scanner.Scan() {
 		row := scanner.Text()
 
-		fmt.Println(row)
+		if strings.Index(row, "down") == 0 {
+			v, _ := strconv.Atoi(row[len("down") + 1:])
+			depth += v
+		}
+
+		if strings.Index(row, "up") == 0 {
+			v, _ := strconv.Atoi(row[len("up") + 1:])
+			depth -= v
+		}
+
+		if strings.Index(row, "forward") == 0 {
+			v, _ := strconv.Atoi(row[len("forward") + 1:])
+			horiz += v
+		}
 	}
+
+
+	fmt.Printf("%v %v %v\n", depth, horiz, depth*horiz)
 
 	if scanner.Err() != nil {
 		panic(scanner.Err())
