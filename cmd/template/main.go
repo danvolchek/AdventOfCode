@@ -15,6 +15,7 @@ import (
 const (
 	inputFileName = "input.txt"
 
+	cmdDirectory      = "cmd"
 	templateDirectory = "template"
 	templateStubName  = "main.txt"
 	stubTargetName    = "main.go"
@@ -53,7 +54,7 @@ func create() error {
 		return fmt.Errorf("couldn't create input file: %s", err)
 	}
 
-	tmpl, err := loadTemplate(path.Join(templateDirectory, templateStubName))
+	tmpl, err := loadTemplate(path.Join(cmdDirectory, templateDirectory, templateStubName))
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %s", err)
 	}
