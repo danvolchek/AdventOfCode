@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -19,23 +18,33 @@ func input() *os.File {
 }
 
 func solve(r io.Reader, width int) {
-	scanner := bufio.NewScanner(r)
-
-	var nums []string
-	for scanner.Scan() {
-		nums = append(nums, scanner.Text())
-	}
-	if scanner.Err() != nil {
-		panic(scanner.Err())
+	raw, err := io.ReadAll(r)
+	if err != nil {
+		panic(err)
 	}
 
+	nums := strings.Split(string(raw), "\n")
 	count := bitCount(nums)
 
-	gammaRate := constructIntFromBits(bitsByIndexFunc(count, mostCommonBit, width), width)
-	epsilonRate := constructIntFromBits(bitsByIndexFunc(count, leastCommonBit, width), width)
+	gammaBits := bitsByIndexFunc(count, mostCommonBit, width)
+	gammaRate := constructIntFromBits(gammaBits, width)
+
+	// epsilon is always the negation of gamma because the least common bit
+	// is by definition the opposite of the most common bit
+	epsilonRate := constructIntFromBits(negate(gammaBits), width)
 
 	fmt.Println(gammaRate, epsilonRate, gammaRate*epsilonRate)
+}
 
+func negate(bits []int) []int {
+	result := make([]int, len(bits))
+	for i, b := range bits {
+		if b == 0 {
+			result[i] = 1
+		}
+	}
+
+	return result
 }
 
 func bitsByIndexFunc(count []int, bitAtIndex func(count int) int, width int) []int {
@@ -82,14 +91,6 @@ func bitCount(nums []string) []int {
 
 func mostCommonBit(count int) int {
 	if count >= 0 {
-		return 1
-	}
-
-	return 0
-}
-
-func leastCommonBit(count int) int {
-	if count < 0 {
 		return 1
 	}
 

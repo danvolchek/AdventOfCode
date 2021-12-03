@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -19,15 +18,12 @@ func input() *os.File {
 }
 
 func solve(r io.Reader, width int) {
-	scanner := bufio.NewScanner(r)
+	raw, err := io.ReadAll(r)
+	if err != nil {
+		panic(err)
+	}
 
-	var nums []string
-	for scanner.Scan() {
-		nums = append(nums, scanner.Text())
-	}
-	if scanner.Err() != nil {
-		panic(scanner.Err())
-	}
+	nums := strings.Split(string(raw), "\n")
 
 	oxygenGeneratorBits := filterRepeatedly(nums, mostCommonBit)
 	epsilonGeneratorBits := filterRepeatedly(nums, leastCommonBit)
@@ -36,7 +32,6 @@ func solve(r io.Reader, width int) {
 	epsilonGeneratorRating := constructIntFromBits(epsilonGeneratorBits, width)
 
 	fmt.Println(oxygenGeneratorRating, epsilonGeneratorRating, oxygenGeneratorRating*epsilonGeneratorRating)
-
 }
 
 func filterRepeatedly(values []string, bitAtIndex func(count int) byte) string {
