@@ -26,12 +26,12 @@ func solve(r io.Reader, width int) {
 	nums := strings.Split(string(raw), "\n")
 
 	oxygenGeneratorBits := filterRepeatedly(nums, mostCommonBit)
-	epsilonGeneratorBits := filterRepeatedly(nums, leastCommonBit)
+	co2ScrubberBits := filterRepeatedly(nums, leastCommonBit)
 
 	oxygenGeneratorRating := constructIntFromBits(oxygenGeneratorBits, width)
-	epsilonGeneratorRating := constructIntFromBits(epsilonGeneratorBits, width)
+	co2ScrubberRating := constructIntFromBits(co2ScrubberBits, width)
 
-	fmt.Println(oxygenGeneratorRating, epsilonGeneratorRating, oxygenGeneratorRating*epsilonGeneratorRating)
+	fmt.Println(oxygenGeneratorRating, co2ScrubberRating, oxygenGeneratorRating*co2ScrubberRating)
 }
 
 func filterRepeatedly(values []string, bitAtIndex func(count int) byte) string {
