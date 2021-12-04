@@ -67,7 +67,7 @@ func SolutionInformation(root string) []Year {
 func parseYear(root, yearNum string) Year {
 	var days []Day
 
-	for i := 1; i < 25; i++ {
+	for i := 1; i <= 25; i++ {
 		dayNum := strconv.Itoa(i)
 		if !exists(path.Join(root, yearNum, dayNum)) {
 			days = append(days, Day{
