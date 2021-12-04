@@ -2,41 +2,45 @@
 
 This repo contains my solutions to the [Advent of Code](https://adventofcode.com/) puzzles.
 
-# Format
+# Solution format
 
 ```
-┌───<year>
-│   └───<day>
-│       ├───leaderboard
-│       │   ├───1
-│       │   └───2
-│       └───optimized
-│           ├───1
-│           └───2
-└───cmd
+<year>
+ └───<day>
+     ├───leaderboard
+     │   ├───1
+     │   └───2
+     └───optimized
+         ├───1
+         └───2
 ```
 
 | Directory     | Meaning                                                                                                      |
 |---------------|--------------------------------------------------------------------------------------------------------------|
-| `year`        | The year the puzzle was released.                                                                            |
-| `day`         | The day the puzzle was released.                                                                             |
+| `year`        | Holds solutions for all puzzles in that year.                                                                |
+| `day`         | Holds solutions for all puzzles on that day.                                                                 |
 | `leaderboard` | A quick attempt at the puzzle to try to get onto the leaderboards.                                           |
 | `optimized`   | The end result of optimizing the solution. Primarily for readability, secondarily for time/space complexity. |
-| `1`           | The first part of the puzzle.                                                                                |
-| `2`           | The second part of the puzzle.                                                                               |
-| `cmd`         | Contains useful scripts (e.g. generating new day directories.)                                               |
+| `1`           | Solution to the first part of the puzzle.                                                                    |
+| `2`           | Solution to the second part of the puzzle.                                                                   |
 
 # Notes
 
 ## Running
 
-The working directory needs to be the root folder of the repository, i.e. `AdventOfCode`, to run a solution.
+The working directory needs to be the root folder of the repository, i.e. `AdventOfCode`, to run both solutions and scripts.
 
 ## Organization
 
 Each day is partitioned into leaderboard and optimized solutions. The optimized solution usually builds on top of the leaderboard solution.
 
 Each part of each solution is partitioned into its own folder, where only that part is solved.
+
+# Scripts
+
+`cmd` contains scripts to:
+ - generate new solution directories
+ - update the tables below
 
 # Completion
 
