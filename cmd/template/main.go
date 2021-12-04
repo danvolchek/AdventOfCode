@@ -38,6 +38,8 @@ func main() {
 func create() error {
 	args, err := parseArgs()
 	if err != nil {
+		flag.PrintDefaults()
+		fmt.Println()
 		return fmt.Errorf("args are invalid: %s", err)
 	}
 
@@ -48,10 +50,12 @@ func create() error {
 		return fmt.Errorf("couldn't create solution folder: %s", err)
 	}
 
-	input, err := os.Create(path.Join(solutionFolder, inputFileName))
-	defer warn(input.Close)
-	if err != nil {
-		return fmt.Errorf("couldn't create input file: %s", err)
+	if !exists(path.Join(solutionFolder, inputFileName)) {
+		input, err := os.Create(path.Join(solutionFolder, inputFileName))
+		defer warn(input.Close)
+		if err != nil {
+			return fmt.Errorf("couldn't create input file: %s", err)
+		}
 	}
 
 	tmpl, err := loadTemplate(path.Join(cmdDirectory, templateDirectory, templateStubName))
@@ -59,6 +63,7 @@ func create() error {
 		return fmt.Errorf("couldn't load template: %s", err)
 	}
 
+	anyCreated := false
 	stubsWriter := &multiWriteCloser{}
 	defer warn(stubsWriter.Close)
 
@@ -66,13 +71,22 @@ func create() error {
 		for _, puzzleType := range puzzleParts {
 			stubDir := path.Join(solutionFolder, solutionType, puzzleType)
 
+			if exists(path.Join(stubDir, stubTargetName)) {
+				continue
+			}
+
 			stubFile, err := createFileAndDirectories(stubDir, stubTargetName)
 			if err != nil {
 				return fmt.Errorf("couldn't create stub file %s: %s", path.Join(stubDir, stubTargetName), err)
 			}
 
+			anyCreated = true
+
 			stubsWriter.Add(stubFile)
 		}
+	}
+	if !anyCreated {
+		return fmt.Errorf("all files already exist, couldn't create anything")
 	}
 
 	err = tmpl.Execute(stubsWriter, args)
@@ -106,7 +120,7 @@ func parseArgs() (args, error) {
 	}
 
 	if rawTypes == "" {
-		return args{}, errors.New("type must be provided")
+		return args{}, errors.New("types must be provided")
 	}
 
 	parsed.Types = strings.Split(rawTypes, ",")
@@ -120,16 +134,7 @@ func parseArgs() (args, error) {
 }
 
 func createSolutionFolder(path string) error {
-	exists, err := exists(path)
-	if err != nil {
-		return err
-	}
-
-	if exists {
-		return fmt.Errorf("%s already exists", path)
-	}
-
-	err = os.MkdirAll(path, os.ModePerm)
+	err := os.MkdirAll(path, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("couldn't make directories: %s", err)
 	}
@@ -137,17 +142,17 @@ func createSolutionFolder(path string) error {
 	return nil
 }
 
-func exists(path string) (bool, error) {
+func exists(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return false, nil
+			return false
 		}
 
-		return false, err
+		panic(err)
 	}
 
-	return true, nil
+	return true
 }
 
 func loadTemplate(path string) (*template.Template, error) {
