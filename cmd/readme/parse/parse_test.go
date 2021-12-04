@@ -105,22 +105,33 @@ func TestSolutionInformation(t *testing.T) {
 
 func fill(expected []parse.Year) {
 	for yearNum, year := range expected {
-		dayNum := 0
 		newDays := make([]parse.Day, 25)
+
 		for i := 1; i <= 25; i++ {
 			stringNum := strconv.Itoa(i)
-			if dayNum >= len(year.Days) || year.Days[dayNum].Num != stringNum {
-				newDays[i-1] = parse.Day{
+
+			day, found := findDay(stringNum, year.Days)
+			if !found {
+				day = parse.Day{
 					Num: stringNum,
 				}
-			} else {
-				newDays[i-1] = year.Days[dayNum]
-				dayNum++
 			}
+
+			newDays[i-1] = day
 		}
 
 		expected[yearNum].Days = newDays
 	}
+}
+
+func findDay(num string, days []parse.Day) (parse.Day, bool) {
+	for _, day := range days {
+		if day.Num == num {
+			return day, true
+		}
+	}
+
+	return parse.Day{}, false
 }
 
 func marshal(v interface{}) []byte {
