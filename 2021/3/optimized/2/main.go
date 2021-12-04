@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -17,13 +18,14 @@ func input() *os.File {
 	return input
 }
 
-func solve(r io.Reader, width int) {
+func solve(r io.Reader) {
 	raw, err := io.ReadAll(r)
 	if err != nil {
 		panic(err)
 	}
 
-	nums := strings.Split(string(raw), "\n")
+	nums := strings.Split(string(bytes.TrimSpace(raw)), "\n")
+	width := len(nums[0])
 
 	oxygenGeneratorBits := filterRepeatedly(nums, mostCommonBit)
 	co2ScrubberBits := filterRepeatedly(nums, leastCommonBit)
@@ -114,6 +116,6 @@ func leastCommonBit(count int) byte {
 }
 
 func main() {
-	solve(strings.NewReader("00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010"), 5)
-	solve(input(), 12)
+	solve(strings.NewReader("00100\n11110\n10110\n10111\n10101\n01111\n00111\n11100\n10000\n11001\n00010\n01010"))
+	solve(input())
 }
