@@ -21,9 +21,9 @@ func solve(r io.Reader) {
 	scanner := bufio.NewScanner(r)
 
 	for scanner.Scan() {
-		row := scanner.Text()
+		line := scanner.Text()
 
-		fmt.Println(row)
+		fmt.Println(line)
 	}
 
 	if scanner.Err() != nil {
