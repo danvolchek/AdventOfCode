@@ -62,7 +62,7 @@ func create() error {
 	stubsWriter := &multiWriteCloser{}
 	defer warn(stubsWriter.Close)
 
-	for _, solutionType := range solutionTypes {
+	for _, solutionType := range args.Types {
 		for _, puzzleType := range puzzleParts {
 			stubDir := path.Join(solutionFolder, solutionType, puzzleType)
 
@@ -85,13 +85,16 @@ func create() error {
 
 type args struct {
 	Year, Day string
+	Types     []string
 }
 
 func parseArgs() (args, error) {
 	var parsed args
 
+	var rawTypes string
 	flag.StringVar(&parsed.Year, "year", "", "the year to add")
 	flag.StringVar(&parsed.Day, "day", "", "the day to add")
+	flag.StringVar(&rawTypes, "types", "", "the types to add")
 	flag.Parse()
 
 	if parsed.Year == "" {
@@ -100,6 +103,17 @@ func parseArgs() (args, error) {
 
 	if parsed.Day == "" {
 		return args{}, errors.New("day must be provided")
+	}
+
+	if rawTypes == "" {
+		return args{}, errors.New("type must be provided")
+	}
+
+	parsed.Types = strings.Split(rawTypes, ",")
+	for _, part := range parsed.Types {
+		if part != solutionTypes[0] && part != solutionTypes[1] {
+			return args{}, fmt.Errorf("invalid types %s", part)
+		}
 	}
 
 	return parsed, nil
