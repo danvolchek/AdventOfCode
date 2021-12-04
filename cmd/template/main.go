@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	solutionTypes = []string{"naughty", "nice"}
+	solutionTypes = []string{"leaderboard", "optimized"}
 	puzzleParts   = []string{"1", "2"}
 )
 
