@@ -38,18 +38,25 @@ Each part of each solution is partitioned into its own folder, where only that p
 
 # Scripts
 
-`cmd` contains scripts to:
- - generate new solution directories
- - update the tables below
+## Generating new solution directories
+
+`go run cmd/template/main.go` will infer which directory to generate by looking at the last completed puzzle and generating the next one.
+E.g. if 2021/5/leaderboard exists, it'll generate 2021/5/optimized. Once that exists, it'll generate 2021/6/leaderboard, and so on.
+
+The year/day/type can be provided manually as well. See `go run cmd/template/main.go --help` for argument info.
+
+## Updating the completion tables
+
+`go run cmd/readme/main.go` will update the completion tables below based on the directory structure of the repository. It takes no arguments.
 
 # Completion
 
 ## 2021
 
-|             | 1                                                                   | 2                                                                   | 3                                                                   | 4                                                                   | 5                                                                   | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 |
-|-------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---|---|---|---|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
-| leaderboard | [1](2021/1/leaderboard/1/main.go),[2](2021/1/leaderboard/2/main.go) | [1](2021/2/leaderboard/1/main.go),[2](2021/2/leaderboard/2/main.go) | [1](2021/3/leaderboard/1/main.go),[2](2021/3/leaderboard/2/main.go) | [1](2021/4/leaderboard/1/main.go),[2](2021/4/leaderboard/2/main.go) | [1](2021/5/leaderboard/1/main.go),[2](2021/5/leaderboard/2/main.go) |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
-| optimized   | [1](2021/1/optimized/1/main.go),[2](2021/1/optimized/2/main.go)     | [1](2021/2/optimized/1/main.go),[2](2021/2/optimized/2/main.go)     | [1](2021/3/optimized/1/main.go),[2](2021/3/optimized/2/main.go)     | [1](2021/4/optimized/1/main.go),[2](2021/4/optimized/2/main.go)     | [1](2021/5/optimized/1/main.go),[2](2021/5/optimized/2/main.go)     |   |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
+|             | 1                                                                   | 2                                                                   | 3                                                                   | 4                                                                   | 5                                                                   | 6                                                                   | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 |
+|-------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---|---|---|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| leaderboard | [1](2021/1/leaderboard/1/main.go),[2](2021/1/leaderboard/2/main.go) | [1](2021/2/leaderboard/1/main.go),[2](2021/2/leaderboard/2/main.go) | [1](2021/3/leaderboard/1/main.go),[2](2021/3/leaderboard/2/main.go) | [1](2021/4/leaderboard/1/main.go),[2](2021/4/leaderboard/2/main.go) | [1](2021/5/leaderboard/1/main.go),[2](2021/5/leaderboard/2/main.go) | [1](2021/6/leaderboard/1/main.go),[2](2021/6/leaderboard/2/main.go) |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
+| optimized   | [1](2021/1/optimized/1/main.go),[2](2021/1/optimized/2/main.go)     | [1](2021/2/optimized/1/main.go),[2](2021/2/optimized/2/main.go)     | [1](2021/3/optimized/1/main.go),[2](2021/3/optimized/2/main.go)     | [1](2021/4/optimized/1/main.go),[2](2021/4/optimized/2/main.go)     | [1](2021/5/optimized/1/main.go),[2](2021/5/optimized/2/main.go)     |                                                                     |   |   |   |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |    |
 
 ## 2020
 
