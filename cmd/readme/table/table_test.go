@@ -1,6 +1,7 @@
 package table_test
 
 import (
+	"bytes"
 	"github.com/danvolchek/AdventOfCode/cmd/readme/table"
 	"testing"
 )
@@ -117,7 +118,11 @@ func TestTable(t *testing.T) {
 				tbl.AddColumn(testColumn.header, testColumn.rows)
 			}
 
-			got := tbl.ToMarkdown()
+			b := &bytes.Buffer{}
+
+			tbl.ToBuffer(b)
+
+			got := b.String()
 
 			if got != testCase.want {
 				t.Errorf("got\n%s\nwant\n%s\n", got, testCase.want)
