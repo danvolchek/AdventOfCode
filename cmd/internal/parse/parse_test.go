@@ -2,7 +2,7 @@ package parse_test
 
 import (
 	"encoding/json"
-	"github.com/danvolchek/AdventOfCode/cmd/readme/parse"
+	"github.com/danvolchek/AdventOfCode/cmd/internal/parse"
 	"reflect"
 	"strconv"
 	"testing"

@@ -21,6 +21,14 @@ type Day struct {
 	PartTwo Part
 }
 
+func (d Day) HasSolution(leaderboard bool) bool {
+	if leaderboard {
+		return d.PartOne.LeaderboardSolutionPath != "" || d.PartTwo.LeaderboardSolutionPath != ""
+	}
+
+	return d.PartOne.OptimizedSolutionPath != "" || d.PartTwo.OptimizedSolutionPath != ""
+}
+
 type Part struct {
 	LeaderboardSolutionPath string
 	OptimizedSolutionPath   string
@@ -58,7 +66,7 @@ func SolutionInformation(root string) []Year {
 	}
 
 	sort.Slice(years, func(i, j int) bool {
-		return toInt(years[i].Num) > toInt(years[j].Num)
+		return ToInt(years[i].Num) > ToInt(years[j].Num)
 	})
 
 	return years
@@ -81,7 +89,7 @@ func parseYear(root, yearNum string) Year {
 	}
 
 	sort.Slice(days, func(i, j int) bool {
-		return toInt(days[i].Num) < toInt(days[j].Num)
+		return ToInt(days[i].Num) < ToInt(days[j].Num)
 	})
 
 	return Year{
@@ -126,7 +134,7 @@ func parsePart(root, yearNum, dayNum, partNum string) Part {
 	}
 }
 
-func toInt(value string) int {
+func ToInt(value string) int {
 	intValue, err := strconv.Atoi(value)
 	if err != nil {
 		panic(err)

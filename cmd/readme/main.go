@@ -4,11 +4,17 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/danvolchek/AdventOfCode/cmd/readme/parse"
+	"github.com/danvolchek/AdventOfCode/cmd/internal/parse"
 	"github.com/danvolchek/AdventOfCode/cmd/readme/table"
 	"os"
 	"strings"
 )
+
+const (
+	readMePath = "README.md"
+)
+
+var tableSection = []byte("# Completion")
 
 func main() {
 	err := generateReadme()
@@ -18,12 +24,6 @@ func main() {
 
 	fmt.Println("Done!")
 }
-
-const (
-	readMePath = "README.md"
-)
-
-var tableSection = []byte("# Completion")
 
 func generateReadme() error {
 	readme, err := os.ReadFile(readMePath)
