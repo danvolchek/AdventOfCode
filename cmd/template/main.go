@@ -4,10 +4,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/danvolchek/AdventOfCode/cmd/internal/parse"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"text/template"
 )
@@ -111,6 +113,10 @@ func parseArgs() (args, error) {
 	flag.StringVar(&rawTypes, "types", "", "the types to add")
 	flag.Parse()
 
+	if parsed.Year == "" && parsed.Day == "" && rawTypes == "" {
+		return inferArgs()
+	}
+
 	if parsed.Year == "" {
 		return args{}, errors.New("year must be provided")
 	}
@@ -131,6 +137,44 @@ func parseArgs() (args, error) {
 	}
 
 	return parsed, nil
+}
+
+func inferArgs() (args, error) {
+	info := parse.SolutionInformation(".")
+
+	year := info[0]
+	day := 0
+	leaderboard := true
+	for day < len(year.Days) && year.Days[day].HasSolution(leaderboard) {
+		if leaderboard {
+			leaderboard = false
+		} else {
+			leaderboard = true
+			day += 1
+		}
+	}
+
+	var yearStr, dayStr, typeStr string
+	if day == len(year.Days) {
+		yearStr = strconv.Itoa(parse.ToInt(year.Num) + 1)
+		dayStr = "0"
+		typeStr = "leaderboard"
+	} else {
+		yearStr = year.Num
+		dayStr = year.Days[day].Num
+		typeStr = "leaderboard"
+		if !leaderboard {
+			typeStr = "optimized"
+		}
+	}
+
+	fmt.Printf("Arguments not provided, inferring year %s day %s type %s\n", yearStr, dayStr, typeStr)
+
+	return args{
+		Year:  yearStr,
+		Day:   dayStr,
+		Types: []string{typeStr},
+	}, nil
 }
 
 func createSolutionFolder(path string) error {
