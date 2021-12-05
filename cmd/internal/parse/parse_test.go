@@ -68,7 +68,7 @@ func TestSolutionInformation(t *testing.T) {
 	result := parse.SolutionInformation("testData")
 
 	if len(result) != len(expected) {
-		t.Fatalf("missing years entirely")
+		t.Fatalf("got %v years, wanted %v years", len(result), len(expected))
 	}
 
 	for i := 0; i < len(expected); i++ {
@@ -98,9 +98,7 @@ func TestSolutionInformation(t *testing.T) {
 				t.Errorf("year %v: day %v: got\n%s\nwant\n%s\n", wantYear.Num, wantDay.Num, marshal(gotDay), marshal(wantDay))
 			}
 		}
-
 	}
-
 }
 
 func fill(expected []parse.Year) {
