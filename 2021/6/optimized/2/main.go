@@ -48,6 +48,7 @@ func solve(r io.Reader) {
 	for i := 0; i < days; i++ {
 		fishToCreate := fish[0]
 
+		// each fish timer ticks down one day
 		for timer := 0; timer < 8; timer++ {
 			fish[timer] = fish[timer+1]
 		}
