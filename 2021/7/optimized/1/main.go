@@ -61,10 +61,10 @@ func solve(r io.Reader) {
 	fmt.Println(minFuel)
 }
 
-func totalFuel(v int, crabs []int) int {
+func totalFuel(position int, crabs []int) int {
 	fuel := 0
-	for _, c := range crabs {
-		fuel += abs(c - v)
+	for _, crab := range crabs {
+		fuel += abs(crab - position)
 	}
 
 	return fuel
