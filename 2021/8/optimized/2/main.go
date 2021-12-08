@@ -69,43 +69,84 @@ func solve(r io.Reader) {
 	records := parse(r)
 
 	sum := 0
-	now := time.Now()
-	for i, record := range records {
-		nowNow := time.Now()
+	start := time.Now()
+	for _, record := range records {
 		mapping := findSignalSegmentMapping(record.patterns)
 
 		sum += translateDigits(record.output, mapping)
-		fmt.Println(i, time.Now().Sub(nowNow))
 	}
 
-	fmt.Println(sum, time.Now().Sub(now))
+	fmt.Println(sum, time.Now().Sub(start))
 }
 
 // findSignalSegmentMapping finds the mapping which satisfies all digits in patterns, or in other words
 // the mapping which results in all translated patterns being valid digits.
-// It does so by trying every single mapping. This is the place to optimize.
+// It does so by trying every single permutation of possible mappings. This is the place to optimize.
 func findSignalSegmentMapping(patterns []string) map[byte]byte {
-	mapping := map[byte]byte{
-		'a': 'a',
-		'b': 'a',
-		'c': 'a',
-		'd': 'a',
-		'e': 'a',
-		'f': 'a',
-		'g': 'a',
+	mapping := make(map[byte]byte)
+
+	perm := make([]int, len(segments))
+	for i := range perm {
+		perm[i] = i
 	}
 
+	updateMapping := func() {
+		for i, v := range perm {
+			mapping[byte('a'+i)] = byte('a' + v)
+		}
+	}
+
+	updateMapping()
+
 	for !areAllDigitsValid(patterns, mapping) {
-		index := 0
-		for mapping[segments[index]] == 'g' {
-			mapping[segments[index]] = 'a'
-			index++
+		ok := nextPermutation(perm)
+		if !ok {
+			panic("no more permutations to try")
 		}
 
-		mapping[segments[index]]++
+		updateMapping()
 	}
 
 	return mapping
+}
+
+// nextPermutation generates the next permutation of nums. It does so using Knuth's permutation algorithm from
+// https://stackoverflow.com/a/11208543 and returns false when all permutations are exhausted.
+func nextPermutation(nums []int) bool {
+	var largestIndex = -1
+	for i := len(nums) - 2; i >= 0; i-- {
+		if nums[i] < nums[i+1] {
+			largestIndex = i
+			break
+		}
+	}
+
+	if largestIndex < 0 {
+		return false
+	}
+
+	var largestIndex2 = -1
+	for i := len(nums) - 1; i >= 0; i-- {
+		if nums[largestIndex] < nums[i] {
+			largestIndex2 = i
+			break
+		}
+	}
+
+	tmp := nums[largestIndex]
+	nums[largestIndex] = nums[largestIndex2]
+	nums[largestIndex2] = tmp
+
+	for i, j := largestIndex+1, len(nums)-1; i < j; {
+		tmp = nums[i]
+		nums[i] = nums[j]
+		nums[j] = tmp
+
+		i++
+		j--
+	}
+
+	return true
 }
 
 // translateDigits translates every digit in mapping to an integer, and then assembles the digits into a single integer,
