@@ -79,6 +79,15 @@ func solve(r io.Reader) {
 	fmt.Println(sum, time.Now().Sub(start))
 }
 
+/*
+a -> 1 7
+b ->
+c -> 6 8
+d -> 0 8
+e 8 -> 9
+f ->
+ */
+
 // findSignalSegmentMapping finds the mapping which satisfies all digits in patterns, or in other words
 // the mapping which results in all translated patterns being valid digits.
 // It does so by trying every single permutation of possible mappings. This is the place to optimize.
