@@ -1,7 +1,6 @@
-.PHONY: all both readme template
-all: both
+.PHONY: all readme template
 
-both: template readme
+all: template readme
 
 readme:
 	go run cmd/readme/main.go
