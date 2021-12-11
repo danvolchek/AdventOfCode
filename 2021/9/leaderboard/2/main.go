@@ -104,7 +104,7 @@ func assignBasins(cave [][]int) [][]pos {
 
 var sentinel = pos{i: -1, j: -1}
 
-// to optimize, instead of starting from each point and moving lower, start from each basin and move up
+// to optimize, instead of starting from each point and moving lower, start from each low point and move up
 func flow(cave [][]int, assignment [][]pos, i, j int) pos {
 	if assignment[i][j] != sentinel || cave[i][j] == 9 {
 		return assignment[i][j]
