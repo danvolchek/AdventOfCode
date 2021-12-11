@@ -106,6 +106,10 @@ func parse(r io.Reader) [][]character {
 		chunks = append(chunks, chunk)
 	}
 
+	if scanner.Err() != nil {
+		panic(scanner.Err())
+	}
+
 	return chunks
 }
 
