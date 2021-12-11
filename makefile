@@ -1,8 +1,10 @@
-.PHONY: all readme template
-all: readme template
+.PHONY: all both readme template
+all: both
 
-readme: template $(shell find cmd -type f)
+both: template readme
+
+readme:
 	go run cmd/readme/main.go
 
-template: $(shell find cmd -type f)
+template:
 	go run cmd/template/main.go
