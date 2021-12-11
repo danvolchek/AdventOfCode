@@ -38,18 +38,20 @@ Each part of each solution is partitioned into its own folder, where only that p
 
 # Scripts
 
-Rather than using `go run`, `make` can also be run to build the scripts into the root of the repository.
-
 ## Generating new solution directories
 
-`go run cmd/template/main.go` will infer which directory to generate by looking at the last completed puzzle and generating the next one.
+`go run cmd/template/main.go` or `make template` will infer which directory to generate by looking at the last completed puzzle and generating the next one.
 E.g. if 2021/5/leaderboard exists, it'll generate 2021/5/optimized. Once that exists, it'll generate 2021/6/leaderboard, and so on.
 
 The year/day/type can be provided manually as well. See `go run cmd/template/main.go --help` for argument info.
 
 ## Updating the completion tables
 
-`go run cmd/readme/main.go` will update the completion tables below based on the directory structure of the repository. It takes no arguments.
+`go run cmd/readme/main.go` or `make readme` will update the completion tables below based on the directory structure of the repository. It takes no arguments.
+
+## Doing both
+
+`make` will infer a new day and then update the readme.
 
 # Completion
 
