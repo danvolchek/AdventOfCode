@@ -19,7 +19,7 @@ const (
 
 	cmdDirectory      = "cmd"
 	templateDirectory = "template"
-	templateStubName  = "_main.txt"
+	templateStubName  = "main.txt"
 	stubTargetName    = "main.go"
 )
 

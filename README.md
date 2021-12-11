@@ -38,6 +38,8 @@ Each part of each solution is partitioned into its own folder, where only that p
 
 # Scripts
 
+Rather than using `go run`, `make` can also be run to build the scripts into the root of the repository.
+
 ## Generating new solution directories
 
 `go run cmd/template/main.go` will infer which directory to generate by looking at the last completed puzzle and generating the next one.
