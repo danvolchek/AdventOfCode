@@ -49,6 +49,7 @@ func solve(r io.Reader) {
 }
 
 func explore(caves map[string][]string, current string, path []string) [][]string {
+	// this is really inefficient - see the optimized solution which runs 3x faster and allocates 50x less
 	next := append(clone(path), current)
 	if current == "end" {
 		return [][]string{next}

@@ -19,16 +19,29 @@ func input() *os.File {
 	return input
 }
 
-func parse(r io.Reader) map[string][]string {
+type cave struct {
+	name  string
+	small bool
+}
+
+func makeCave(name string) cave {
+	return cave{
+		name:  name,
+		small: strings.ToLower(name) == name,
+	}
+}
+
+func parse(r io.Reader) map[cave][]cave {
 	scanner := bufio.NewScanner(r)
 
-	caves := make(map[string][]string)
+	caves := make(map[cave][]cave)
 	for scanner.Scan() {
 		line := scanner.Text()
 
 		parts := strings.Split(line, "-")
-		first := parts[0]
-		second := parts[1]
+
+		first := makeCave(parts[0])
+		second := makeCave(parts[1])
 
 		caves[first] = append(caves[first], second)
 		caves[second] = append(caves[second], first)
@@ -45,7 +58,7 @@ func solve(r io.Reader) {
 	caves := parse(r)
 	t := time.Now()
 
-	numPaths := explore(caves, "start", nil)
+	numPaths := explore(caves, cave{name: "start", small: true}, nil)
 
 	fmt.Println(numPaths)
 	fmt.Println(time.Now().Sub(t))
@@ -54,14 +67,15 @@ func solve(r io.Reader) {
 // pathNode represents the current cave being visited along some path. By storing a pointer to the previous pathNode, it
 // builds a chain of caves in reverse order.
 type pathNode struct {
-	cave string
+	cave cave
 	prev *pathNode
 }
 
 // explore returns the number of paths from currentCave to "end", given an already travelled path of path and caves for
 // valid transitions between caves according to the rules of the part.
-func explore(caves map[string][]string, currentCave string, path *pathNode) int {
-	if currentCave == "end" {
+func explore(caves map[cave][]cave, currentCave cave, path *pathNode) int {
+	// a path has been found
+	if currentCave.name == "end" {
 		return 1
 	}
 
@@ -69,14 +83,15 @@ func explore(caves map[string][]string, currentCave string, path *pathNode) int 
 		cave: currentCave,
 		prev: path,
 	}
-	paths := 0
 
+	// add up the number of paths from taking all the possible caves we could go to from this cave
+	paths := 0
 	for _, nextCave := range caves[currentCave] {
 		// if we're visiting start again, don't - that's not allowed
 		// else, if all small caves have been visited exactly once, any cave is a valid cave
 		// else, if we've done this transition two or more times before, don't do it again to avoid infinite loops
 		// else, if we're visiting a small cave again, don't - that's not allowed (the double small cave has already been used)
-		if nextCave == "start" || (!smallCavesAllVisitedOnce(currentPath) && (transitionedBefore(currentCave, nextCave, currentPath) || visitingSmallAgain(nextCave, currentPath))) {
+		if nextCave.name == "start" || (!smallCavesAllVisitedOnce(currentPath) && (transitionedBefore(currentCave, nextCave, currentPath) || visitingSmallAgain(nextCave, currentPath))) {
 			continue
 		}
 
@@ -88,11 +103,11 @@ func explore(caves map[string][]string, currentCave string, path *pathNode) int 
 
 // transitionedBefore returns whether from -> to has happened two or more times already.
 // this is up one from part 1, because being able to visit a small cave twice means we may need to repeat transitions twice
-func transitionedBefore(from, to string, path *pathNode) bool {
+func transitionedBefore(from, to cave, path *pathNode) bool {
 	seen := 0
-	lastCave := ""
+	lastCave := cave{}
 
-	seenTooManyTimes := iterate(path, func(cave string) bool {
+	seenTooManyTimes := iterate(path, func(cave cave) bool {
 		if cave == from && lastCave == to {
 			if seen == 2 {
 				return false
@@ -108,13 +123,13 @@ func transitionedBefore(from, to string, path *pathNode) bool {
 	return seenTooManyTimes
 }
 
-func visitingSmallAgain(cave string, path *pathNode) bool {
-	if strings.ToLower(cave) != cave {
+func visitingSmallAgain(current cave, path *pathNode) bool {
+	if !current.small {
 		return false
 	}
 
-	foundSmall := iterate(path, func(visitedCave string) bool {
-		if visitedCave == cave {
+	foundSmall := iterate(path, func(cave cave) bool {
+		if cave == current {
 			return false
 		}
 
@@ -125,10 +140,10 @@ func visitingSmallAgain(cave string, path *pathNode) bool {
 }
 
 func smallCavesAllVisitedOnce(path *pathNode) bool {
-	smalls := make(map[string]int)
+	smalls := make(map[cave]int)
 
-	foundDoubleSmall := iterate(path, func(cave string) bool {
-		if strings.ToLower(cave) != cave {
+	foundDoubleSmall := iterate(path, func(cave cave) bool {
+		if !cave.small {
 			return true
 		}
 
@@ -145,7 +160,7 @@ func smallCavesAllVisitedOnce(path *pathNode) bool {
 
 // iterate traverses through the path ending at path, performing an action at each cave.
 // it returns true if it was told to stop early
-func iterate(path *pathNode, action func(cave string) bool) bool {
+func iterate(path *pathNode, action func(cave cave) bool) bool {
 	for path != nil {
 		cont := action(path.cave)
 		if !cont {
@@ -159,8 +174,8 @@ func iterate(path *pathNode, action func(cave string) bool) bool {
 
 func printCave(path *pathNode) {
 	var s string
-	iterate(path, func(cave string) bool {
-		s = cave + " " + s
+	iterate(path, func(cave cave) bool {
+		s = cave.name + " " + s
 
 		return true
 	})
