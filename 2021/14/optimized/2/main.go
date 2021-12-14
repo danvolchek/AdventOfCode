@@ -62,6 +62,7 @@ func parse(r io.Reader) (map[string]int, byte, byte, []rule) {
 
 func solve(r io.Reader) {
 	polymer, start, end, rules := parse(r)
+
 	for i := 0; i < steps; i++ {
 		simulate(polymer, rules)
 	}
@@ -77,15 +78,18 @@ func solve(r io.Reader) {
 func countElements(polymer map[string]int, start, end byte) []int {
 	countsByElement := make(map[byte]int)
 
-	// counting each pair double counts every element, because every pair shares elements with adjacent pairs
-	// (except for the first and last element, which are not shared, and so are undercounted by one)
+	// counting each pair double counts every element (except the first and last, see below)
+	// because every pair shares elements with adjacent pairs, so we can get the real count by
+	// adding all the pair counts and dividing them by 2
 	for pair, amount := range polymer {
 		for index := range pair {
 			countsByElement[pair[index]] += amount
 		}
 	}
 
-	// add one to first and last element
+	// the first and last element in the polymer are not double counted - they don't share adjacent pairs
+	// however, the division by 2 assumes every element is exactly double counted
+	// to make it correct, we purposefully double count the start and end elements (of which there are one each)
 	countsByElement[start] += 1
 	countsByElement[end] += 1
 
@@ -107,7 +111,7 @@ func countElements(polymer map[string]int, start, end byte) []int {
 }
 
 func simulate(polymer map[string]int, rules []rule) {
-	toAdd := make(map[string]int)
+	newPairs := make(map[string]int)
 
 	for _, r := range rules {
 		if amount := polymer[r.pair]; amount != 0 {
@@ -116,12 +120,12 @@ func simulate(polymer map[string]int, rules []rule) {
 
 			// each pair this rule generates is added to the polymer
 			for _, pair := range r.newPairs {
-				toAdd[pair] += amount
+				newPairs[pair] += amount
 			}
 		}
 	}
 
-	for pair, amount := range toAdd {
+	for pair, amount := range newPairs {
 		polymer[pair] += amount
 	}
 }
