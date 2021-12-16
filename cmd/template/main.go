@@ -71,8 +71,12 @@ func create() error {
 	defer warn(stubsWriter.Close)
 
 	for _, solutionType := range args.Types {
-		for _, puzzleType := range puzzleParts {
-			stubDir := path.Join(solutionFolder, solutionType, puzzleType)
+		for _, puzzlePart := range puzzleParts {
+			// day 25 only has 1 part
+			if args.Day == "25" && puzzlePart == "2" {
+				continue
+			}
+			stubDir := path.Join(solutionFolder, solutionType, puzzlePart)
 
 			if exists(path.Join(stubDir, stubTargetName)) {
 				continue
