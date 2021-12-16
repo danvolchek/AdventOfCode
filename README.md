@@ -43,6 +43,12 @@ Each part of each solution is partitioned into its own folder, where only that p
 `go run cmd/template/main.go` or `make template` will infer which directory to generate by looking at the last completed puzzle and generating the next one.
 E.g. if 2021/5/leaderboard exists, it'll generate 2021/5/optimized. Once that exists, it'll generate 2021/6/leaderboard, and so on.
 
+When inferring arguments, solutions to skip can be specified through `cmd/skip.txt`. Each line is of the format
+`year/day/types # optional comment`
+where types is a comma separated list of either `l` for leaderboard solutions or `o` for optimized solutions. 
+If no types are provided it defaults to all types for that day,
+if no day then all days for that year. Comments optional.
+
 The year/day/type can be provided manually as well. See `go run cmd/template/main.go --help` for argument info.
 
 ## Updating the completion tables

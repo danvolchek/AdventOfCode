@@ -17,10 +17,11 @@ import (
 const (
 	inputFileName = "input.txt"
 
-	cmdDirectory      = "cmd"
-	templateDirectory = "template"
-	templateStubName  = "main.txt"
-	stubTargetName    = "main.go"
+	cmdDirectory         = "cmd"
+	templateDirectory    = "template"
+	inferenceTypesToSkip = "skip.txt"
+	templateStubName     = "main.txt"
+	stubTargetName       = "main.go"
 )
 
 var (
@@ -104,6 +105,28 @@ type args struct {
 	Types     []string
 }
 
+func (a args) valid() error {
+	if a.Year == "" {
+		return errors.New("year must be provided")
+	}
+
+	if a.Day == "" {
+		return errors.New("day must be provided")
+	}
+
+	if len(a.Types) == 0 {
+		return errors.New("types must be provided")
+	}
+
+	for _, solType := range a.Types {
+		if solType != solutionTypes[0] && solType != solutionTypes[1] {
+			return fmt.Errorf("invalid types %s", solType)
+		}
+	}
+
+	return nil
+}
+
 func parseArgs() (args, error) {
 	var parsed args
 
@@ -112,69 +135,167 @@ func parseArgs() (args, error) {
 	flag.StringVar(&parsed.Day, "day", "", "the day to add")
 	flag.StringVar(&rawTypes, "types", "", "the types to add")
 	flag.Parse()
+	parsed.Types = strings.Split(rawTypes, ",")
 
 	if parsed.Year == "" && parsed.Day == "" && rawTypes == "" {
-		return inferArgs()
+		inferred, err := inferArgs()
+		if err != nil {
+			return args{}, err
+		}
+
+		if err := inferred.valid(); err != nil {
+			panic(fmt.Sprintf("infered args were invalid: %v:  %s", inferred, err))
+		}
+
+		fmt.Printf("arguments not provided so inferred %+v\n", inferred)
+
+		return inferred, nil
 	}
 
-	if parsed.Year == "" {
-		return args{}, errors.New("year must be provided")
+	return parsed, parsed.valid()
+}
+
+type skipIndicator struct {
+	year, day              string
+	leaderboard, optimized bool
+}
+
+func (s skipIndicator) Skip(y parse.Year, d parse.Day, leaderboard bool) bool {
+	if y.Num != s.year {
+		return false
 	}
 
-	if parsed.Day == "" {
-		return args{}, errors.New("day must be provided")
+	if s.day == "" {
+		return true
 	}
 
-	if rawTypes == "" {
-		return args{}, errors.New("types must be provided")
+	if s.day != d.Num {
+		return false
 	}
 
-	parsed.Types = strings.Split(rawTypes, ",")
-	for _, part := range parsed.Types {
-		if part != solutionTypes[0] && part != solutionTypes[1] {
-			return args{}, fmt.Errorf("invalid types %s", part)
+	if (leaderboard && s.leaderboard) || (!leaderboard && s.optimized) {
+		return true
+	}
+
+	return false
+}
+
+func parseSkipfile() ([]skipIndicator, error) {
+	skipFile, err := os.Open(path.Join(cmdDirectory, templateDirectory, inferenceTypesToSkip))
+	if err != nil {
+		return nil, err
+	}
+
+	skipBytes, err := io.ReadAll(skipFile)
+	if err != nil {
+		return nil, err
+	}
+
+	var skipIndicators []skipIndicator
+	rawSkips := strings.Split(strings.TrimSpace(string(skipBytes)), "\n")
+
+	for _, skip := range rawSkips {
+		skip = strings.TrimSpace(skip)
+		if commentIndex := strings.Index(skip, "#"); commentIndex != -1 {
+			skip = strings.TrimSpace(skip[0:commentIndex])
+		}
+
+		parts := strings.Split(skip, "/")
+
+		year, day := "", ""
+		leaderboard, optimized := true, true
+		switch len(parts) {
+		case 1:
+			year = parts[0]
+		case 2:
+			year, day = parts[0], parts[1]
+		case 3:
+			year, day = parts[0], parts[1]
+
+			if len(parts[2]) > 0 {
+				solutionTypes := strings.Split(parts[2], ",")
+				leaderboard, optimized = contains(solutionTypes, "l"), contains(solutionTypes, "o")
+			}
+		}
+		skipIndicators = append(skipIndicators, skipIndicator{
+			year:        year,
+			day:         day,
+			leaderboard: leaderboard,
+			optimized:   optimized,
+		})
+	}
+
+	return skipIndicators, nil
+}
+
+func contains(items []string, item string) bool {
+	for _, value := range items {
+		if value == item {
+			return true
 		}
 	}
 
-	return parsed, nil
+	return false
 }
 
 func inferArgs() (args, error) {
 	info := parse.SolutionInformation(".")
 
-	year := info[0]
-	day := 0
-	leaderboard := true
-	for day < len(year.Days) && year.Days[day].HasSolution(leaderboard) {
-		if leaderboard {
-			leaderboard = false
-		} else {
-			leaderboard = true
-			day += 1
+	skipIndicators, err := parseSkipfile()
+	if err != nil {
+		return args{}, err
+	}
+
+	return findIncompleteSolution(info, skipIndicators)
+}
+
+func shouldSkip(skipIndicators []skipIndicator, year parse.Year, day parse.Day, leaderboard bool) bool {
+	for _, indicator := range skipIndicators {
+		if indicator.Skip(year, day, leaderboard) {
+			return true
 		}
 	}
 
-	var yearStr, dayStr, typeStr string
-	if day == len(year.Days) {
-		yearStr = strconv.Itoa(parse.ToInt(year.Num) + 1)
-		dayStr = "0"
-		typeStr = "leaderboard"
-	} else {
-		yearStr = year.Num
-		dayStr = year.Days[day].Num
-		typeStr = "leaderboard"
-		if !leaderboard {
-			typeStr = "optimized"
+	return false
+}
+
+func findIncompleteSolution(info []parse.Year, skipIndicators []skipIndicator) (args, error) {
+	for i := len(info) - 1; i >= 0; i-- {
+		year := info[i]
+
+		for _, day := range year.Days {
+			for _, lb := range []bool{true, false} {
+				if !shouldSkip(skipIndicators, year, day, lb) && !day.HasSolution(lb) {
+					return createArgs(year, day, lb), nil
+				}
+			}
 		}
 	}
 
-	fmt.Printf("Arguments not provided, inferring year %s day %s type %s\n", yearStr, dayStr, typeStr)
+	yearInt, err := strconv.Atoi(info[0].Num)
+	if err != nil {
+		return args{}, err
+	}
 
 	return args{
-		Year:  yearStr,
-		Day:   dayStr,
-		Types: []string{typeStr},
+		Year:  strconv.Itoa(yearInt + 1),
+		Day:   "1",
+		Types: []string{"leaderboard"},
 	}, nil
+
+}
+
+func createArgs(y parse.Year, d parse.Day, leaderboard bool) args {
+	typeStr := "leaderboard"
+	if !leaderboard {
+		typeStr = "optimized"
+	}
+
+	return args{
+		Year:  y.Num,
+		Day:   d.Num,
+		Types: []string{typeStr},
+	}
 }
 
 func createSolutionFolder(path string) error {
