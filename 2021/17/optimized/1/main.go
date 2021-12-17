@@ -19,21 +19,21 @@ func input() *os.File {
 	return input
 }
 
-var reg = regexp.MustCompile(`x=(-?\d+)\.\.(-?\d+).*y=(-?\d+)\.\.(-?\d+)`)
+var targetAreaRegex = regexp.MustCompile(`x=(-?\d+)\.\.(-?\d+).*y=(-?\d+)\.\.(-?\d+)`)
 
-type target struct {
+type targetArea struct {
 	x1, x2, y1, y2 int
 }
 
-func parse(r io.Reader) target {
+func parse(r io.Reader) targetArea {
 	bytes, err := io.ReadAll(r)
 	if err != nil {
 		panic(err)
 	}
 
-	parts := reg.FindStringSubmatch(string(bytes))
+	parts := targetAreaRegex.FindStringSubmatch(string(bytes))
 
-	return target{
+	return targetArea{
 		x1: toInt(parts[1]),
 		x2: toInt(parts[2]),
 		y1: toInt(parts[3]),
@@ -51,18 +51,18 @@ func toInt(stringVal string) int {
 }
 
 func solve(r io.Reader) {
-	targetArea := parse(r)
+	target := parse(r)
 
 	maxY := 0
 
-	for dx := 0; dx < targetArea.x2; dx++ {
-		for dy := 0; dy < -targetArea.y1; dy++ {
+	for dx := 0; dx < target.x2; dx++ {
+		for dy := 0; dy < -target.y1; dy++ {
 			p := &probe{
-				x:          0,
-				y:          0,
-				dx:         dx,
-				dy:         dy,
-				targetArea: targetArea,
+				x:      0,
+				y:      0,
+				dx:     dx,
+				dy:     dy,
+				target: target,
 			}
 
 			if probeMaxY, intersects := p.intersectsEventually(); intersects {
@@ -79,7 +79,7 @@ func solve(r io.Reader) {
 type probe struct {
 	x, y, dx, dy int
 
-	targetArea target
+	target targetArea
 }
 
 func (p *probe) intersectsEventually() (int, bool) {
@@ -95,8 +95,8 @@ func (p *probe) intersectsEventually() (int, bool) {
 			maxY = p.y
 		}
 
-		// fallen below/to the right of the target
-		if p.x > p.targetArea.x2 || p.y < p.targetArea.y1 {
+		// fallen below/to the right of the target area
+		if p.x > p.target.x2 || p.y < p.target.y1 {
 			return 0, false
 		}
 	}
@@ -116,7 +116,7 @@ func (p *probe) simulate() {
 }
 
 func (p *probe) intersects() bool {
-	return p.x >= p.targetArea.x1 && p.x <= p.targetArea.x2 && p.y >= p.targetArea.y1 && p.y <= p.targetArea.y2
+	return p.x >= p.target.x1 && p.x <= p.target.x2 && p.y >= p.target.y1 && p.y <= p.target.y2
 }
 
 func main() {
