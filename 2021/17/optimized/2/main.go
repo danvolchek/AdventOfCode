@@ -19,7 +19,7 @@ func input() *os.File {
 	return input
 }
 
-var targetAreaRegex = regexp.MustCompile(`x=(-?\d+)\.\.(-?\d+).*y=(-?\d+)\.\.(-?\d+)`)
+var targetAreaRegexp = regexp.MustCompile(`x=(-?\d+)\.\.(-?\d+).*y=(-?\d+)\.\.(-?\d+)`)
 
 type targetArea struct {
 	x1, x2, y1, y2 int
@@ -31,7 +31,7 @@ func parse(r io.Reader) targetArea {
 		panic(err)
 	}
 
-	parts := targetAreaRegex.FindStringSubmatch(string(bytes))
+	parts := targetAreaRegexp.FindStringSubmatch(string(bytes))
 
 	return targetArea{
 		x1: toInt(parts[1]),
@@ -88,6 +88,7 @@ func (p *probe) intersectsEventually() bool {
 		p.simulate()
 
 		// fallen below/to the right of the target area
+		// assumes we're always going right and down
 		if p.x > p.target.x2 || p.y < p.target.y1 {
 			return false
 		}
