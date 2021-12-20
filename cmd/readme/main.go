@@ -36,21 +36,21 @@ func generateReadme() error {
 		return errors.New("could not find where to write table in readme")
 	}
 
-	buf := bytes.NewBuffer(before)
-	buf.Write(tableSection)
-	buf.WriteString("\n")
+	completionBuffer := bytes.NewBuffer(before)
+	completionBuffer.Write(tableSection)
+	completionBuffer.WriteString("\n")
 
-	solutions := parse.SolutionInformation(".")
+	solutions := parse.Solutions(".")
 	for _, year := range solutions {
-		buf.WriteString("\n## ")
-		buf.WriteString(year.Num)
-		buf.WriteString("\n\n")
+		completionBuffer.WriteString("\n## ")
+		completionBuffer.WriteString(year.Num)
+		completionBuffer.WriteString("\n\n")
 
 		daysTable := createTable(year.Days)
-		daysTable.ToBuffer(buf)
+		daysTable.ToBuffer(completionBuffer)
 	}
 
-	err = os.WriteFile(readMePath, buf.Bytes(), 0644)
+	err = os.WriteFile(readMePath, completionBuffer.Bytes(), 0644)
 	if err != nil {
 		return err
 	}

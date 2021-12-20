@@ -42,7 +42,7 @@ const (
 
 var numberRegexp = regexp.MustCompile(`^\d+$`)
 
-func SolutionInformation(root string) []Year {
+func Solutions(root string) []Year {
 	var years []Year
 
 	files, err := os.ReadDir(root)
@@ -66,7 +66,7 @@ func SolutionInformation(root string) []Year {
 	}
 
 	sort.Slice(years, func(i, j int) bool {
-		return ToInt(years[i].Num) > ToInt(years[j].Num)
+		return toInt(years[i].Num) > toInt(years[j].Num)
 	})
 
 	return years
@@ -89,7 +89,7 @@ func parseYear(root, yearNum string) Year {
 	}
 
 	sort.Slice(days, func(i, j int) bool {
-		return ToInt(days[i].Num) < ToInt(days[j].Num)
+		return toInt(days[i].Num) < toInt(days[j].Num)
 	})
 
 	return Year{
@@ -134,7 +134,7 @@ func parsePart(root, yearNum, dayNum, partNum string) Part {
 	}
 }
 
-func ToInt(value string) int {
+func toInt(value string) int {
 	intValue, err := strconv.Atoi(value)
 	if err != nil {
 		panic(err)

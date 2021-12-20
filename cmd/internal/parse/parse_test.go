@@ -65,7 +65,7 @@ var expected = []parse.Year{
 func TestSolutionInformation(t *testing.T) {
 	fill(expected)
 
-	result := parse.SolutionInformation("testData")
+	result := parse.Solutions("testData")
 
 	if len(result) != len(expected) {
 		t.Fatalf("got %v years, wanted %v years", len(result), len(expected))

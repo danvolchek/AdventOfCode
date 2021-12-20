@@ -114,8 +114,18 @@ func (a args) valid() error {
 		return errors.New("year must be provided")
 	}
 
+	_, err := strconv.Atoi(a.Year)
+	if err != nil {
+		return fmt.Errorf("invalid year: %s", err)
+	}
+
 	if a.Day == "" {
 		return errors.New("day must be provided")
+	}
+
+	_, err = strconv.Atoi(a.Day)
+	if err != nil {
+		return fmt.Errorf("invalid day: %s", err)
 	}
 
 	if len(a.Types) == 0 {
@@ -164,6 +174,30 @@ type skipIndicator struct {
 	leaderboard, optimized bool
 }
 
+func (s skipIndicator) valid() error {
+	if s.year == "" {
+		return errors.New("year must be provided")
+	}
+
+	_, err := strconv.Atoi(s.year)
+	if err != nil {
+		return fmt.Errorf("invalid year: %s", err)
+	}
+
+	if s.day != "" {
+		_, err = strconv.Atoi(s.day)
+		if err != nil {
+			return fmt.Errorf("invalid day: %s", err)
+		}
+	}
+
+	if !s.leaderboard && !s.optimized {
+		return errors.New("doesn't skip leaderboard or optimized")
+	}
+
+	return nil
+}
+
 func (s skipIndicator) Skip(y parse.Year, d parse.Day, leaderboard bool) bool {
 	if y.Num != s.year {
 		return false
@@ -198,8 +232,12 @@ func parseSkipfile() ([]skipIndicator, error) {
 	var skipIndicators []skipIndicator
 	rawSkips := strings.Split(strings.TrimSpace(string(skipBytes)), "\n")
 
-	for _, skip := range rawSkips {
+	for i, skip := range rawSkips {
 		skip = strings.TrimSpace(skip)
+		if len(skip) == 0 {
+			continue
+		}
+
 		if commentIndex := strings.Index(skip, "#"); commentIndex != -1 {
 			skip = strings.TrimSpace(skip[0:commentIndex])
 		}
@@ -220,13 +258,19 @@ func parseSkipfile() ([]skipIndicator, error) {
 				solutionTypes := strings.Split(parts[2], ",")
 				leaderboard, optimized = contains(solutionTypes, "l"), contains(solutionTypes, "o")
 			}
+		default:
+			panic(fmt.Errorf("bad skip on line %v: %s", i+1, skip))
 		}
-		skipIndicators = append(skipIndicators, skipIndicator{
+		s := skipIndicator{
 			year:        year,
 			day:         day,
 			leaderboard: leaderboard,
 			optimized:   optimized,
-		})
+		}
+		if err := s.valid(); err != nil {
+			panic(fmt.Errorf("bad skip on line %v: %s", i+1, err))
+		}
+		skipIndicators = append(skipIndicators, s)
 	}
 
 	return skipIndicators, nil
@@ -243,7 +287,7 @@ func contains(items []string, item string) bool {
 }
 
 func inferArgs() (args, error) {
-	info := parse.SolutionInformation(".")
+	info := parse.Solutions(".")
 
 	skipIndicators, err := parseSkipfile()
 	if err != nil {
