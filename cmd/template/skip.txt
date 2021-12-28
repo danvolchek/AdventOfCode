@@ -2,5 +2,11 @@
 2020      # Not currently doing this year
 
 2021/15/o # Requires a priority queue implementation; don't want to write one
-2021/18/o # Didn't get to it yet
-2021/19/o # Still working on leaderboard solution
+2021/18/o # Didn't get to the rest during 2021
+2021/19/o
+2021/20/o
+2021/21/o
+2021/22/o
+2021/23/o
+2021/24/o
+2021/25/o
