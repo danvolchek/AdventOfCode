@@ -237,8 +237,8 @@ type reconstructor struct {
 }
 
 // reconstruct returns all possible series of inputs that result in the target z value after
-// the block blockNum was executed.  It does so by tracing z values from the desired block to block 1,
-// recording the input values used to reach the targett z values it finds along the way.
+// the block blockNum was executed. It does so by tracing z values from the desired block to block 1,
+// recording the input values used to reach the target z values it finds along the way.
 func (r reconstructor) reconstruct(blockNum, targetZValue int) [][]int {
 	if blockNum == -1 {
 		*r.numFound += 1
