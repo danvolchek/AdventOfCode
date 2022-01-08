@@ -2,18 +2,27 @@ package lib
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
 	"strings"
 )
 
+type SkipRange struct {
+	Min, Max int
+}
+
+func (s SkipRange) contains(value int) bool {
+	return value >= s.Min && value <= s.Max
+}
+
 type SkipSolution struct {
-	Year, Day int
+	Year, Day SkipRange
 }
 
 func (s SkipSolution) ShouldSkip(sol Solution) bool {
-	return s.Year == sol.Year && (s.Day == 0 || s.Day == sol.Day)
+	return s.Year.contains(sol.Year) && (s.Day.Max == 0 || s.Day.contains(sol.Day))
 }
 
 func ParseSkips(r io.Reader) []SkipSolution {
@@ -41,16 +50,16 @@ func ParseSkips(r io.Reader) []SkipSolution {
 		var err error
 
 		if len(parts) >= 1 {
-			skip.Year, err = strconv.Atoi(parts[0])
+			skip.Year, err = parseRange(parts[0])
 			if err != nil {
-				panic(fmt.Sprintf("bad skip: %v: year isn't a number", line))
+				panic(fmt.Sprintf("bad skip: %v: year: %v", line, err))
 			}
 		}
 
 		if len(parts) >= 2 {
-			skip.Day, err = strconv.Atoi(parts[1])
+			skip.Day, err = parseRange(parts[1])
 			if err != nil {
-				panic(fmt.Sprintf("bad skip: %v: day isn't a number", line))
+				panic(fmt.Sprintf("bad skip: %v: day: %v", line, err))
 			}
 		}
 
@@ -63,4 +72,38 @@ func ParseSkips(r io.Reader) []SkipSolution {
 	}
 
 	return solutionsToSkip
+}
+
+func parseRange(s string) (SkipRange, error) {
+	parts := strings.Split(s, "-")
+	if len(parts) > 2 {
+		return SkipRange{}, errors.New("range should have at most one separator")
+	}
+
+	min, err := strconv.Atoi(parts[0])
+	if err != nil {
+		errMsg := "min isn't a number"
+		if len(parts) == 1 {
+			errMsg = "isn't a number"
+		}
+
+		return SkipRange{}, errors.New(errMsg)
+	}
+
+	if len(parts) == 1 {
+		return SkipRange{
+			Min: min,
+			Max: min,
+		}, nil
+	}
+
+	max, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return SkipRange{}, errors.New("max isn't a number")
+	}
+
+	return SkipRange{
+		Min: min,
+		Max: max,
+	}, nil
 }

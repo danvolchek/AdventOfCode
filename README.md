@@ -43,8 +43,9 @@ Each part of each solution is partitioned into its own folder, where only that p
 `go run cmd/template/main.go` without arguments (or `make template`) will infer which directory to generate by looking at the last completed puzzle and generating the next one.
 E.g. if 2021/5/leaderboard exists, it'll generate 2021/5/optimized. Once that exists, it'll generate 2021/6/leaderboard, and so on.
 
-When inferring arguments, solutions to skip can be specified through `skip.txt`. Each line is of the format
-`year/day # optional comment`, and if day is omitted the entire year is skipped.
+When inferring arguments, solutions to skip can be specified through `skip.txt`.
+Each line is of the format `year/day # optional comment`, and if day is omitted the entire year is skipped.
+`year` or `day` can either be a single number `num`, or a range like `num-num` to exclude multiple values.
 
 The arguments can be provided through the command line as well. See `go run cmd/template/main.go --help` for argument info.
 

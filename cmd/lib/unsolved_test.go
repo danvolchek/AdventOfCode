@@ -7,11 +7,6 @@ import (
 )
 
 func TestFirstUnsolvedSolution(t *testing.T) {
-	var skip2012ExceptDay25 []lib.SkipSolution
-	for i := 1; i < 25; i++ {
-		skip2012ExceptDay25 = append(skip2012ExceptDay25, lib.SkipSolution{Year: 2012, Day: i})
-	}
-
 	for _, testCase := range []struct {
 		root     string
 		expected lib.Solution
@@ -59,7 +54,7 @@ func TestFirstUnsolvedSolution(t *testing.T) {
 		},
 		{
 			root:  filepath.Join("testData", "testUnsolved", "firstYear", "dayTwentyFiveLeaderboard"),
-			skips: skip2012ExceptDay25,
+			skips: []lib.SkipSolution{{Year: singleValueRange(2012), Day: lib.SkipRange{Min: 1, Max: 24}}},
 			expected: lib.Solution{
 				Year:        2012,
 				Day:         25,
@@ -84,7 +79,7 @@ func TestFirstUnsolvedSolution(t *testing.T) {
 		},
 		{
 			root:  filepath.Join("testData", "testUnsolved", "secondYearSkips", "dayTwentyFiveLeaderboard"),
-			skips: append([]lib.SkipSolution{{Year: 2011}}, skip2012ExceptDay25...),
+			skips: []lib.SkipSolution{{Year: singleValueRange(2011)}, {Year: singleValueRange(2012), Day: lib.SkipRange{Min: 1, Max: 24}}},
 			expected: lib.Solution{
 				Year:        2012,
 				Day:         25,

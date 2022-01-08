@@ -6,34 +6,67 @@ import (
 	"testing"
 )
 
+func singleValueRange(value int) lib.SkipRange {
+	return lib.SkipRange{
+		Min: value,
+		Max: value,
+	}
+}
+
 func TestParseSkips_Valid(t *testing.T) {
-	rawSkips := "1\n2/3\n4#foo\n\n\n#bar\n5 # bar\n6/7 # baz\n8 "
+	rawSkips := "1\n2/3\n4#foo\n\n\n#bar\n5 # bar\n6/7 # baz\n8 \n9-10\n11/12-13\n14-15/16-17"
 	expectedSkips := []lib.SkipSolution{
 		{
-			Year: 1,
-			Day:  0,
+			Year: singleValueRange(1),
 		},
 		{
-			Year: 2,
-			Day:  3,
+			Year: singleValueRange(2),
+			Day:  singleValueRange(3),
 		},
 		{
-			Year: 4,
-			Day:  0,
+			Year: singleValueRange(4),
 		},
 		{
-			Year: 5,
-			Day:  0,
+			Year: singleValueRange(5),
 		},
 		{
-			Year: 6,
-			Day:  7,
+			Year: singleValueRange(6),
+			Day:  singleValueRange(7),
 		},
 		{
-			Year: 8,
-			Day:  0,
+			Year: singleValueRange(8),
+		},
+		{
+			Year: lib.SkipRange{
+				Min: 9,
+				Max: 10,
+			},
+		},
+		{
+			Year: singleValueRange(11),
+			Day: lib.SkipRange{
+				Min: 12,
+				Max: 13,
+			},
+		},
+		{
+			Year: lib.SkipRange{
+				Min: 14,
+				Max: 15,
+			},
+			Day: lib.SkipRange{
+				Min: 16,
+				Max: 17,
+			},
 		},
 	}
+
+	defer func() {
+		err := recover()
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}()
 
 	actualSkips := lib.ParseSkips(strings.NewReader(rawSkips))
 
@@ -65,15 +98,39 @@ func TestParseSkips_Invalid(t *testing.T) {
 		},
 		{
 			rawSkip: "hello",
-			error:   "bad skip: hello: year isn't a number",
+			error:   "bad skip: hello: year: isn't a number",
 		},
 		{
 			rawSkip: "foo/bar",
-			error:   "bad skip: foo/bar: year isn't a number",
+			error:   "bad skip: foo/bar: year: isn't a number",
 		},
 		{
 			rawSkip: "1/bar",
-			error:   "bad skip: 1/bar: day isn't a number",
+			error:   "bad skip: 1/bar: day: isn't a number",
+		},
+		{
+			rawSkip: "foo-2/bar",
+			error:   "bad skip: foo-2/bar: year: min isn't a number",
+		},
+		{
+			rawSkip: "2-foo/bar",
+			error:   "bad skip: 2-foo/bar: year: max isn't a number",
+		},
+		{
+			rawSkip: "1/bar-2",
+			error:   "bad skip: 1/bar-2: day: min isn't a number",
+		},
+		{
+			rawSkip: "1/2-bar",
+			error:   "bad skip: 1/2-bar: day: max isn't a number",
+		},
+		{
+			rawSkip: "1-2-3/4",
+			error:   "bad skip: 1-2-3/4: year: range should have at most one separator",
+		},
+		{
+			rawSkip: "1/2-3-4",
+			error:   "bad skip: 1/2-3-4: day: range should have at most one separator",
 		},
 	} {
 		func() {
