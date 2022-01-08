@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/danvolchek/AdventOfCode/cmd/internal/parse"
-	"github.com/danvolchek/AdventOfCode/cmd/readme/table"
+	"github.com/danvolchek/AdventOfCode/cmd/lib"
 	"os"
+	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -17,7 +18,7 @@ const (
 var tableSection = []byte("# Completion")
 
 func main() {
-	err := generateReadme()
+	err := generateReadme(".")
 	if err != nil {
 		panic(err)
 	}
@@ -25,7 +26,7 @@ func main() {
 	fmt.Println("Done!")
 }
 
-func generateReadme() error {
+func generateReadme(root string) error {
 	readme, err := os.ReadFile(readMePath)
 	if err != nil {
 		return err
@@ -40,13 +41,15 @@ func generateReadme() error {
 	completionBuffer.Write(tableSection)
 	completionBuffer.WriteString("\n")
 
-	solutions := parse.Solutions(".")
-	for _, year := range solutions {
+	years := lib.YearsWithSolutions(root)
+	sort.Sort(sort.Reverse(sort.IntSlice(years)))
+
+	for _, year := range years {
 		completionBuffer.WriteString("\n## ")
-		completionBuffer.WriteString(year.Num)
+		completionBuffer.WriteString(strconv.Itoa(year))
 		completionBuffer.WriteString("\n\n")
 
-		daysTable := createTable(year.Days)
+		daysTable := createTable(root, year)
 		daysTable.ToBuffer(completionBuffer)
 	}
 
@@ -58,37 +61,39 @@ func generateReadme() error {
 	return nil
 }
 
-func createTable(days []parse.Day) *table.Table {
-	yearTable := &table.Table{
+func createTable(root string, year int) *lib.Table {
+	yearTable := &lib.Table{
 		NumRows: 2,
 	}
 
 	yearTable.AddColumn("", []string{"leaderboard", "optimized"})
 
-	for _, day := range days {
-		yearTable.AddColumn(day.Num, []string{
-			createLink(day, func(part parse.Part) string {
-				return part.LeaderboardSolutionPath
-			}),
-			createLink(day, func(part parse.Part) string {
-				return part.OptimizedSolutionPath
-			}),
+	for day := 1; day <= 25; day++ {
+		yearTable.AddColumn(strconv.Itoa(day), []string{
+			createLink(root, year, day, true),
+			createLink(root, year, day, false),
 		})
 	}
 
 	return yearTable
 }
 
-func createLink(day parse.Day, selector func(part parse.Part) string) string {
+func createLink(root string, year, day int, leaderboard bool) string {
 	var parts []string
 
-	partOnePath := selector(day.PartOne)
-	if partOnePath != "" {
+	sol := lib.Solution{
+		Year:        year,
+		Day:         day,
+		Leaderboard: leaderboard,
+	}
+
+	partOnePath, ok := sol.PartOne(root)
+	if ok {
 		parts = append(parts, makeLink("1", partOnePath))
 	}
 
-	partTwoPath := selector(day.PartTwo)
-	if partTwoPath != "" {
+	partTwoPath, ok := sol.PartTwo(root)
+	if ok {
 		parts = append(parts, makeLink("2", partTwoPath))
 	}
 

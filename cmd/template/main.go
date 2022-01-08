@@ -1,102 +1,158 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
-	"github.com/danvolchek/AdventOfCode/cmd/internal/parse"
-	"io"
+	"github.com/danvolchek/AdventOfCode/cmd/lib"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 	"strconv"
-	"strings"
 	"text/template"
 )
 
-const (
-	inputFileName = "input.txt"
+var infer bool
+var dryRun bool
 
-	cmdDirectory         = "cmd"
-	templateDirectory    = "template"
-	inferenceTypesToSkip = "skip.txt"
-	templateStubName     = "main.txt"
-	stubTargetName       = "main.go"
-)
+var argSolTypes [2]bool
+var argSolution lib.Solution
 
-var (
-	solutionTypes = []string{"leaderboard", "optimized"}
-	puzzleParts   = []string{"1", "2"}
-)
+func init() {
+	flag.IntVar(&argSolution.Year, "year", 0, "solution year")
+	flag.IntVar(&argSolution.Day, "day", 0, "solution day")
+	flag.BoolVar(&argSolTypes[0], "l", false, "create leaderboard")
+	flag.BoolVar(&argSolTypes[1], "o", false, "create optimized")
+	flag.BoolVar(&dryRun, "dryrun", false, "print solution to create and exit")
+	flag.Parse()
 
-func main() {
-	if err := create(); err != nil {
-		fmt.Println(err)
+	if !(argSolTypes[0] || argSolTypes[1] || argSolution.Year != 0 || argSolution.Day != 0) {
+		infer = true
+		fmt.Println("Inferring solution to create")
+		return
+	}
+
+	fail := func(message string) {
+		fmt.Println(message)
+		flag.PrintDefaults()
 		os.Exit(1)
-	} else {
-		fmt.Println("Done!")
+	}
+
+	if argSolution.Year == 0 {
+		fail("Year needed")
+	}
+
+	if argSolution.Day == 0 {
+		fail("Day needed")
+	}
+
+	if !argSolTypes[0] && !argSolTypes[1] {
+		fail("Specify at least leaderboard or optimized")
 	}
 }
 
-func create() error {
-	args, err := parseArgs()
-	if err != nil {
-		flag.PrintDefaults()
-		fmt.Println()
-		return fmt.Errorf("args are invalid: %s", err)
+func main() {
+	sols := getSolutionsToCreate()
+
+	for _, sol := range sols {
+		if dryRun {
+			fmt.Println("Would create:", sol)
+			continue
+		}
+		fmt.Println("Creating solution:", sol)
+
+		err := createSolution(sol)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	solutionFolder := path.Join(args.Year, args.Day)
+	fmt.Println("Done!")
+}
 
-	err = createSolutionFolder(solutionFolder)
+func getSolutionsToCreate() []lib.Solution {
+	if infer {
+		skipFile, err := os.Open("skip.txt")
+		if err != nil {
+			panic(err)
+		}
+
+		return []lib.Solution{lib.FirstUnsolvedSolution(".", lib.ParseSkips(skipFile))}
+	}
+
+	var solutions []lib.Solution
+
+	for _, i := range []int{0, 1} {
+		if argSolTypes[i] {
+			clone := argSolution
+			clone.Leaderboard = i == 0
+			solutions = append(solutions, clone)
+		}
+	}
+
+	return solutions
+}
+
+func createSolution(sol lib.Solution) error {
+	solutionFolder := filepath.Join(strconv.Itoa(sol.Year), strconv.Itoa(sol.Day))
+
+	err := os.MkdirAll(solutionFolder, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("couldn't create solution folder: %s", err)
 	}
 
-	if !exists(path.Join(solutionFolder, inputFileName)) {
-		input, err := os.Create(path.Join(solutionFolder, inputFileName))
-		defer warn(input.Close)
+	inputFile := filepath.Join(solutionFolder, "input.txt")
+
+	if !fileExists(inputFile) {
+		input, err := os.Create(inputFile)
+		defer input.Close()
 		if err != nil {
 			return fmt.Errorf("couldn't create input file: %s", err)
 		}
 	}
 
-	tmpl, err := loadTemplate(path.Join(cmdDirectory, templateDirectory, templateStubName))
+	tmpl, err := loadTemplate(filepath.Join("cmd", "template", "main.txt"))
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %s", err)
 	}
 
 	anyCreated := false
-	stubsWriter := &multiWriteCloser{}
-	defer warn(stubsWriter.Close)
+	stubsWriter := &lib.MultiWriteCloser{}
+	defer stubsWriter.Close()
 
-	for _, solutionType := range args.Types {
-		for _, puzzlePart := range puzzleParts {
-			// day 25 only has 1 part
-			if args.Day == "25" && puzzlePart == "2" {
-				continue
-			}
-			stubDir := path.Join(solutionFolder, solutionType, puzzlePart)
-
-			if exists(path.Join(stubDir, stubTargetName)) {
-				continue
-			}
-
-			stubFile, err := createFileAndDirectories(stubDir, stubTargetName)
-			if err != nil {
-				return fmt.Errorf("couldn't create stub file %s: %s", path.Join(stubDir, stubTargetName), err)
-			}
-
-			anyCreated = true
-
-			stubsWriter.Add(stubFile)
+	for _, partOne := range []bool{true, false} {
+		// day 25 only has 1 part
+		if sol.Day == 25 && !partOne {
+			continue
 		}
-	}
-	if !anyCreated {
-		return fmt.Errorf("all files already exist, couldn't create anything")
+
+		var solPath string
+		var exists bool
+		if partOne {
+			solPath, exists = sol.PartOne(".")
+		} else {
+			solPath, exists = sol.PartTwo(".")
+		}
+
+		if exists {
+			continue
+		}
+
+		stubFile, err := createFileAndDirectories(solPath)
+		if err != nil {
+			return fmt.Errorf("couldn't create stub file %s: %s", solPath, err)
+		}
+
+		anyCreated = true
+
+		stubsWriter.Add(stubFile)
 	}
 
-	err = tmpl.Execute(stubsWriter, args)
+	if !anyCreated {
+		fmt.Println("all files already exist, couldn't create anything")
+		return nil
+	}
+
+	err = tmpl.Execute(stubsWriter, sol)
 	if err != nil {
 		return fmt.Errorf("couldn't write template to stubs: %s", err)
 	}
@@ -104,258 +160,7 @@ func create() error {
 	return nil
 }
 
-type args struct {
-	Year, Day string
-	Types     []string
-}
-
-func (a args) valid() error {
-	if a.Year == "" {
-		return errors.New("year must be provided")
-	}
-
-	_, err := strconv.Atoi(a.Year)
-	if err != nil {
-		return fmt.Errorf("invalid year: %s", err)
-	}
-
-	if a.Day == "" {
-		return errors.New("day must be provided")
-	}
-
-	_, err = strconv.Atoi(a.Day)
-	if err != nil {
-		return fmt.Errorf("invalid day: %s", err)
-	}
-
-	if len(a.Types) == 0 {
-		return errors.New("types must be provided")
-	}
-
-	for _, solType := range a.Types {
-		if solType != solutionTypes[0] && solType != solutionTypes[1] {
-			return fmt.Errorf("invalid types %s", solType)
-		}
-	}
-
-	return nil
-}
-
-func parseArgs() (args, error) {
-	var parsed args
-
-	var rawTypes string
-	flag.StringVar(&parsed.Year, "year", "", "the year to add")
-	flag.StringVar(&parsed.Day, "day", "", "the day to add")
-	flag.StringVar(&rawTypes, "types", "", "the types to add")
-	flag.Parse()
-	parsed.Types = strings.Split(rawTypes, ",")
-
-	if parsed.Year == "" && parsed.Day == "" && rawTypes == "" {
-		inferred, err := inferArgs()
-		if err != nil {
-			return args{}, err
-		}
-
-		if err := inferred.valid(); err != nil {
-			panic(fmt.Sprintf("infered args were invalid: %v:  %s", inferred, err))
-		}
-
-		fmt.Printf("arguments not provided so inferred %+v\n", inferred)
-
-		return inferred, nil
-	}
-
-	return parsed, parsed.valid()
-}
-
-type skipIndicator struct {
-	year, day              string
-	leaderboard, optimized bool
-}
-
-func (s skipIndicator) valid() error {
-	if s.year == "" {
-		return errors.New("year must be provided")
-	}
-
-	_, err := strconv.Atoi(s.year)
-	if err != nil {
-		return fmt.Errorf("invalid year: %s", err)
-	}
-
-	if s.day != "" {
-		_, err = strconv.Atoi(s.day)
-		if err != nil {
-			return fmt.Errorf("invalid day: %s", err)
-		}
-	}
-
-	if !s.leaderboard && !s.optimized {
-		return errors.New("doesn't skip leaderboard or optimized")
-	}
-
-	return nil
-}
-
-func (s skipIndicator) Skip(y parse.Year, d parse.Day, leaderboard bool) bool {
-	if y.Num != s.year {
-		return false
-	}
-
-	if s.day == "" {
-		return true
-	}
-
-	if s.day != d.Num {
-		return false
-	}
-
-	if (leaderboard && s.leaderboard) || (!leaderboard && s.optimized) {
-		return true
-	}
-
-	return false
-}
-
-func parseSkipfile() ([]skipIndicator, error) {
-	skipFile, err := os.Open(path.Join(cmdDirectory, templateDirectory, inferenceTypesToSkip))
-	if err != nil {
-		return nil, err
-	}
-
-	skipBytes, err := io.ReadAll(skipFile)
-	if err != nil {
-		return nil, err
-	}
-
-	var skipIndicators []skipIndicator
-	rawSkips := strings.Split(strings.TrimSpace(string(skipBytes)), "\n")
-
-	for i, skip := range rawSkips {
-		skip = strings.TrimSpace(skip)
-		if len(skip) == 0 {
-			continue
-		}
-
-		if commentIndex := strings.Index(skip, "#"); commentIndex != -1 {
-			skip = strings.TrimSpace(skip[0:commentIndex])
-		}
-
-		parts := strings.Split(skip, "/")
-
-		year, day := "", ""
-		leaderboard, optimized := true, true
-		switch len(parts) {
-		case 1:
-			year = parts[0]
-		case 2:
-			year, day = parts[0], parts[1]
-		case 3:
-			year, day = parts[0], parts[1]
-
-			if len(parts[2]) > 0 {
-				solutionTypes := strings.Split(parts[2], ",")
-				leaderboard, optimized = contains(solutionTypes, "l"), contains(solutionTypes, "o")
-			}
-		default:
-			panic(fmt.Errorf("bad skip on line %v: %s", i+1, skip))
-		}
-		s := skipIndicator{
-			year:        year,
-			day:         day,
-			leaderboard: leaderboard,
-			optimized:   optimized,
-		}
-		if err := s.valid(); err != nil {
-			panic(fmt.Errorf("bad skip on line %v: %s", i+1, err))
-		}
-		skipIndicators = append(skipIndicators, s)
-	}
-
-	return skipIndicators, nil
-}
-
-func contains(items []string, item string) bool {
-	for _, value := range items {
-		if value == item {
-			return true
-		}
-	}
-
-	return false
-}
-
-func inferArgs() (args, error) {
-	info := parse.Solutions(".")
-
-	skipIndicators, err := parseSkipfile()
-	if err != nil {
-		return args{}, err
-	}
-
-	return findIncompleteSolution(info, skipIndicators)
-}
-
-func shouldSkip(skipIndicators []skipIndicator, year parse.Year, day parse.Day, leaderboard bool) bool {
-	for _, indicator := range skipIndicators {
-		if indicator.Skip(year, day, leaderboard) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func findIncompleteSolution(info []parse.Year, skipIndicators []skipIndicator) (args, error) {
-	for i := len(info) - 1; i >= 0; i-- {
-		year := info[i]
-
-		for _, day := range year.Days {
-			for _, lb := range []bool{true, false} {
-				if !shouldSkip(skipIndicators, year, day, lb) && !day.HasSolution(lb) {
-					return createArgs(year, day, lb), nil
-				}
-			}
-		}
-	}
-
-	yearInt, err := strconv.Atoi(info[0].Num)
-	if err != nil {
-		return args{}, err
-	}
-
-	return args{
-		Year:  strconv.Itoa(yearInt + 1),
-		Day:   "1",
-		Types: []string{"leaderboard"},
-	}, nil
-
-}
-
-func createArgs(y parse.Year, d parse.Day, leaderboard bool) args {
-	typeStr := "leaderboard"
-	if !leaderboard {
-		typeStr = "optimized"
-	}
-
-	return args{
-		Year:  y.Num,
-		Day:   d.Num,
-		Types: []string{typeStr},
-	}
-}
-
-func createSolutionFolder(path string) error {
-	err := os.MkdirAll(path, os.ModePerm)
-	if err != nil {
-		return fmt.Errorf("couldn't make directories: %s", err)
-	}
-
-	return nil
-}
-
-func exists(path string) bool {
+func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -382,63 +187,22 @@ func loadTemplate(path string) (*template.Template, error) {
 	return tmpl, nil
 }
 
-func createFileAndDirectories(parent string, child string) (*os.File, error) {
-	err := os.MkdirAll(parent, os.ModePerm)
+func createFileAndDirectories(path string) (*os.File, error) {
+	parent := filepath.Dir(path)
+	child, err := filepath.Rel(parent, path)
+	if err != nil {
+		return nil, err
+	}
+
+	err = os.MkdirAll(parent, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't make directories: %s", err)
 	}
 
-	file, err := os.Create(path.Join(parent, child))
+	file, err := os.Create(filepath.Join(parent, child))
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create file: %s", err)
 	}
 
 	return file, nil
-}
-
-func warn(action func() error) {
-	err := action()
-	if err != nil {
-		fmt.Printf("warn: %s", err)
-	}
-}
-
-// based on io.MultiWriter, but is an io.WriteCloser and can add new io.WriteClosers on the fly
-type multiWriteCloser struct {
-	writeClosers []io.WriteCloser
-}
-
-func (mwc *multiWriteCloser) Write(p []byte) (n int, err error) {
-	for _, wc := range mwc.writeClosers {
-		n, err = wc.Write(p)
-		if err != nil {
-			return
-		}
-		if n != len(p) {
-			err = io.ErrShortWrite
-			return
-		}
-	}
-	return len(p), nil
-}
-
-func (mwc *multiWriteCloser) Close() error {
-	var errMessages []string
-
-	for _, wc := range mwc.writeClosers {
-		err := wc.Close()
-		if err != nil {
-			errMessages = append(errMessages, err.Error())
-		}
-	}
-
-	if len(errMessages) == 0 {
-		return nil
-	}
-
-	return errors.New(strings.Join(errMessages, ","))
-}
-
-func (mwc *multiWriteCloser) Add(w io.WriteCloser) {
-	mwc.writeClosers = append(mwc.writeClosers, w)
 }

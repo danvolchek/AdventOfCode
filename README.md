@@ -40,24 +40,25 @@ Each part of each solution is partitioned into its own folder, where only that p
 
 ## Generating new solution directories
 
-`go run cmd/template/main.go` or `make template` will infer which directory to generate by looking at the last completed puzzle and generating the next one.
+`go run cmd/template/main.go` without arguments (or `make template`) will infer which directory to generate by looking at the last completed puzzle and generating the next one.
 E.g. if 2021/5/leaderboard exists, it'll generate 2021/5/optimized. Once that exists, it'll generate 2021/6/leaderboard, and so on.
 
-When inferring arguments, solutions to skip can be specified through `cmd/template/skip.txt`. Each line is of the format
-`year/day/types # optional comment`
-where types is a comma separated list of either `l` for leaderboard solutions or `o` for optimized solutions. 
-If no types are provided it defaults to all types for that day,
-if no day then all days for that year. Comments optional.
+When inferring arguments, solutions to skip can be specified through `skip.txt`. Each line is of the format
+`year/day # optional comment`, and if day is omitted the entire year is skipped.
 
-The year/day/type can be provided manually as well. See `go run cmd/template/main.go --help` for argument info.
+The arguments can be provided through the command line as well. See `go run cmd/template/main.go --help` for argument info.
 
 ## Updating the completion tables
 
-`go run cmd/readme/main.go` or `make readme` will update the completion tables below based on the directory structure of the repository. It takes no arguments.
+`go run cmd/readme/main.go` (or `make readme`) will update the completion tables below based on the directory structure of the repository. It takes no arguments.
 
 ## Doing both
 
-`make` will infer a new day and then update the readme.
+`make` will infer a new day, create it, and then update the readme.
+
+## Running tests
+
+`make test` will run tests on the command scripts.
 
 # Completion
 
@@ -77,7 +78,7 @@ The year/day/type can be provided manually as well. See `go run cmd/template/mai
 
 ## 2019
 
-|             | 1                                                                   | 2                                                                   | 3                                                                   | 4                                                                   | 5                                       | 6 | 7 | 8 | 9                                       | 10 | 11 | 12 | 13                                        | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 |
-|-------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|-----------------------------------------|---|---|---|-----------------------------------------|----|----|----|-------------------------------------------|----|----|----|----|----|----|----|----|----|----|----|----|
-| leaderboard | [1](2019/1/leaderboard/1/main.go),[2](2019/1/leaderboard/2/main.go) | [1](2019/2/leaderboard/1/main.go),[2](2019/2/leaderboard/2/main.go) | [1](2019/3/leaderboard/1/main.go),[2](2019/3/leaderboard/2/main.go) | [1](2019/4/leaderboard/1/main.go),[2](2019/4/leaderboard/2/main.go) |                                         |   |   |   |                                         |    |    |    |                                           |    |    |    |    |    |    |    |    |    |    |    |    |
-| optimized   |                                                                     |                                                                     |                                                                     | [1](2019/4/optimized/1/main.go),[2](2019/4/optimized/2/main.go)     | [1](2019/5/main.go),[2](2019/5/main.go) |   |   |   | [1](2019/9/main.go),[2](2019/9/main.go) |    |    |    | [1](2019/13/main.go),[2](2019/13/main.go) |    |    |    |    |    |    |    |    |    |    |    |    |
+|             | 1                                                                   | 2                                                                   | 3                                                                   | 4                                                                   | 5                               | 6 | 7 | 8 | 9                               | 10 | 11 | 12 | 13                               | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 |
+|-------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------------------------------------------|---------------------------------|---|---|---|---------------------------------|----|----|----|----------------------------------|----|----|----|----|----|----|----|----|----|----|----|----|
+| leaderboard | [1](2019/1/leaderboard/1/main.go),[2](2019/1/leaderboard/2/main.go) | [1](2019/2/leaderboard/1/main.go),[2](2019/2/leaderboard/2/main.go) | [1](2019/3/leaderboard/1/main.go),[2](2019/3/leaderboard/2/main.go) | [1](2019/4/leaderboard/1/main.go),[2](2019/4/leaderboard/2/main.go) |                                 |   |   |   |                                 |    |    |    |                                  |    |    |    |    |    |    |    |    |    |    |    |    |
+| optimized   |                                                                     |                                                                     |                                                                     | [1](2019/4/optimized/1/main.go),[2](2019/4/optimized/2/main.go)     | [2](2019/5/optimized/2/main.go) |   |   |   | [2](2019/9/optimized/2/main.go) |    |    |    | [2](2019/13/optimized/2/main.go) |    |    |    |    |    |    |    |    |    |    |    |    |
