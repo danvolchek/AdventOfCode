@@ -18,7 +18,7 @@ func (s Solution) Path(root string) (string, bool) {
 
 	solPath := filepath.Join(root, year, day, solType)
 
-	return solPath, exists(solPath)
+	return solPath, Exists(solPath)
 }
 
 func (s Solution) PartOne(root string) (string, bool) {
@@ -34,7 +34,7 @@ func (s Solution) partPath(root, part string) (string, bool) {
 
 	partPath := filepath.Join(base, part, "main.go")
 
-	return partPath, ok && exists(partPath)
+	return partPath, ok && Exists(partPath)
 }
 
 func (s Solution) String() string {
@@ -52,7 +52,7 @@ func (s Solution) typeName() string {
 	return solutionType
 }
 
-func exists(path string) bool {
+func Exists(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {

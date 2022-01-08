@@ -102,7 +102,7 @@ func createSolution(sol lib.Solution) error {
 
 	inputFile := filepath.Join(solutionFolder, "input.txt")
 
-	if !fileExists(inputFile) {
+	if !lib.Exists(inputFile) {
 		input, err := os.Create(inputFile)
 		defer input.Close()
 		if err != nil {
@@ -158,19 +158,6 @@ func createSolution(sol lib.Solution) error {
 	}
 
 	return nil
-}
-
-func fileExists(path string) bool {
-	_, err := os.Stat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-
-		panic(err)
-	}
-
-	return true
 }
 
 func loadTemplate(path string) (*template.Template, error) {
