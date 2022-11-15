@@ -33,6 +33,14 @@ type instruction struct {
 	start, end pos
 }
 
+func (p pos) Range(o pos, action func(p pos)) {
+	for x := p.x; x <= o.x; x += 1 {
+		for y := p.y; y <= o.y; y += 1 {
+			action(pos{x: x, y: y})
+		}
+	}
+}
+
 var parseReg = regexp.MustCompile(`(.+) (\d+),(\d+) through (\d+),(\d+)`)
 
 func parse(parts []string) instruction {
@@ -69,25 +77,19 @@ func solve(instructions []instruction) int {
 	for _, instr := range instructions {
 		switch instr.act {
 		case on:
-			for x := instr.start.x; x <= instr.end.x; x += 1 {
-				for y := instr.start.y; y <= instr.end.y; y += 1 {
-					grid[pos{x: x, y: y}] += 1
-				}
-			}
+			instr.start.Range(instr.end, func(p pos) {
+				grid[p] += 1
+			})
 		case off:
-			for x := instr.start.x; x <= instr.end.x; x += 1 {
-				for y := instr.start.y; y <= instr.end.y; y += 1 {
-					if grid[pos{x: x, y: y}] > 0 {
-						grid[pos{x: x, y: y}] -= 1
-					}
+			instr.start.Range(instr.end, func(p pos) {
+				if grid[p] > 0 {
+					grid[p] -= 1
 				}
-			}
+			})
 		case toggle:
-			for x := instr.start.x; x <= instr.end.x; x += 1 {
-				for y := instr.start.y; y <= instr.end.y; y += 1 {
-					grid[pos{x: x, y: y}] += 2
-				}
-			}
+			instr.start.Range(instr.end, func(p pos) {
+				grid[p] += 2
+			})
 		default:
 			panic(instr.act)
 		}

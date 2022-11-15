@@ -28,6 +28,14 @@ type pos struct {
 	x, y int
 }
 
+func (p pos) Range(o pos, action func(p pos)) {
+	for x := p.x; x <= o.x; x += 1 {
+		for y := p.y; y <= o.y; y += 1 {
+			action(pos{x: x, y: y})
+		}
+	}
+}
+
 type instruction struct {
 	act        action
 	start, end pos
@@ -69,23 +77,17 @@ func solve(instructions []instruction) int {
 	for _, instr := range instructions {
 		switch instr.act {
 		case on:
-			for x := instr.start.x; x <= instr.end.x; x += 1 {
-				for y := instr.start.y; y <= instr.end.y; y += 1 {
-					grid[pos{x: x, y: y}] = true
-				}
-			}
+			instr.start.Range(instr.end, func(p pos) {
+				grid[p] = true
+			})
 		case off:
-			for x := instr.start.x; x <= instr.end.x; x += 1 {
-				for y := instr.start.y; y <= instr.end.y; y += 1 {
-					grid[pos{x: x, y: y}] = false
-				}
-			}
+			instr.start.Range(instr.end, func(p pos) {
+				grid[p] = false
+			})
 		case toggle:
-			for x := instr.start.x; x <= instr.end.x; x += 1 {
-				for y := instr.start.y; y <= instr.end.y; y += 1 {
-					grid[pos{x: x, y: y}] = !grid[pos{x: x, y: y}]
-				}
-			}
+			instr.start.Range(instr.end, func(p pos) {
+				grid[p] = !grid[p]
+			})
 		default:
 			panic(instr.act)
 		}
