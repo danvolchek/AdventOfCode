@@ -1,20 +1,11 @@
 package lib
 
-import (
-	"fmt"
-	"sort"
+const (
+	firstYear = 2015
 )
 
 func FirstUnsolvedSolution(root string, solutionsToSkip []SkipSolution) Solution {
-	years := YearsWithSolutions(root)
-	if len(years) == 0 {
-		panic(fmt.Sprintf("No years found in %v", root))
-	}
-
-	sort.Ints(years)
-	smallestYear := years[0]
-
-	for year := smallestYear; ; year++ {
+	for year := firstYear; ; year++ {
 		for day := 1; day <= 25; day++ {
 			for _, leaderboard := range []bool{true, false} {
 				solution := Solution{

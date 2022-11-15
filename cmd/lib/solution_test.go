@@ -18,38 +18,38 @@ func TestSolution_Path(t *testing.T) {
 	for _, testCase := range []solutionTestCase{
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         5,
 				Leaderboard: true,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "5", "leaderboard"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "5", "leaderboard"),
 			expectedOkay: true,
 		},
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         5,
 				Leaderboard: false,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "5", "optimized"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "5", "optimized"),
 			expectedOkay: false,
 		},
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         6,
 				Leaderboard: false,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "6", "optimized"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "6", "optimized"),
 			expectedOkay: true,
 		},
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         6,
 				Leaderboard: true,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "6", "leaderboard"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "6", "leaderboard"),
 			expectedOkay: false,
 		},
 	} {
@@ -68,38 +68,38 @@ func TestSolution_PartOne(t *testing.T) {
 	for _, testCase := range []solutionTestCase{
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         5,
 				Leaderboard: true,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "5", "leaderboard", "1", "main.go"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "5", "leaderboard", "1", "main.go"),
 			expectedOkay: true,
 		},
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         7,
 				Leaderboard: true,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "7", "leaderboard", "1", "main.go"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "7", "leaderboard", "1", "main.go"),
 			expectedOkay: false,
 		},
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         6,
 				Leaderboard: false,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "6", "optimized", "1", "main.go"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "6", "optimized", "1", "main.go"),
 			expectedOkay: true,
 		},
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         8,
 				Leaderboard: true,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "8", "leaderboard", "1", "main.go"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "8", "leaderboard", "1", "main.go"),
 			expectedOkay: false,
 		},
 	} {
@@ -118,38 +118,38 @@ func TestSolution_PartTwo(t *testing.T) {
 	for _, testCase := range []solutionTestCase{
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         7,
 				Leaderboard: true,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "7", "leaderboard", "2", "main.go"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "7", "leaderboard", "2", "main.go"),
 			expectedOkay: true,
 		},
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         5,
 				Leaderboard: true,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "5", "leaderboard", "2", "main.go"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "5", "leaderboard", "2", "main.go"),
 			expectedOkay: false,
 		},
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         8,
 				Leaderboard: false,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "8", "optimized", "2", "main.go"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "8", "optimized", "2", "main.go"),
 			expectedOkay: true,
 		},
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         6,
 				Leaderboard: true,
 			},
-			expectedPath: filepath.Join(solutionTestRoot, "2012", "6", "leaderboard", "2", "main.go"),
+			expectedPath: filepath.Join(solutionTestRoot, "2015", "6", "leaderboard", "2", "main.go"),
 			expectedOkay: false,
 		},
 	} {
@@ -171,19 +171,19 @@ func TestSolution_String(t *testing.T) {
 	}{
 		{
 			s: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         6,
 				Leaderboard: true,
 			},
-			expected: "{Year: 2012, Day: 6, Type: Leaderboard}",
+			expected: "{Year: 2015, Day: 6, Type: Leaderboard}",
 		},
 		{
 			s: lib.Solution{
-				Year:        2013,
+				Year:        2016,
 				Day:         8,
 				Leaderboard: false,
 			},
-			expected: "{Year: 2013, Day: 8, Type: Optimized}",
+			expected: "{Year: 2016, Day: 8, Type: Optimized}",
 		},
 	} {
 		actual := testCase.s.String()

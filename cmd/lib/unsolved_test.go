@@ -15,7 +15,7 @@ func TestFirstUnsolvedSolution(t *testing.T) {
 		{
 			root: filepath.Join("testData", "testUnsolved", "firstYear", "dayOneLeaderboard"),
 			expected: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         1,
 				Leaderboard: true,
 			},
@@ -23,7 +23,7 @@ func TestFirstUnsolvedSolution(t *testing.T) {
 		{
 			root: filepath.Join("testData", "testUnsolved", "firstYear", "dayOneLeaderboardWithSecondYear"),
 			expected: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         1,
 				Leaderboard: true,
 			},
@@ -31,7 +31,7 @@ func TestFirstUnsolvedSolution(t *testing.T) {
 		{
 			root: filepath.Join("testData", "testUnsolved", "firstYear", "dayOneOptimized"),
 			expected: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         1,
 				Leaderboard: false,
 			},
@@ -39,7 +39,7 @@ func TestFirstUnsolvedSolution(t *testing.T) {
 		{
 			root: filepath.Join("testData", "testUnsolved", "firstYear", "dayThreeLeaderboard"),
 			expected: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         3,
 				Leaderboard: true,
 			},
@@ -47,16 +47,16 @@ func TestFirstUnsolvedSolution(t *testing.T) {
 		{
 			root: filepath.Join("testData", "testUnsolved", "firstYear", "dayThreeOptimized"),
 			expected: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         3,
 				Leaderboard: false,
 			},
 		},
 		{
 			root:  filepath.Join("testData", "testUnsolved", "firstYear", "dayTwentyFiveLeaderboard"),
-			skips: []lib.SkipSolution{{Year: singleValueRange(2012), Day: lib.SkipRange{Min: 1, Max: 24}}},
+			skips: []lib.SkipSolution{{Year: singleValueRange(2015), Day: lib.SkipRange{Min: 1, Max: 24}}},
 			expected: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         25,
 				Leaderboard: true,
 			},
@@ -64,7 +64,7 @@ func TestFirstUnsolvedSolution(t *testing.T) {
 		{
 			root: filepath.Join("testData", "testUnsolved", "secondYearNoSkips", "noNextYear"),
 			expected: lib.Solution{
-				Year:        2013,
+				Year:        2016,
 				Day:         1,
 				Leaderboard: true,
 			},
@@ -72,16 +72,16 @@ func TestFirstUnsolvedSolution(t *testing.T) {
 		{
 			root: filepath.Join("testData", "testUnsolved", "secondYearNoSkips", "someNextYear"),
 			expected: lib.Solution{
-				Year:        2013,
+				Year:        2016,
 				Day:         3,
 				Leaderboard: false,
 			},
 		},
 		{
 			root:  filepath.Join("testData", "testUnsolved", "secondYearSkips", "dayTwentyFiveLeaderboard"),
-			skips: []lib.SkipSolution{{Year: singleValueRange(2011)}, {Year: singleValueRange(2012), Day: lib.SkipRange{Min: 1, Max: 24}}},
+			skips: []lib.SkipSolution{{Year: singleValueRange(2011)}, {Year: singleValueRange(2015), Day: lib.SkipRange{Min: 1, Max: 24}}},
 			expected: lib.Solution{
-				Year:        2012,
+				Year:        2015,
 				Day:         25,
 				Leaderboard: true,
 			},
