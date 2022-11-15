@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"github.com/danvolchek/AdventOfCode/lib"
-	"io"
 	"os"
 	"path"
-	"strings"
 )
 
 func input() *os.File {
@@ -18,10 +15,8 @@ func input() *os.File {
 	return input
 }
 
-func solve(r io.Reader) {
+func solve(instructions []byte) int {
 	floor := 0
-
-	instructions := lib.Must(io.ReadAll(r))
 
 	for i, instruction := range instructions {
 		switch instruction {
@@ -34,14 +29,14 @@ func solve(r io.Reader) {
 		}
 
 		if floor == -1 {
-			fmt.Println(i + 1)
-			return
+			return i + 1
 		}
 	}
+
 	panic("not found")
 }
 
 func main() {
-	solve(strings.NewReader("()())"))
-	solve(input())
+	lib.TestSolveBytes("()())", solve)
+	lib.SolveBytes(input(), solve)
 }
