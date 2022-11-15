@@ -59,9 +59,14 @@ func solve(lines []string) int {
 }
 
 func main() {
-	lib.TestSolveLines("qjhvhtzxzqqjkmpb", solve)
-	lib.TestSolveLines("xxyxx", solve)
-	lib.TestSolveLines("uurcxstgmygtbstg", solve)
-	lib.TestSolveLines("ieodomkazucvgmuy", solve)
-	lib.SolveLines(input(), solve)
+	solver := lib.Solver[[]string, int]{
+		ParseF: lib.ParseLine(lib.AsIs[string]()),
+		SolveF: solve,
+	}
+
+	solver.Expect("qjhvhtzxzqqjkmpb", 1)
+	solver.Expect("xxyxx", 1)
+	solver.Expect("uurcxstgmygtbstg", 0)
+	solver.Expect("ieodomkazucvgmuy", 0)
+	solver.Solve(input())
 }

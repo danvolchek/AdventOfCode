@@ -47,7 +47,13 @@ func solve(instructions []byte) int {
 }
 
 func main() {
-	lib.TestSolveBytes("^>v<", solve)
-	lib.TestSolveBytes("^v^v^v^v^v", solve)
-	lib.SolveBytes(input(), solve)
+	solver := lib.Solver[[]byte, int]{
+		ParseF: lib.ParseBytes(),
+		SolveF: solve,
+	}
+
+	solver.Expect(">", 2)
+	solver.Expect("^>v<", 4)
+	solver.Expect("^v^v^v^v^v", 2)
+	solver.Solve(input())
 }

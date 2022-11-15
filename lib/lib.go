@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -35,45 +37,76 @@ func Atoi(s string) int {
 	return Must(strconv.Atoi(s))
 }
 
-// SolveBytes runs solution using the raw result of reading r.
-func SolveBytes[T any](r io.Reader, solution func(input []byte) T) {
-	input := Must(io.ReadAll(r))
-	result := solution(input)
-	fmt.Println(result)
+// Solver is a wrapper around running a solution, providing helper methods to simplify boilerplate.
+type Solver[T, V any] struct {
+	ParseF func(input io.Reader) T
+	SolveF func(parsed T) V
 }
 
-// TestSolveBytes is SolveBytes with a string input (for test cases).
-func TestSolveBytes[T any](input string, solution func(input []byte) T) {
-	SolveBytes(strings.NewReader(input), solution)
-}
+// Expect runs the solution against input, compares it to expected, and prints the result.
+func (s Solver[T, V]) Expect(input string, expected V) {
+	actual := s.solve(strings.NewReader(input))
 
-// SolveLines runs solution interpreting r as a newline delimited list of strings.
-func SolveLines[T any](r io.Reader, solution func(lines []string) T) {
-	SolveParseLines(r, func(line string) string { return line }, solution)
-}
-
-// TestSolveLines is SolveLines with a string input (for test cases).
-func TestSolveLines[T any](input string, solution func(lines []string) T) {
-	SolveLines(strings.NewReader(input), solution)
-}
-
-// SolveParseLines runs solution interpreting r as a newline delimited list of strings, parsed according to a function.
-func SolveParseLines[T, K any](r io.Reader, parse func(line string) K, solution func(lines []K) T) {
-	var lines []K
-
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		lines = append(lines, parse(scanner.Text()))
+	if !reflect.DeepEqual(expected, actual) {
+		fmt.Printf("(fail)    test: \"%v\" -> expected %v, got %v\n", input, expected, actual)
+	} else {
+		fmt.Printf("(success) test: \"%v\" -> got %v\n", input, actual)
 	}
-	if scanner.Err() != nil {
-		panic(scanner.Err())
-	}
-
-	result := solution(lines)
-	fmt.Println(result)
 }
 
-// TestSolveParseLines is SolveParseLines with a string input (for test cases).
-func TestSolveParseLines[T, K any](input string, parse func(line string) K, solution func(lines []K) T) {
-	SolveParseLines(strings.NewReader(input), parse, solution)
+// Test runs the solution against input and prints the result.
+func (s Solver[T, V]) Test(input string) {
+	fmt.Printf("test: \"%v\" -> %v\n", input, s.solve(strings.NewReader(input)))
+}
+
+// Solve runs the solution against the real input and prints the result.
+func (s Solver[T, V]) Solve(input io.Reader) {
+	fmt.Printf("real: %v\n", s.solve(input))
+}
+
+// solve runs the solution against input and returns the result.
+func (s Solver[T, V]) solve(input io.Reader) V {
+	return s.SolveF(s.ParseF(input))
+}
+
+// ParseBytes is a parse function helper that returns the raw bytes read.
+func ParseBytes() func(input io.Reader) []byte {
+	return func(input io.Reader) []byte {
+		return Must(io.ReadAll(input))
+	}
+}
+
+// ParseLine is a parse function helper that splits parsing into one line at a time, returning a slice of items.
+func ParseLine[T any](parse func(line string) T) func(r io.Reader) []T {
+	return func(r io.Reader) []T {
+		var lines []T
+
+		scanner := bufio.NewScanner(r)
+		for scanner.Scan() {
+			lines = append(lines, parse(scanner.Text()))
+		}
+		if scanner.Err() != nil {
+			panic(scanner.Err())
+		}
+
+		return lines
+	}
+}
+
+// AsIs is a parse function helper that leaves the value as is.
+func AsIs[T any]() func(value T) T {
+	return func(line T) T {
+		return line
+	}
+}
+
+// ParseRegexp is a parse function helper that returns substring matches from a string. Useful with ParseLine.
+func ParseRegexp[T any](reg *regexp.Regexp, parse func(parts []string) T) func(line string) T {
+	return func(line string) T {
+		result := reg.FindAllStringSubmatch(line, -1)
+
+		parts := result[0][1:]
+
+		return parse(parts)
+	}
 }

@@ -45,6 +45,12 @@ func solve(prefix []byte) int {
 }
 
 func main() {
-	lib.TestSolveBytes("abcdef", solve)
-	lib.SolveBytes(input(), solve)
+	solver := lib.Solver[[]byte, int]{
+		ParseF: lib.ParseBytes(),
+		SolveF: solve,
+	}
+
+	solver.Expect("abcdef", 609043)
+	solver.Expect("pqrstuv", 1048970)
+	solver.Solve(input())
 }

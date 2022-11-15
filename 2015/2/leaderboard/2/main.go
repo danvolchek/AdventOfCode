@@ -44,6 +44,12 @@ func solve(presents []present) int {
 }
 
 func main() {
-	lib.TestSolveParseLines("2x3x4", parse, solve)
-	lib.SolveParseLines(input(), parse, solve)
+	solver := lib.Solver[[]present, int]{
+		ParseF: lib.ParseLine(parse),
+		SolveF: solve,
+	}
+
+	solver.Expect("2x3x4", 34)
+	solver.Expect("1x1x10", 14)
+	solver.Solve(input())
 }

@@ -37,6 +37,13 @@ func solve(instructions []byte) int {
 }
 
 func main() {
-	lib.TestSolveBytes("()())", solve)
-	lib.SolveBytes(input(), solve)
+	solver := lib.Solver[[]byte, int]{
+		ParseF: lib.ParseBytes(),
+		SolveF: solve,
+	}
+
+	solver.Expect(")", 1)
+	solver.Expect("()())", 5)
+
+	solver.Solve(input())
 }

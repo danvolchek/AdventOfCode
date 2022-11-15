@@ -33,13 +33,9 @@ type instruction struct {
 	start, end pos
 }
 
-var lineRegexp = regexp.MustCompile(`(.+) (\d+),(\d+) through (\d+),(\d+)`)
+var parseReg = regexp.MustCompile(`(.+) (\d+),(\d+) through (\d+),(\d+)`)
 
-func parse(line string) instruction {
-	result := lineRegexp.FindAllStringSubmatch(line, -1)
-
-	parts := result[0][1:]
-
+func parse(parts []string) instruction {
 	var act action
 	switch parts[0] {
 	case "turn on":
@@ -104,8 +100,13 @@ func solve(instructions []instruction) int {
 }
 
 func main() {
-	lib.TestSolveParseLines("turn on 0,0 through 999,999", parse, solve)
-	lib.TestSolveParseLines("toggle 0,0 through 999,0", parse, solve)
-	lib.TestSolveParseLines("turn on 499,499 through 500,500", parse, solve)
-	lib.SolveParseLines(input(), parse, solve)
+	solver := lib.Solver[[]instruction, int]{
+		ParseF: lib.ParseLine(lib.ParseRegexp(parseReg, parse)),
+		SolveF: solve,
+	}
+
+	solver.Expect("turn on 0,0 through 999,999", 1000000)
+	solver.Expect("toggle 0,0 through 999,0", 1000)
+	solver.Expect("turn on 499,499 through 500,500", 4)
+	solver.Solve(input())
 }
