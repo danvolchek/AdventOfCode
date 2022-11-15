@@ -4,7 +4,6 @@ import (
 	"github.com/danvolchek/AdventOfCode/lib"
 	"os"
 	"path"
-	"strings"
 )
 
 func input() *os.File {
@@ -20,8 +19,9 @@ type present struct {
 	l, w, h int
 }
 
-func parse(line string) present {
-	parts := strings.Split(line, "x")
+const split = "x"
+
+func parse(parts []string) present {
 	return present{
 		l: lib.Atoi(parts[0]),
 		w: lib.Atoi(parts[1]),
@@ -45,7 +45,7 @@ func solve(presents []present) int {
 
 func main() {
 	solver := lib.Solver[[]present, int]{
-		ParseF: lib.ParseLine(parse),
+		ParseF: lib.ParseLine(lib.ParseSplit(split, parse)),
 		SolveF: solve,
 	}
 
