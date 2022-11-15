@@ -45,5 +45,5 @@ func main() {
 	solver.Expect(")", 1)
 	solver.Expect("()())", 5)
 
-	solver.Solve(input())
+	solver.Verify(input(), 1783)
 }

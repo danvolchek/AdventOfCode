@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // Solver is a wrapper around running a solution, providing helper methods to simplify boilerplate.
@@ -21,28 +22,53 @@ type Solver[T, V any] struct {
 
 // Expect runs the solution against input, compares it to expected, and prints the result.
 func (s Solver[T, V]) Expect(input string, expected V) {
-	actual := s.solve(strings.NewReader(input))
+	actual, dur := s.solve(strings.NewReader(input))
 
 	if !reflect.DeepEqual(expected, actual) {
-		fmt.Printf("(fail)    test: \"%v\" -> expected %v, got %v\n", input, expected, actual)
+		fmt.Printf("(fail)    test: \"%v\" -> expected %v, got %v%v\n", input, expected, actual, dur)
 	} else {
-		fmt.Printf("(success) test: \"%v\" -> got %v\n", input, actual)
+		fmt.Printf("(success) test: \"%v\" -> got %v%v\n", input, actual, dur)
 	}
 }
 
 // Test runs the solution against input and prints the result.
 func (s Solver[T, V]) Test(input string) {
-	fmt.Printf("test: \"%v\" -> %v\n", input, s.solve(strings.NewReader(input)))
+	solution, dur := s.solve(strings.NewReader(input))
+	fmt.Printf("test: \"%v\" -> %v%v\n", input, solution, dur)
+}
+
+// Verify runs the solution against the real input, compares it to expected, and prints the result.
+func (s Solver[T, V]) Verify(input io.Reader, expected V) {
+	actual, dur := s.solve(input)
+
+	if !reflect.DeepEqual(expected, actual) {
+		fmt.Printf("(fail)    real: expected %v, got %v%v\n", expected, actual, dur)
+	} else {
+		fmt.Printf("(success) real: got %v%v\n", actual, dur)
+	}
 }
 
 // Solve runs the solution against the real input and prints the result.
 func (s Solver[T, V]) Solve(input io.Reader) {
-	fmt.Printf("real: %v\n", s.solve(input))
+	solution, dur := s.solve(input)
+	fmt.Printf("real: %v%v\n", solution, dur)
 }
 
-// solve runs the solution against input and returns the result.
-func (s Solver[T, V]) solve(input io.Reader) V {
-	return s.SolveF(s.ParseF(input))
+// solve runs the solution against input and returns the result and elapsed time.
+func (s Solver[T, V]) solve(input io.Reader) (V, formatDur) {
+	now := time.Now()
+
+	solution := s.SolveF(s.ParseF(input))
+
+	return solution, formatDur{dur: time.Now().Sub(now)}
+}
+
+type formatDur struct {
+	dur time.Duration
+}
+
+func (f formatDur) String() string {
+	return " (" + f.dur.String() + ")"
 }
 
 // ParseBytes is a top level parse function that returns the raw bytes read.

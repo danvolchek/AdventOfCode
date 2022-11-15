@@ -55,5 +55,5 @@ func main() {
 	solver.Expect(">", 2)
 	solver.Expect("^>v<", 4)
 	solver.Expect("^v^v^v^v^v", 2)
-	solver.Solve(input())
+	solver.Verify(input(), 2572)
 }

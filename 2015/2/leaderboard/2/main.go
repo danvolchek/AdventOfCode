@@ -53,5 +53,5 @@ func main() {
 
 	solver.Expect("2x3x4", 34)
 	solver.Expect("1x1x10", 14)
-	solver.Solve(input())
+	solver.Verify(input(), 3737498)
 }

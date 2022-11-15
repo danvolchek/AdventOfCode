@@ -80,5 +80,5 @@ func main() {
 	solver.Expect("jchzalrnumimnmhp", 0)
 	solver.Expect("haegwjzuvuyypxyu", 0)
 	solver.Expect("dvszwmarrgswjxmb", 0)
-	solver.Solve(input())
+	solver.Verify(input(), 258)
 }

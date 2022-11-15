@@ -54,5 +54,5 @@ func main() {
 		solver.Expect(tc.in, tc.out)
 	}
 
-	solver.Solve(input())
+	solver.Verify(input(), 232)
 }

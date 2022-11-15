@@ -109,5 +109,5 @@ func main() {
 
 	solver.Expect("turn on 0,0 through 999,999", 1000000)
 	solver.Expect("toggle 0,0 through 999,0", 2000)
-	solver.Solve(input())
+	solver.Verify(input(), 14110788)
 }

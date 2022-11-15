@@ -52,5 +52,5 @@ func main() {
 
 	solver.Expect("abcdef", 6742839)
 	solver.Expect("pqrstuv", 5714438)
-	solver.Solve(input())
+	solver.Verify(input(), 3938038)
 }
