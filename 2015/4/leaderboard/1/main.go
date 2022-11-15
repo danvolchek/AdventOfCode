@@ -3,13 +3,10 @@ package main
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 	"github.com/danvolchek/AdventOfCode/lib"
-	"io"
 	"os"
 	"path"
 	"strconv"
-	"strings"
 )
 
 func input() *os.File {
@@ -21,9 +18,7 @@ func input() *os.File {
 	return input
 }
 
-func solve(r io.Reader) {
-	prefix := lib.Must(io.ReadAll(r))
-
+func solve(prefix []byte) int {
 	hash := md5.New()
 	num := 1
 	for {
@@ -41,17 +36,15 @@ func solve(r io.Reader) {
 		}
 
 		if found {
-			fmt.Println(num)
-			return
+			return num
 		}
 
 		hash.Reset()
 		num += 1
 	}
-
 }
 
 func main() {
-	solve(strings.NewReader("abcdef"))
-	solve(input())
+	lib.TestSolveBytes("abcdef", solve)
+	lib.SolveBytes(input(), solve)
 }
