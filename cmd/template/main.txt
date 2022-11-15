@@ -1,9 +1,8 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"io"
+    "fmt"
+	"github.com/danvolchek/AdventOfCode/lib"
 	"os"
 	"path"
 )
@@ -17,20 +16,20 @@ func input() *os.File {
 	return input
 }
 
-func solve(r io.Reader) {
-	scanner := bufio.NewScanner(r)
+func parse(line string) any {
+    return line
+}
 
-	for scanner.Scan() {
-		line := scanner.Text()
+func solve(lines []any) any {
+	for _, line := range lines {
 
-		fmt.Println(line)
-	}
+        fmt.Println(line)
+    }
 
-	if scanner.Err() != nil {
-		panic(scanner.Err())
-	}
+    return 0
 }
 
 func main() {
-	solve(input())
+	lib.TestSolveParseLines("foo", parse, solve)
+    lib.SolveParseLines(input(), parse, solve)
 }
