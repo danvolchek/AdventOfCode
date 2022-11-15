@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"github.com/danvolchek/AdventOfCode/lib"
-	"io"
 	"os"
 	"path"
-	"strings"
 )
 
 func input() *os.File {
@@ -44,9 +41,7 @@ func (g *gifter) Move(instruction byte) {
 	g.gifts[g.position] += 1
 }
 
-func solve(r io.Reader) {
-	instructions := lib.Must(io.ReadAll(r))
-
+func solve(instructions []byte) int {
 	santa := gifter{
 		gifts: map[pos]int{
 			{x: 0, y: 0}: 1,
@@ -80,11 +75,11 @@ func solve(r io.Reader) {
 		gotGifts[position] = true
 	}
 
-	fmt.Println(len(gotGifts))
+	return len(gotGifts)
 }
 
 func main() {
-	solve(strings.NewReader("^>v<"))
-	solve(strings.NewReader("^v^v^v^v^v"))
-	solve(input())
+	lib.TestSolveBytes("^>v<", solve)
+	lib.TestSolveBytes("^v^v^v^v^v", solve)
+	lib.SolveBytes(input(), solve)
 }

@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"github.com/danvolchek/AdventOfCode/lib"
-	"io"
 	"os"
 	"path"
-	"strings"
 )
 
 func input() *os.File {
@@ -22,9 +19,7 @@ type pos struct {
 	x, y int
 }
 
-func solve(r io.Reader) {
-	instructions := lib.Must(io.ReadAll(r))
-
+func solve(instructions []byte) int {
 	position := pos{x: 0, y: 0}
 
 	gifts := make(map[pos]int)
@@ -48,11 +43,11 @@ func solve(r io.Reader) {
 		gifts[position] += 1
 	}
 
-	fmt.Println(len(gifts))
+	return len(gifts)
 }
 
 func main() {
-	solve(strings.NewReader("^>v<"))
-	solve(strings.NewReader("^v^v^v^v^v"))
-	solve(input())
+	lib.TestSolveBytes("^>v<", solve)
+	lib.TestSolveBytes("^v^v^v^v^v", solve)
+	lib.SolveBytes(input(), solve)
 }
