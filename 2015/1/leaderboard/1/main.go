@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/danvolchek/AdventOfCode/lib"
 	"io"
 	"os"
 	"path"
@@ -20,10 +21,7 @@ func input() *os.File {
 func solve(r io.Reader) {
 	floor := 0
 
-	instructions, err := io.ReadAll(r)
-	if err != nil {
-		panic(err)
-	}
+	instructions := lib.Must(io.ReadAll(r))
 
 	for _, instruction := range instructions {
 		switch instruction {
