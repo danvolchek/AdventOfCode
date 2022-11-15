@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
 	"path"
+	"strings"
 )
 
 func input() *os.File {
@@ -18,19 +18,32 @@ func input() *os.File {
 }
 
 func solve(r io.Reader) {
-	scanner := bufio.NewScanner(r)
+	floor := 0
 
-	for scanner.Scan() {
-		line := scanner.Text()
-
-		fmt.Println(line)
+	instructions, err := io.ReadAll(r)
+	if err != nil {
+		panic(err)
 	}
 
-	if scanner.Err() != nil {
-		panic(scanner.Err())
+	for i, instruction := range instructions {
+		switch instruction {
+		case '(':
+			floor += 1
+		case ')':
+			floor -= 1
+		default:
+			panic(string(instruction))
+		}
+
+		if floor == -1 {
+			fmt.Println(i + 1)
+			return
+		}
 	}
+	panic("not found")
 }
 
 func main() {
+	solve(strings.NewReader("()())"))
 	solve(input())
 }
