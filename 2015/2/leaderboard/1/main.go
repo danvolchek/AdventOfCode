@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
 	"github.com/danvolchek/AdventOfCode/lib"
-	"io"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 )
 
@@ -20,35 +16,34 @@ func input() *os.File {
 	return input
 }
 
-func solve(r io.Reader) {
-	scanner := bufio.NewScanner(r)
+type present struct {
+	l, w, h int
+}
 
+func parse(line string) present {
+	parts := strings.Split(line, "x")
+	return present{
+		l: lib.Atoi(parts[0]),
+		w: lib.Atoi(parts[1]),
+		h: lib.Atoi(parts[2]),
+	}
+}
+
+func solve(presents []present) int {
 	totalPaper := 0
 
 	paperForPresent := func(l, w, h int) int {
 		return 2*l*w + 2*w*h + 2*h*l + lib.Min(l*w, l*h, h*w)
 	}
 
-	for scanner.Scan() {
-		line := scanner.Text()
-		if len(line) == 0 {
-			continue
-		}
-
-		parts := strings.Split(line, "x")
-		l, w, h := lib.Must(strconv.Atoi(parts[0])), lib.Must(strconv.Atoi(parts[1])), lib.Must(strconv.Atoi(parts[2]))
-
-		totalPaper += paperForPresent(l, w, h)
+	for _, present := range presents {
+		totalPaper += paperForPresent(present.l, present.w, present.h)
 	}
 
-	if scanner.Err() != nil {
-		panic(scanner.Err())
-	}
-
-	fmt.Println(totalPaper)
+	return totalPaper
 }
 
 func main() {
-	solve(strings.NewReader("2x3x4"))
-	solve(input())
+	lib.TestSolveParseLines("2x3x4", parse, solve)
+	lib.SolveParseLines(input(), parse, solve)
 }
