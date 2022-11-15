@@ -88,10 +88,3 @@ func ParseRegexp[T any](reg *regexp.Regexp, parse func(parts []string) T) func(l
 		return parse(firstMatchSubmatches)
 	}
 }
-
-// ParseSplit is a parse function helper that returns parts of a sttring split by a separator. Useful with ParseLine.
-func ParseSplit[T any](separator string, parse func(parts []string) T) func(line string) T {
-	return func(line string) T {
-		return parse(strings.Split(line, separator))
-	}
-}

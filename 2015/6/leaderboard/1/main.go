@@ -36,6 +36,8 @@ type instruction struct {
 var parseReg = regexp.MustCompile(`(.+) (\d+),(\d+) through (\d+),(\d+)`)
 
 func parse(parts []string) instruction {
+	// line format: "(turn on|turn off|toggle) 123,456 through 789,100"
+
 	var act action
 	switch parts[0] {
 	case "turn on":

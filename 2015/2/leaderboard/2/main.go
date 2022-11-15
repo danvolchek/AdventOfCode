@@ -21,6 +21,8 @@ type present struct {
 }
 
 func parse(line string) present {
+	// line format: "2x3x4"
+
 	parts := strings.Split(line, "x")
 	return present{
 		l: lib.Atoi(parts[0]),
