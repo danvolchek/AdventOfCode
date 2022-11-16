@@ -25,16 +25,16 @@ func (s Solver[T, V]) Expect(input string, expected V) {
 	actual, dur := s.solve(strings.NewReader(input))
 
 	if !reflect.DeepEqual(expected, actual) {
-		fmt.Printf("(fail)    test: \"%v\" -> expected %v, got %v%v\n", input, expected, actual, dur)
+		fmt.Printf("(fail)    test: \"%v\" -> expected %v, got %v%v\n", formatInput(input), expected, actual, dur)
 	} else {
-		fmt.Printf("(success) test: \"%v\" -> got %v%v\n", input, actual, dur)
+		fmt.Printf("(success) test: \"%v\" -> got %v%v\n", formatInput(input), actual, dur)
 	}
 }
 
 // Test runs the solution against input and prints the result.
 func (s Solver[T, V]) Test(input string) {
 	solution, dur := s.solve(strings.NewReader(input))
-	fmt.Printf("test: \"%v\" -> %v%v\n", input, solution, dur)
+	fmt.Printf("test: \"%v\" -> %v%v\n", formatInput(input), solution, dur)
 }
 
 // Verify runs the solution against the real input, compares it to expected, and prints the result.
@@ -60,15 +60,19 @@ func (s Solver[T, V]) solve(input io.Reader) (V, formatDur) {
 
 	solution := s.SolveF(s.ParseF(input))
 
-	return solution, formatDur{dur: time.Now().Sub(now)}
+	return solution, formatDur(time.Now().Sub(now))
 }
 
-type formatDur struct {
-	dur time.Duration
+type formatInput string
+
+func (f formatInput) String() string {
+	return strings.ReplaceAll(string(f), "\n", "\n"+strings.Repeat(" ", 17))
 }
+
+type formatDur time.Duration
 
 func (f formatDur) String() string {
-	return " (" + f.dur.String() + ")"
+	return " (" + time.Duration(f).String() + ")"
 }
 
 // ParseBytes is a top level parse function that returns the raw bytes read.
