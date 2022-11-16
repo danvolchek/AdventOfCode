@@ -242,7 +242,13 @@ func main() {
 		SolveF: solve,
 	}
 
+	solver.ParseExpect("123 -> z", []instruction{{target: "z", op: constValue{value: 123}}})
+	solver.ParseExpect("x AND y -> z", []instruction{{target: "z", op: binaryExpression{arg1: referenceValue{name: "x"}, arg2: referenceValue{name: "y"}, op: opAnd}}})
+	solver.ParseExpect("x OR y -> z", []instruction{{target: "z", op: binaryExpression{arg1: referenceValue{name: "x"}, arg2: referenceValue{name: "y"}, op: opOr}}})
+	solver.ParseExpect("x LSHIFT y -> z", []instruction{{target: "z", op: binaryExpression{arg1: referenceValue{name: "x"}, arg2: referenceValue{name: "y"}, op: opLShift}}})
+	solver.ParseExpect("x RSHIFT y -> z", []instruction{{target: "z", op: binaryExpression{arg1: referenceValue{name: "x"}, arg2: referenceValue{name: "y"}, op: opRShift}}})
+	solver.ParseExpect("NOT x -> z", []instruction{{target: "z", op: monaryExpression{arg: referenceValue{name: "x"}, op: opNot}}})
 	solver.Expect("123 -> x\n456 -> y\nx AND y -> d\nx OR y -> e\nx LSHIFT 2 -> f\ny RSHIFT 2 -> g\nNOT x -> a\nNOT y -> i", 65412)
 	solver.Expect("123 -> x\n456 -> y\nx AND y -> d\nx OR y -> e\nx LSHIFT 2 -> f\ny RSHIFT 2 -> g\nNOT x -> h\nNOT y -> a", 65079)
-	solver.Solve(input())
+	solver.Verify(input(), 16076)
 }
