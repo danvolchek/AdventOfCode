@@ -94,10 +94,8 @@ func (f formatDur) String() string {
 }
 
 // ParseBytes is a top level parse function that returns the raw bytes read.
-func ParseBytes() func(input io.Reader) []byte {
-	return func(input io.Reader) []byte {
-		return Must(io.ReadAll(input))
-	}
+func ParseBytes(input io.Reader) []byte {
+	return Must(io.ReadAll(input))
 }
 
 // ParseLine is a top level function helper that splits parsing into one line at a time, returning a slice of items.
@@ -119,10 +117,8 @@ func ParseLine[T any](parse func(line string) T) func(r io.Reader) []T {
 }
 
 // AsIs is a parse function helper that leaves the value as is. Useful with ParseLine.
-func AsIs[T any]() func(value T) T {
-	return func(line T) T {
-		return line
-	}
+func AsIs(line string) string {
+	return line
 }
 
 // ParseRegexp is a parse function helper that returns substring matches from a string. Useful with ParseLine.

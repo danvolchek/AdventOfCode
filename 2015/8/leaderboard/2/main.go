@@ -35,7 +35,7 @@ func solve(lines []string) int {
 
 func main() {
 	solver := lib.Solver[[]string, int]{
-		ParseF: lib.ParseLine(lib.AsIs[string]()),
+		ParseF: lib.ParseLine(lib.AsIs),
 		SolveF: solve,
 	}
 

@@ -34,7 +34,7 @@ func solve(instructions []byte) int {
 
 func main() {
 	solver := lib.Solver[[]byte, int]{
-		ParseF: lib.ParseBytes(),
+		ParseF: lib.ParseBytes,
 		SolveF: solve,
 	}
 
