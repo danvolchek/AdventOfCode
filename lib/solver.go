@@ -60,9 +60,9 @@ func (s Solver[T, V]) Verify(input io.Reader, expected V) {
 	actual, dur := s.solve(input)
 
 	if !reflect.DeepEqual(expected, actual) {
-		fmt.Printf("(fail)    real: expected %v, got %v%v\n", expected, actual, dur)
+		fmt.Printf("(fail)     real: expected %v, got %v%v\n", expected, actual, dur)
 	} else {
-		fmt.Printf("(success) real: got %v%v\n", actual, dur)
+		fmt.Printf("(success)  real: got %v%v\n", actual, dur)
 	}
 }
 
@@ -130,5 +130,12 @@ func ParseRegexp[T any](reg *regexp.Regexp, parse func(parts []string) T) func(l
 		firstMatchSubmatches := matches[0][1:]
 
 		return parse(firstMatchSubmatches)
+	}
+}
+
+// ToString is a solve function helper that converts a byte slice to a string.
+func ToString[T any](solve func(T) []byte) func(T) string {
+	return func(input T) string {
+		return string(solve(input))
 	}
 }
