@@ -83,8 +83,24 @@ func Map[T, V any](items []T, mapper func(T) V) []V {
 	return result
 }
 
+// Filter returns entries in items that the filter function returns true for.
+func Filter[T any](items []T, filter func(T) bool) []T {
+	var result []T
+
+	for _, item := range items {
+		if filter(item) {
+			result = append(result, item)
+		}
+	}
+
+	return result
+}
+
 // Permutations returns all possible permutations of items.
-// https://en.wikipedia.org/wiki/Heap%27s_algorithm
+// It uses https://en.wikipedia.org/wiki/Heap%27s_algorithm.
+//
+// Note: Almost every time, there is a more efficient solution than generating every possible permutation of a list.
+// I.e. there's a way to filter out potential options that are known not right.
 func Permutations[T any](items []T) [][]T {
 	var results [][]T
 
