@@ -59,6 +59,30 @@ func Remove[T any](items []T, index int) []T {
 	return result
 }
 
+// Keys returns the keys of a map.
+func Keys[T comparable, V any](items map[T]V) []T {
+	keys := make([]T, len(items))
+
+	i := 0
+	for key := range items {
+		keys[i] = key
+		i += 1
+	}
+
+	return keys
+}
+
+// Map converts a slice of items of type T to type V using a mapping function.
+func Map[T, V any](items []T, mapper func(T) V) []V {
+	result := make([]V, len(items))
+
+	for i, t := range items {
+		result[i] = mapper(t)
+	}
+
+	return result
+}
+
 // Permutations returns all possible permutations of items.
 // https://en.wikipedia.org/wiki/Heap%27s_algorithm
 func Permutations[T any](items []T) [][]T {
