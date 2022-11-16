@@ -58,3 +58,43 @@ func Remove[T any](items []T, index int) []T {
 
 	return result
 }
+
+// Permutations returns all possible permutations of items.
+// https://en.wikipedia.org/wiki/Heap%27s_algorithm
+func Permutations[T any](items []T) [][]T {
+	var results [][]T
+
+	scratch := make([]T, len(items))
+	copy(scratch, items)
+
+	savePerm := func() {
+		scratch2 := make([]T, len(items))
+		copy(scratch2, scratch)
+
+		results = append(results, scratch2)
+	}
+
+	stack := make([]int, len(items))
+
+	savePerm()
+
+	for i := 1; i < len(items); {
+		if stack[i] < i {
+			if i%2 == 0 {
+				scratch[0], scratch[i] = scratch[i], scratch[0]
+			} else {
+				scratch[stack[i]], scratch[i] = scratch[i], scratch[stack[i]]
+			}
+
+			savePerm()
+
+			stack[i] += 1
+			i = 1
+		} else {
+			stack[i] = 0
+			i += 1
+		}
+	}
+
+	return results
+}
