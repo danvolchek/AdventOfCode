@@ -31,20 +31,17 @@ func parse(parts []string) distance {
 	}
 }
 
-func calcDistance(curr string, remaining []string, distances map[string]map[string]int) int {
-	if len(remaining) == 0 {
-		return 0
+func calcDistance(path []string, distances map[string]map[string]int) int {
+	total := 0
+	for i := 0; i < len(distances)-1; i++ {
+		total += distances[path[i]][path[i+1]]
 	}
 
-	max := 0
-
-	for i, destination := range remaining {
-		max = lib.Max(max, distances[curr][destination]+calcDistance(destination, lib.Remove(remaining, i), distances))
-	}
-
-	return max
+	return total
 }
 
+// note: this is the travelling salesman problem. There are more efficient solutions for this problem;
+// this algorithm is not that - it tries every possible combination without any caching.
 func solve(instructions []distance) int {
 	distances := map[string]map[string]int{}
 	for _, instr := range instructions {
@@ -64,15 +61,14 @@ func solve(instructions []distance) int {
 		locations = append(locations, location)
 	}
 
-	max := 0
+	paths := lib.Permutations(locations)
 
-	// note: this is the travelling salesman problem. There are more efficient solutions for this problem;
-	// this algorithm is not that - it tries every possible combination without any caching.
-	for i, location := range locations {
-		max = lib.Max(max, calcDistance(location, lib.Remove(locations, i), distances))
+	var totals []int
+	for _, path := range paths {
+		totals = append(totals, calcDistance(path, distances))
 	}
 
-	return max
+	return lib.Max(totals...)
 }
 
 func main() {
@@ -82,5 +78,5 @@ func main() {
 	}
 
 	solver.Expect("London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141", 982)
-	solver.Solve(input())
+	solver.Verify(input(), 909)
 }
