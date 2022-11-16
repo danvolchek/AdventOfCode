@@ -31,15 +31,6 @@ func parse(parts []string) distance {
 	}
 }
 
-func calcDistance(path []string, distances map[string]map[string]int) int {
-	total := 0
-	for i := 0; i < len(distances)-1; i++ {
-		total += distances[path[i]][path[i+1]]
-	}
-
-	return total
-}
-
 // note: this is the travelling salesman problem. There are more efficient solutions for this problem;
 // this algorithm is not that - it tries every possible combination without any caching.
 func solve(instructions []distance) int {
@@ -56,19 +47,22 @@ func solve(instructions []distance) int {
 		distances[instr.end][instr.start] = instr.length
 	}
 
-	var locations []string
-	for location := range distances {
-		locations = append(locations, location)
+	calcDistance := func(path []string) int {
+		total := 0
+		for i := 0; i < len(distances)-1; i++ {
+			total += distances[path[i]][path[i+1]]
+		}
+
+		return total
 	}
+
+	locations := lib.Keys(distances)
 
 	paths := lib.Permutations(locations)
 
-	var totals []int
-	for _, path := range paths {
-		totals = append(totals, calcDistance(path, distances))
-	}
+	totalDistances := lib.Map(paths, calcDistance)
 
-	return lib.Min(totals...)
+	return lib.Min(totalDistances...)
 }
 
 func main() {
