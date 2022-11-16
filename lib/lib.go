@@ -11,6 +11,13 @@ func Must[T any](value T, err error) T {
 	return value
 }
 
+// NoPanic panics if err is non-nil.
+func NoPanic(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Min returns the smallest value in values.
 func Min(values ...int) int {
 	min := 0

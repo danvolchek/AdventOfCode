@@ -98,6 +98,11 @@ func ParseBytes(input io.Reader) []byte {
 	return Must(io.ReadAll(input))
 }
 
+// ParseString is a top level parse function that returns the string representation of the raw bytes read.
+func ParseString(input io.Reader) string {
+	return string(Must(io.ReadAll(input)))
+}
+
 // ParseLine is a top level function helper that splits parsing into one line at a time, returning a slice of items.
 // It accepts a parse function to parse each line seen.
 func ParseLine[T any](parse func(line string) T) func(r io.Reader) []T {
