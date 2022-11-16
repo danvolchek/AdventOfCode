@@ -59,5 +59,5 @@ func main() {
 		SolveF: solve,
 	}
 
-	solver.Solve(input())
+	solver.Verify(input(), 5103798)
 }
