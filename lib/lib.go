@@ -24,7 +24,30 @@ func Min(values ...int) int {
 	return min
 }
 
+// Max returns the largest value in values.
+func Max(values ...int) int {
+	max := 0
+
+	for i, value := range values {
+		if i == 0 || value > max {
+			max = value
+		}
+	}
+
+	return max
+}
+
 // Atoi is a convenience wrapper on [strconv.Atoi] that panics if it fails.
 func Atoi(s string) int {
 	return Must(strconv.Atoi(s))
+}
+
+// Remove returns a new slice that has the item at index removed from items.
+func Remove[T any](items []T, index int) []T {
+	result := make([]T, len(items)-1)
+
+	copy(result, items[:index])
+	copy(result[index:], items[index+1:])
+
+	return result
 }
