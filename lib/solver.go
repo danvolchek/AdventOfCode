@@ -20,14 +20,32 @@ type Solver[T, V any] struct {
 	SolveF func(parsed T) V
 }
 
+// Parse parses input and prints the result.
+func (s Solver[T, V]) Parse(input string) {
+	actual := s.ParseF(strings.NewReader(input))
+
+	fmt.Printf("parse: \"%v\" -> %+v\n", formatInput(input), actual)
+}
+
+// ParseExpect parses input, compares it to expected, and prints the result.
+func (s Solver[T, V]) ParseExpect(input string, expected T) {
+	actual := s.ParseF(strings.NewReader(input))
+
+	if !reflect.DeepEqual(expected, actual) {
+		fmt.Printf("(fail)    parse: \"%v\" -> expected %+v, got %+v\n", formatInput(input), expected, actual)
+	} else {
+		fmt.Printf("(success) parse: \"%v\" -> got %+v\n", formatInput(input), actual)
+	}
+}
+
 // Expect runs the solution against input, compares it to expected, and prints the result.
 func (s Solver[T, V]) Expect(input string, expected V) {
 	actual, dur := s.solve(strings.NewReader(input))
 
 	if !reflect.DeepEqual(expected, actual) {
-		fmt.Printf("(fail)    test: \"%v\" -> expected %v, got %v%v\n", formatInput(input), expected, actual, dur)
+		fmt.Printf("(fail)     test: \"%v\" -> expected %v, got %v%v\n", formatInput(input), expected, actual, dur)
 	} else {
-		fmt.Printf("(success) test: \"%v\" -> got %v%v\n", formatInput(input), actual, dur)
+		fmt.Printf("(success)  test: \"%v\" -> got %v%v\n", formatInput(input), actual, dur)
 	}
 }
 
