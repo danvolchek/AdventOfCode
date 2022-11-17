@@ -3,20 +3,10 @@ package main
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"strconv"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "4", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 func solve(prefix []byte) int {
 	hash := md5.New()
@@ -52,5 +42,5 @@ func main() {
 
 	solver.Expect("abcdef", 6742839)
 	solver.Expect("pqrstuv", 5714438)
-	solver.Verify(input(), 3938038)
+	solver.Verify(3938038)
 }

@@ -2,18 +2,7 @@ package main
 
 import (
 	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "11", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 func hasIncreasing(password []byte) bool {
 	for i := 0; i < len(password)-2; i++ {
@@ -114,5 +103,5 @@ func main() {
 		ParseF: lib.ParseBytes,
 		SolveF: solve,
 	}
-	solver.Verify(input(), "cqkaabcc")
+	solver.Verify("cqkaabcc")
 }

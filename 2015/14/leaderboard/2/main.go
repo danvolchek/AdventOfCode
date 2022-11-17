@@ -1,20 +1,10 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "14", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 type reindeer struct {
 	name                        string
@@ -103,5 +93,5 @@ func main() {
 	solver.Expect("Comet can fly 14 km/s for 10 seconds, but then must rest for 127 seconds.\nDancer can fly 16 km/s for 11 seconds, but then must rest for 162 seconds.", 689)
 
 	totalTime = 2503
-	solver.Verify(input(), 1102)
+	solver.Verify(1102)
 }

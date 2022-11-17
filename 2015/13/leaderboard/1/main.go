@@ -1,21 +1,11 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
 	"strings"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "13", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 type happinessChange struct {
 	target, neighbor string
@@ -90,5 +80,5 @@ David would lose 7 happiness units by sitting next to Bob.
 David would gain 41 happiness units by sitting next to Carol.
 `
 	solver.Expect(strings.TrimSpace(testCase), 330)
-	solver.Verify(input(), 618)
+	solver.Verify(618)
 }

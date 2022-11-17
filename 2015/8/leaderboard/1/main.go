@@ -1,21 +1,11 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
 	"strings"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "8", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 func decode(line string) string {
 	line = line[1 : len(line)-1]
@@ -47,5 +37,5 @@ func main() {
 	solver.Expect(`"aaa\"aaa"`, 3)
 	solver.Expect(`"\x27"`, 5)
 	solver.Expect(`"\x27"`, 5)
-	solver.Verify(input(), 1350)
+	solver.Verify(1350)
 }

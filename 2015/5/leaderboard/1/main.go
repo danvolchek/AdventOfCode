@@ -1,21 +1,11 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "5", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 func countVowels(line string) int {
 	vowels := 0
@@ -80,5 +70,5 @@ func main() {
 	solver.Expect("jchzalrnumimnmhp", 0)
 	solver.Expect("haegwjzuvuyypxyu", 0)
 	solver.Expect("dvszwmarrgswjxmb", 0)
-	solver.Verify(input(), 258)
+	solver.Verify(258)
 }

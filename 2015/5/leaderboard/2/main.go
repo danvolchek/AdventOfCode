@@ -1,20 +1,10 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"strings"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "5", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 func find(line string, substr string, not int) bool {
 	line = line[0:not] + strings.Repeat("*", len(substr)) + line[not+len(substr):]
@@ -68,5 +58,5 @@ func main() {
 	solver.Expect("xxyxx", 1)
 	solver.Expect("uurcxstgmygtbstg", 0)
 	solver.Expect("ieodomkazucvgmuy", 0)
-	solver.Verify(input(), 53)
+	solver.Verify(53)
 }

@@ -1,20 +1,10 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "9", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 type distance struct {
 	start, end string
@@ -72,5 +62,5 @@ func main() {
 	}
 
 	solver.Expect("London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141", 982)
-	solver.Verify(input(), 909)
+	solver.Verify(909)
 }

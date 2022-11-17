@@ -2,19 +2,9 @@ package main
 
 import (
 	"encoding/json"
+
 	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "12", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 func sum(value any) int {
 	switch value.(type) {
@@ -73,5 +63,5 @@ func main() {
 	solver.Expect(`{"d":"red","e":[1,2,3,4],"f":5}`, 0)
 	solver.Expect(`[1,"red",5]`, 6)
 
-	solver.Verify(input(), 68466)
+	solver.Verify(68466)
 }

@@ -1,20 +1,10 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"strings"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "2", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 type present struct {
 	l, w, h int
@@ -53,5 +43,5 @@ func main() {
 
 	solver.Expect("2x3x4", 34)
 	solver.Expect("1x1x10", 14)
-	solver.Verify(input(), 3737498)
+	solver.Verify(3737498)
 }

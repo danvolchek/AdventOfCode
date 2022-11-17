@@ -1,20 +1,10 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "6", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 type action int
 
@@ -112,5 +102,5 @@ func main() {
 	solver.Expect("turn on 0,0 through 999,999", 1000000)
 	solver.Expect("toggle 0,0 through 999,0", 1000)
 	solver.Expect("turn on 499,499 through 500,500", 4)
-	solver.Verify(input(), 377891)
+	solver.Verify(377891)
 }

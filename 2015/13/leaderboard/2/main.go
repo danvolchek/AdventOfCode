@@ -1,20 +1,10 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "13", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 type happinessChange struct {
 	target, neighbor string
@@ -82,5 +72,5 @@ func main() {
 		SolveF: solve,
 	}
 
-	solver.Verify(input(), 601)
+	solver.Verify(601)
 }

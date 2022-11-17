@@ -1,20 +1,10 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "12", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 var numberRegexp = regexp.MustCompile(`-?[0-9]+`)
 
@@ -45,5 +35,5 @@ func main() {
 	solver.Expect(`[]`, 0)
 	solver.Expect(`{}`, 0)
 
-	solver.Verify(input(), 119433)
+	solver.Verify(119433)
 }

@@ -1,20 +1,10 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"strconv"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "10", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 func expand(input []byte) []byte {
 	var result []byte
@@ -59,5 +49,5 @@ func main() {
 		SolveF: solve,
 	}
 
-	solver.Verify(input(), 5103798)
+	solver.Verify(5103798)
 }

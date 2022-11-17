@@ -1,20 +1,10 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"strings"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "8", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 func encode(line string) string {
 	line = strings.ReplaceAll(line, `\`, `\\`)
@@ -43,5 +33,5 @@ func main() {
 	solver.Expect(`"abc"`, 4)
 	solver.Expect(`"aaa\"aaa"`, 6)
 	solver.Expect(`"\x27"`, 5)
-	solver.Verify(input(), 2085)
+	solver.Verify(2085)
 }

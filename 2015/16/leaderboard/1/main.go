@@ -1,21 +1,11 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
 	"strings"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "16", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 var targetProperties = map[string]int{
 	"children":    3,
@@ -80,5 +70,5 @@ func main() {
 		SolveF: solve,
 	}
 
-	solver.Verify(input(), 103)
+	solver.Verify(103)
 }

@@ -2,18 +2,7 @@ package main
 
 import (
 	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "3", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 type pos struct {
 	x, y int
@@ -55,5 +44,5 @@ func main() {
 	solver.Expect(">", 2)
 	solver.Expect("^>v<", 4)
 	solver.Expect("^v^v^v^v^v", 2)
-	solver.Verify(input(), 2572)
+	solver.Verify(2572)
 }

@@ -1,22 +1,12 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "7", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 type evaluable interface {
 	Ready(context map[string]uint16) bool
@@ -250,5 +240,5 @@ func main() {
 	solver.ParseExpect("NOT x -> z", []instruction{{target: "z", op: monaryExpression{arg: referenceValue{name: "x"}, op: opNot}}})
 	solver.Expect("123 -> x\n456 -> y\nx AND y -> d\nx OR y -> e\nx LSHIFT 2 -> f\ny RSHIFT 2 -> g\nNOT x -> a\nNOT y -> i", 65412)
 	solver.Expect("123 -> x\n456 -> y\nx AND y -> d\nx OR y -> e\nx LSHIFT 2 -> f\ny RSHIFT 2 -> g\nNOT x -> h\nNOT y -> a", 65079)
-	solver.Verify(input(), 16076)
+	solver.Verify(16076)
 }

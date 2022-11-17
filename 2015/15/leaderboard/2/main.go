@@ -1,20 +1,10 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "15", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 type ingredient struct {
 	name                                            string
@@ -100,5 +90,5 @@ func main() {
 	}
 
 	solver.Expect("Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8\nCinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3", 57600000)
-	solver.Verify(input(), 15862900)
+	solver.Verify(15862900)
 }

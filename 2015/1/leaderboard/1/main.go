@@ -2,18 +2,7 @@ package main
 
 import (
 	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "1", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 func solve(instructions []byte) int {
 	floor := 0
@@ -54,5 +43,5 @@ func main() {
 		solver.Expect(tc.in, tc.out)
 	}
 
-	solver.Verify(input(), 232)
+	solver.Verify(232)
 }

@@ -1,22 +1,12 @@
 package main
 
 import (
-	"github.com/danvolchek/AdventOfCode/lib"
-	"os"
-	"path"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/danvolchek/AdventOfCode/lib"
 )
-
-func input() *os.File {
-	input, err := os.Open(path.Join("2015", "7", "input.txt"))
-	if err != nil {
-		panic(err)
-	}
-
-	return input
-}
 
 type evaluable interface {
 	Ready(context map[string]uint16) bool
@@ -250,5 +240,5 @@ func main() {
 		SolveF: solve,
 	}
 
-	solver.Verify(input(), 2797)
+	solver.Verify(2797)
 }

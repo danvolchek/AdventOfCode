@@ -4,8 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"os"
+	"path"
 	"reflect"
 	"regexp"
+	"runtime/debug"
 	"strings"
 	"time"
 )
@@ -56,8 +59,8 @@ func (s Solver[T, V]) Test(input string) {
 }
 
 // Verify runs the solution against the real input, compares it to expected, and prints the result.
-func (s Solver[T, V]) Verify(input io.Reader, expected V) {
-	actual, dur := s.solve(input)
+func (s Solver[T, V]) Verify(expected V) {
+	actual, dur := s.solve(getRealInput())
 
 	if !reflect.DeepEqual(expected, actual) {
 		fmt.Printf("(fail)     real: expected %v, got %v%v\n", expected, actual, dur)
@@ -67,8 +70,8 @@ func (s Solver[T, V]) Verify(input io.Reader, expected V) {
 }
 
 // Solve runs the solution against the real input and prints the result.
-func (s Solver[T, V]) Solve(input io.Reader) {
-	solution, dur := s.solve(input)
+func (s Solver[T, V]) Solve() {
+	solution, dur := s.solve(getRealInput())
 	fmt.Printf("real: %v%v\n", solution, dur)
 }
 
@@ -79,6 +82,19 @@ func (s Solver[T, V]) solve(input io.Reader) (V, formatDur) {
 	solution := s.SolveF(s.ParseF(input))
 
 	return solution, formatDur(time.Now().Sub(now))
+}
+
+// getRealInput returns a reader which reads the input file.
+func getRealInput() io.Reader {
+	buildInfo, ok := debug.ReadBuildInfo()
+	if !ok {
+		panic(ok)
+	}
+
+	// path is of the form github.com/danvolchek/AdventOfCode/2015/16/leaderboard/1
+	parts := strings.Split(buildInfo.Path, string(os.PathSeparator))
+
+	return Must(os.Open(path.Join(parts[3], parts[4], "input.txt")))
 }
 
 type formatInput string
