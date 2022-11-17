@@ -24,7 +24,7 @@ type equation struct {
 	a, n *big.Int
 }
 
-//https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Existence_(constructive_proof)
+// https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Existence_(constructive_proof)
 func findX2(eq1, eq2 equation) *big.Int {
 	//euclid := extendedEuclid(eq1.n, eq2.n)
 
