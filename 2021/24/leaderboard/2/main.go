@@ -21,7 +21,6 @@ import (
 // all the possible z values. Once we have those, we trace back input choices by z value that end with
 // z = 0 after input 14 (the target z) - this yields every valid input. Then we pick the min/max
 
-
 func input() *os.File {
 	input, err := os.Open(path.Join("2021", "24", "input.txt"))
 	if err != nil {
@@ -95,13 +94,13 @@ func parse(r io.Reader) []block {
 type solveResult struct {
 	// The minimum z value, corresponding to input = 1. Because of the form of the equation, if there was no
 	// equality in the z equation, input = 2 is Min + 1, input = 3 is Min + 2, and so on.
-	Min     uint64 `json:"m,omitempty"`
+	Min uint64 `json:"m,omitempty"`
 
 	// If there was an equality in the z equation, this is the corresponding z value.
-	MatchZ  uint64 `json:"z"`
+	MatchZ uint64 `json:"z"`
 
 	// If there was an equality in the z equation, it happened at only one input. This is that input.
-	MatchIn byte	`json:"i,omitempty"`
+	MatchIn byte `json:"i,omitempty"`
 }
 
 func (s solveResult) hasEqualityMatch() bool {
@@ -113,13 +112,13 @@ func (s solveResult) zValues() []uint64 {
 
 	var i byte
 	for i = 1; i <= 9; i++ {
-		zToMatch := uint64(i - 1) + s.Min
+		zToMatch := uint64(i-1) + s.Min
 
 		if i == s.MatchIn {
 			zToMatch = s.MatchZ
 		}
 
-		ret[i - 1] = zToMatch
+		ret[i-1] = zToMatch
 	}
 
 	return ret
@@ -139,7 +138,7 @@ func (b block) solve(prevZ uint64) solveResult {
 		cond := (prevZ % 26) + b.a
 		if cond == in {
 			ret.MatchIn = byte(in)
-			ret.MatchZ = prevZ/b.b
+			ret.MatchZ = prevZ / b.b
 			break
 		}
 	}
@@ -183,12 +182,12 @@ func solve(r io.Reader) {
 
 		possibForBlock := make(map[uint64]solveResult)
 
-		lastInValues := lastInValuesMem[len(lastInValuesMem) - 1]
+		lastInValues := lastInValuesMem[len(lastInValuesMem)-1]
 
 		for _, lastResult := range lastInValues {
 			for _, zToMatch := range lastResult.zValues() {
 				sol := b.solve(zToMatch)
-				if blockNum == len(blocks) - 1 {
+				if blockNum == len(blocks)-1 {
 					if !sol.hasEqualityMatch() {
 						continue
 					}
@@ -208,7 +207,6 @@ func solve(r io.Reader) {
 	//write(0, lastInValuesMem)
 
 	fmt.Println("reconstructing....")
-
 
 	fmt.Println("chasing 0")
 	stop := make(chan int)
@@ -236,7 +234,7 @@ func solve(r io.Reader) {
 		return numsInt[i] < numsInt[j]
 	})
 
-	fmt.Println(numsInt[0], numsInt[len(numsInt) - 1])
+	fmt.Println(numsInt[0], numsInt[len(numsInt)-1])
 }
 
 type combiner []int
@@ -258,10 +256,9 @@ func chase(zss []map[uint64]solveResult, target uint64) [][]int {
 		return [][]int{{}}
 	}
 
-
 	var ret [][]int
 
-	zs := zss[len(zss) - 1]
+	zs := zss[len(zss)-1]
 
 	for prevZ, result := range zs {
 		for i, nextZ := range result.zValues() {
@@ -271,7 +268,7 @@ func chase(zss []map[uint64]solveResult, target uint64) [][]int {
 
 				//fmt.Println("found", target, "with num", inpNum, "now chasing", prevZ)
 
-				for _, v := range ap(chase(zss[:len(zss) - 1], prevZ), inpNum) {
+				for _, v := range ap(chase(zss[:len(zss)-1], prevZ), inpNum) {
 					//return [][]int{v}
 
 					ret = append(ret, v)
@@ -280,16 +277,15 @@ func chase(zss []map[uint64]solveResult, target uint64) [][]int {
 		}
 	}
 
-
 	return ret
 }
 
 func ap(rets [][]int, v int) [][]int {
 	n := make([][]int, len(rets))
 	for i, ret := range rets {
-		n[i] = make([]int, len(ret) + 1)
+		n[i] = make([]int, len(ret)+1)
 		copy(n[i], ret)
-		n[i][len(n[i]) - 1] = v
+		n[i][len(n[i])-1] = v
 	}
 
 	return n
@@ -298,7 +294,7 @@ func ap(rets [][]int, v int) [][]int {
 func read(i int, q interface{}) bool {
 	f, err := os.Open(fmt.Sprintf("24_%d.json", i))
 	if err != nil {
-		return  false
+		return false
 	}
 	b, err := io.ReadAll(f)
 	if err != nil {

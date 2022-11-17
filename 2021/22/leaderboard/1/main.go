@@ -21,12 +21,12 @@ func input() *os.File {
 }
 
 type action struct {
-	on bool
+	on       bool
 	from, to pos
 }
 
 type pos struct {
-	x,y,z int
+	x, y, z int
 }
 
 var reg = regexp.MustCompile(`(...?) x=(-?\d+)\.\.(-?\d+),y=(-?\d+)\.\.(-?\d+),z=(-?\d+)\.\.(-?\d+)`)
@@ -40,13 +40,13 @@ func solve(r io.Reader) {
 
 		parts := reg.FindStringSubmatch(line)
 		actions = append(actions, action{
-			on:   parts[1] == "on",
+			on: parts[1] == "on",
 			from: pos{
 				x: toInt(parts[2]),
 				y: toInt(parts[4]),
 				z: toInt(parts[6]),
 			},
-			to:   pos{
+			to: pos{
 				x: toInt(parts[3]),
 				y: toInt(parts[5]),
 				z: toInt(parts[7]),
@@ -72,9 +72,9 @@ func solve(r io.Reader) {
 			for y := action.from.y; y <= action.to.y; y++ {
 				for z := action.from.z; z <= action.to.z; z++ {
 					if action.on {
-						cubes[pos{x:x, y:y, z:z}] = true
+						cubes[pos{x: x, y: y, z: z}] = true
 					} else {
-						delete(cubes, pos{x:x, y:y, z:z})
+						delete(cubes, pos{x: x, y: y, z: z})
 					}
 				}
 			}
@@ -85,7 +85,7 @@ func solve(r io.Reader) {
 }
 
 func oob(p pos) bool {
-	oobs := func(i int) bool {return i < - 50 || i > 50}
+	oobs := func(i int) bool { return i < -50 || i > 50 }
 	return oobs(p.x) || oobs(p.y) || oobs(p.z)
 }
 

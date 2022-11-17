@@ -62,8 +62,8 @@ func solve(r io.Reader) {
 			}
 			dieRolls += 1
 		}
-		for i := 0; i<toAdd; i++ {
-			firstPos ++
+		for i := 0; i < toAdd; i++ {
+			firstPos++
 			if firstPos == 11 {
 				firstPos = 1
 			}
@@ -84,8 +84,8 @@ func solve(r io.Reader) {
 			}
 			dieRolls += 1
 		}
-		for i := 0; i<toAdd; i++ {
-			secondPos ++
+		for i := 0; i < toAdd; i++ {
+			secondPos++
 			if secondPos == 11 {
 				secondPos = 1
 			}

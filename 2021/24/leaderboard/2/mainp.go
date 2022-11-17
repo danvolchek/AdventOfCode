@@ -37,12 +37,12 @@ func inputp() *os.File {
 }
 
 type action struct {
-	op op
+	op         op
 	arg1, arg2 string
 }
 
 type alu2Action struct {
-	op op
+	op         op
 	arg1, arg2 *alu2Action
 
 	value int
@@ -51,7 +51,7 @@ type alu2Action struct {
 }
 
 type alu2 struct {
-	w,x,y,z *alu2Action
+	w, x, y, z *alu2Action
 
 	inpIndex int
 }
@@ -71,7 +71,7 @@ func (a *alu2) store(arg string) **alu2Action {
 	}
 }
 
-func (a * alu2) load(arg string, debugDepth int) *alu2Action {
+func (a *alu2) load(arg string, debugDepth int) *alu2Action {
 	switch arg {
 	case "w":
 		return a.w
@@ -92,17 +92,17 @@ func (a * alu2) load(arg string, debugDepth int) *alu2Action {
 
 func newAlu2() *alu2 {
 	return &alu2{
-		w:        makeRaw(0, 0),
-		x:        makeRaw(0, 0),
-		y:        makeRaw(0, 0),
-		z:        makeRaw(0, 0),
+		w: makeRaw(0, 0),
+		x: makeRaw(0, 0),
+		y: makeRaw(0, 0),
+		z: makeRaw(0, 0),
 	}
 }
 
 func makeRaw(v, debugDepth int) *alu2Action {
 	return &alu2Action{
-		op:    opRaw,
-		value: v,
+		op:         opRaw,
+		value:      v,
 		debugDepth: debugDepth,
 	}
 }
@@ -112,8 +112,8 @@ func (a *alu2) build(acts []action) {
 		switch act.op {
 		case opInp:
 			*a.store(act.arg1) = &alu2Action{
-				op:    act.op,
-				value: a.inpIndex,
+				op:         act.op,
+				value:      a.inpIndex,
 				debugDepth: i + 1,
 			}
 			a.inpIndex += 1
@@ -121,9 +121,9 @@ func (a *alu2) build(acts []action) {
 			continue
 		default:
 			*a.store(act.arg1) = &alu2Action{
-				op:       act.op,
-				arg1: a.load(act.arg1, i + 1),
-				arg2: a.load(act.arg2, i + 1),
+				op:         act.op,
+				arg1:       a.load(act.arg1, i+1),
+				arg2:       a.load(act.arg2, i+1),
 				debugDepth: i + 1,
 			}
 		}
@@ -132,18 +132,17 @@ func (a *alu2) build(acts []action) {
 
 var simplificationMap = map[*alu2Action]*alu3Action{}
 
-
 type alu3Action struct {
 	raw, isNotImp bool
 
-	val int
+	val      int
 	inpIndex int
 
 	val1, val2 *alu3Action
-	op op
+	op         op
 }
 
-func (v* alu2Action) simplify3() *alu3Action {
+func (v *alu2Action) simplify3() *alu3Action {
 	if vv, ok := simplificationMap[v]; ok {
 		return vv
 	}
@@ -164,27 +163,27 @@ func (v* alu2Action) simplify3() *alu3Action {
 
 		if v1.raw && v2.raw && v1.isNotImp && v2.isNotImp {
 			return &alu3Action{
-				raw: true,
+				raw:      true,
 				isNotImp: true,
-				val: v1.val + v2.val,
+				val:      v1.val + v2.val,
 			}
 		}
 	case opMul:
 		v2 = v.arg2.simplify3()
 		if v2.raw && v2.isNotImp && v2.val == 0 {
 			return &alu3Action{
-				raw:  true,
+				raw:      true,
 				isNotImp: true,
-				val:  0,
+				val:      0,
 			}
 		}
 
 		v1 = v.arg1.simplify3()
 		if v1.raw && v1.isNotImp && v1.val == 0 {
 			return &alu3Action{
-				raw:  true,
+				raw:      true,
 				isNotImp: true,
-				val:  0,
+				val:      0,
 			}
 		}
 
@@ -196,9 +195,9 @@ func (v* alu2Action) simplify3() *alu3Action {
 
 		if v1.raw && v2.raw && v1.isNotImp && v2.isNotImp {
 			return &alu3Action{
-				raw: true,
+				raw:      true,
 				isNotImp: true,
-				val: v1.val * v2.val,
+				val:      v1.val * v2.val,
 			}
 		}
 
@@ -212,18 +211,18 @@ func (v* alu2Action) simplify3() *alu3Action {
 
 		if v1.raw && v2.raw && v1.isNotImp && v2.isNotImp {
 			return &alu3Action{
-				raw: true,
+				raw:      true,
 				isNotImp: true,
-				val: v1.val / v2.val,
+				val:      v1.val / v2.val,
 			}
 		}
 	case opMod:
 		v1 = v.arg1.simplify3()
 		if v1.raw && v1.isNotImp && v1.val == 0 {
 			return &alu3Action{
-				raw: true,
+				raw:      true,
 				isNotImp: true,
-				val: 0,
+				val:      0,
 			}
 		}
 
@@ -231,9 +230,9 @@ func (v* alu2Action) simplify3() *alu3Action {
 
 		if v1.raw && v2.raw && v1.isNotImp && v2.isNotImp {
 			return &alu3Action{
-				raw: true,
+				raw:      true,
 				isNotImp: true,
-				val: v1.val % v2.val,
+				val:      v1.val % v2.val,
 			}
 		}
 
@@ -247,34 +246,33 @@ func (v* alu2Action) simplify3() *alu3Action {
 		// a valid inp is 1-9
 		if v1.raw && !v1.isNotImp && v2.raw && v2.isNotImp && (v2.val > 9 || v2.val < 0) {
 			return &alu3Action{
-				raw: true,
+				raw:      true,
 				isNotImp: true,
-				val: 0,
+				val:      0,
 			}
 		}
 
 		// a valid inp is 1-9
 		if v2.raw && !v2.isNotImp && v1.raw && v1.isNotImp && (v1.val > 9 || v1.val < 0) {
 			return &alu3Action{
-				raw: true,
+				raw:      true,
 				isNotImp: true,
-				val: 0,
+				val:      0,
 			}
 		}
-
 
 		if v1.raw && v2.raw && v1.isNotImp && v2.isNotImp {
 			if v1.val == v2.val {
 				return &alu3Action{
-					raw: true,
+					raw:      true,
 					isNotImp: true,
-					val: 1,
+					val:      1,
 				}
 			} else {
 				return &alu3Action{
-					raw: true,
+					raw:      true,
 					isNotImp: true,
-					val: 0,
+					val:      0,
 				}
 			}
 		}
@@ -285,30 +283,29 @@ func (v* alu2Action) simplify3() *alu3Action {
 			if v2ok {
 				if v1Max < v2Min || v2Max < v1Min {
 					return &alu3Action{
-						raw: true,
+						raw:      true,
 						isNotImp: true,
-						val: 0,
+						val:      0,
 					}
 				}
 			}
 		}
 
-
 	case opInp:
 		return &alu3Action{
-			raw:  true,
+			raw:      true,
 			isNotImp: false,
 			inpIndex: v.value,
 		}
 	case opRaw:
 		return &alu3Action{
-			raw:  true,
+			raw:      true,
 			isNotImp: true,
-			val:  v.value,
+			val:      v.value,
 		}
 	}
 
-	ret :=  &alu3Action{
+	ret := &alu3Action{
 		val1: v1,
 		val2: v2,
 		op:   v.op,
@@ -355,7 +352,7 @@ func (v *alu3Action) possibleValues() (int, int, bool) {
 		// mod a b where a >= b is between 0, b - 1
 		return 0, v2Max - 1, v1ok && v2ok
 	case opEql:
-		return 0,1, true
+		return 0, 1, true
 	case opRaw:
 		return v.val, v.val, true
 	default:
@@ -381,7 +378,7 @@ func (v *alu3Action) ToString(s *strings.Builder) {
 	s.WriteByte(')')
 }
 
-func (v * alu3Action) String() string {
+func (v *alu3Action) String() string {
 	var s strings.Builder
 	v.ToString(&s)
 	return s.String()
@@ -458,6 +455,7 @@ func (v *alu2Action) simplify() string {
 	//simplificationMap[v] = ret
 	return ret
 }
+
 /*
 type alu struct {
 	w,x,y,z int
@@ -539,7 +537,7 @@ func solvep(r io.Reader) {
 		line := scanner.Text()
 		if len(line) == 0 {
 			instrs = append(instrs, action{
-				op:   opNop,
+				op: opNop,
 			})
 			continue
 		}
@@ -552,7 +550,7 @@ func solvep(r io.Reader) {
 			arg1: parts[1],
 		}
 
-		if len(parts) ==3 {
+		if len(parts) == 3 {
 			act.arg2 = parts[2]
 		}
 
@@ -576,14 +574,14 @@ func solvep(r io.Reader) {
 		a.inpIndex = inpNum
 		if oldZ != nil {
 			a.z = &alu2Action{
-				op:         opInp,
-				value:      99-inpNum,
+				op:    opInp,
+				value: 99 - inpNum,
 			}
 		}
 		a.build(instrs[start:end])
 		oldZ = a.z
 
-		fmt.Printf("%d (%d-%d)\n", inpNum, start + 1, end)
+		fmt.Printf("%d (%d-%d)\n", inpNum, start+1, end)
 		fmt.Println("w:", a.w.simplify3())
 		fmt.Println("x:", a.x.simplify3())
 		fmt.Println("y:", a.y.simplify3())
@@ -594,23 +592,20 @@ func solvep(r io.Reader) {
 		inpNum += 1
 	}
 	/*
-	for i := 1; i <len(instrs); i++ {
-		a := newAlu2()
-		a.build(instrs[:i])
-		fmt.Printf("%d: %s\n",i, lines[i-1])
-		fmt.Println("w:", a.w.simplify3())
-		fmt.Println("x:", a.x.simplify3())
-		fmt.Println("y:", a.y.simplify3())
-		fmt.Println("z:", a.z.simplify3())
+		for i := 1; i <len(instrs); i++ {
+			a := newAlu2()
+			a.build(instrs[:i])
+			fmt.Printf("%d: %s\n",i, lines[i-1])
+			fmt.Println("w:", a.w.simplify3())
+			fmt.Println("x:", a.x.simplify3())
+			fmt.Println("y:", a.y.simplify3())
+			fmt.Println("z:", a.z.simplify3())
 
-		b.ReadString('\n')
-	}*/
-
+			b.ReadString('\n')
+		}*/
 
 	//fmt.Println(a.y.simplify3())
 	//fmt.Println(a.z.simplify3())
-
-
 
 	/*a := newAlu2()
 	a.build(instrs)
@@ -630,7 +625,6 @@ func solvep(r io.Reader) {
 	if err != nil {
 		panic(err)
 	}*/
-
 
 }
 

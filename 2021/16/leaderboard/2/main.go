@@ -142,7 +142,6 @@ func gt(ps []packet) int {
 	return 0
 }
 
-
 func lt(ps []packet) int {
 	if calc(ps[0]) < calc(ps[1]) {
 		return 1
@@ -159,13 +158,11 @@ func eq(ps []packet) int {
 	return 0
 }
 
-
-
 type packet struct {
 	version int
 	typeId  int
 
-	value int
+	value      int
 	subPackets []packet
 }
 
@@ -184,10 +181,9 @@ func parsePacket(pp string) ([]packet, string) {
 		return nil, ""
 	}
 
-
 	var p = &pp
 	version := consumeInt(p, 3)
-	id := consumeInt(p,3)
+	id := consumeInt(p, 3)
 
 	switch id {
 	case 4:
@@ -204,9 +200,9 @@ func parsePacket(pp string) ([]packet, string) {
 		}
 
 		return []packet{{
-			version:    version,
-			typeId:     id,
-			value: toInt(num),
+			version: version,
+			typeId:  id,
+			value:   toInt(num),
 		}}, *p
 	default:
 		lengthTypeId := consume(p, 1)
@@ -217,7 +213,7 @@ func parsePacket(pp string) ([]packet, string) {
 
 			startSize := len(*p)
 			var subpackets []packet
-			for startSize - len(*p) < packetsSize {
+			for startSize-len(*p) < packetsSize {
 				var newPackets []packet
 				newPackets, *p = parsePacket(*p)
 

@@ -20,8 +20,8 @@ func input() *os.File {
 
 type character struct {
 	value, match rune
-	isOpen bool
-	score int
+	isOpen       bool
+	score        int
 }
 
 func (c character) Score() int {
@@ -34,28 +34,28 @@ func (c character) Score() int {
 
 var characters = []character{
 	{
-		value: '(',
-		match: ')',
+		value:  '(',
+		match:  ')',
 		isOpen: true,
-		score: 3,
+		score:  3,
 	},
 	{
-		value: '[',
-		match: ']',
+		value:  '[',
+		match:  ']',
 		isOpen: true,
-		score: 57,
+		score:  57,
 	},
 	{
-		value: '{',
-		match: '}',
+		value:  '{',
+		match:  '}',
 		isOpen: true,
-		score: 1197,
+		score:  1197,
 	},
 	{
-		value: '<',
-		match: '>',
+		value:  '<',
+		match:  '>',
 		isOpen: true,
-		score: 25137,
+		score:  25137,
 	},
 }
 

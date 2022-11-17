@@ -26,7 +26,7 @@ type action struct {
 }
 
 type pos struct {
-	x,y,z int
+	x, y, z int
 }
 
 type cuboid struct {
@@ -42,14 +42,13 @@ type cutOutCuboid struct {
 	cuts []*cutOutCuboid
 }
 
-
 func (c cutOutCuboid) volume() int {
 	cutVolume := 0
 	for _, cut := range c.cuts {
 		cutVolume += cut.volume()
 	}
 
-	vol:= c.area.volume() - cutVolume
+	vol := c.area.volume() - cutVolume
 	//if vol < 0 {
 	//	return 0
 	//}
@@ -122,14 +121,13 @@ func (c *cutOutCuboid) checkIntersect(cub cuboid) {
 	c.cuts = append(c.cuts, &cutOutCuboid{area: inter})
 }
 
-
-func addCuboid(onCuboids []*cutOutCuboid, act action) []*cutOutCuboid{
+func addCuboid(onCuboids []*cutOutCuboid, act action) []*cutOutCuboid {
 	for _, cub := range onCuboids {
 		cub.checkIntersect(act.r)
 	}
 
 	if act.on {
-		onCuboids = append(onCuboids,  &cutOutCuboid{
+		onCuboids = append(onCuboids, &cutOutCuboid{
 			area: act.r,
 			cuts: nil,
 		})
@@ -139,15 +137,15 @@ func addCuboid(onCuboids []*cutOutCuboid, act action) []*cutOutCuboid{
 }
 
 func intersection(c1, c2 cuboid) (cuboid, bool) {
-	if c1.from.x > c2.to.x || c1.to.x < c2.from.x {  // c1 right of c2 || c1 left of c2
+	if c1.from.x > c2.to.x || c1.to.x < c2.from.x { // c1 right of c2 || c1 left of c2
 		return cuboid{}, false
 	}
 
-	if c1.from.y > c2.to.y || c1.to.y < c2.from.y {  // c1 right of c2 || c1 left of c2
+	if c1.from.y > c2.to.y || c1.to.y < c2.from.y { // c1 right of c2 || c1 left of c2
 		return cuboid{}, false
 	}
 
-	if c1.from.z > c2.to.z || c1.to.z < c2.from.z {  // c1 right of c2 || c1 left of c2
+	if c1.from.z > c2.to.z || c1.to.z < c2.from.z { // c1 right of c2 || c1 left of c2
 		return cuboid{}, false
 	}
 
@@ -157,13 +155,12 @@ func intersection(c1, c2 cuboid) (cuboid, bool) {
 			y: max(c1.from.y, c2.from.y),
 			z: max(c1.from.z, c2.from.z),
 		},
-		to:   pos{
+		to: pos{
 			x: min(c1.to.x, c2.to.x),
 			y: min(c1.to.y, c2.to.y),
 			z: min(c1.to.z, c2.to.z),
 		},
 	}, true
-
 
 }
 
@@ -183,8 +180,6 @@ func max(a, b int) int {
 	return b
 }
 
-
-
 func toInt(s string) int {
 	v, err := strconv.Atoi(s)
 	if err != nil {
@@ -195,7 +190,7 @@ func toInt(s string) int {
 }
 
 func testIntersect() {
-	for _, tc := range []struct{a,b,c cuboid}{
+	for _, tc := range []struct{ a, b, c cuboid }{
 		{
 			a: parseCube("on x=0..10,y=0..10,z=0..10").r,
 			b: parseCube("on x=0..5,y=0..5,z=0..5").r,
@@ -231,7 +226,7 @@ func testIntersect() {
 			b: parseCube("on x=5..15,y=5..15,z=15..20").r,
 			c: cuboid{},
 		},
-	}{
+	} {
 		inter, _ := intersection(tc.a, tc.b)
 		if inter != tc.c {
 			fmt.Println(tc.a, tc.b)

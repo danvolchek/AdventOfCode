@@ -22,19 +22,19 @@ func input() *os.File {
 }
 
 type action struct {
-	op string
+	op         string
 	arg1, arg2 string
 }
 
 type alu2Action struct {
-	op string
+	op         string
 	arg1, arg2 *alu2Action
 
 	inpIndex int
 }
 
 type alu2 struct {
-	w,x,y,z *alu2Action
+	w, x, y, z *alu2Action
 
 	inpIndex int
 }
@@ -54,7 +54,7 @@ func (a *alu2) store(arg string) **alu2Action {
 	}
 }
 
-func (a * alu2) load(arg string) *alu2Action {
+func (a *alu2) load(arg string) *alu2Action {
 	switch arg {
 	case "w":
 		return a.w
@@ -69,8 +69,6 @@ func (a * alu2) load(arg string) *alu2Action {
 	}
 }
 
-
-
 func (a *alu2) build(acts []action) {
 	for _, act := range acts {
 		switch act.op {
@@ -82,7 +80,7 @@ func (a *alu2) build(acts []action) {
 			a.inpIndex += 1
 		default:
 			*a.store(act.arg1) = &alu2Action{
-				op:       act.op,
+				op:   act.op,
 				arg1: a.load(act.arg1),
 				arg2: a.load(act.arg2),
 			}
@@ -118,7 +116,7 @@ func (v *alu2Action) simplify() string {
 }
 
 type alu struct {
-	w,x,y,z int
+	w, x, y, z int
 
 	inp []int
 }
@@ -207,7 +205,7 @@ func solve(r io.Reader) {
 			arg1: parts[1],
 		}
 
-		if len(parts) ==3 {
+		if len(parts) == 3 {
 			act.arg2 = parts[2]
 		}
 

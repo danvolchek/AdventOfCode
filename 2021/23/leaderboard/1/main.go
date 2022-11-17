@@ -21,7 +21,7 @@ func input() *os.File {
 
 type state struct {
 	hallway [11]byte
-	rooms [4][2]byte
+	rooms   [4][2]byte
 }
 
 func solve(r io.Reader) {
@@ -37,22 +37,22 @@ func solve(r io.Reader) {
 
 	i := 0
 	for _, v := range bytes.Split(first, []byte{'#'}) {
-		if len(v) ==0 || v[0] == '#' || len(bytes.TrimSpace(v)) == 0 {
+		if len(v) == 0 || v[0] == '#' || len(bytes.TrimSpace(v)) == 0 {
 			continue
 		}
 
 		s.rooms[i][0] = v[0]
-		i+=1
+		i += 1
 
 	}
 	i = 0
 	for _, v := range bytes.Split(second, []byte{'#'}) {
-		if len(v) ==0 ||  v[0] == '#' || len(bytes.TrimSpace(v)) == 0 {
+		if len(v) == 0 || v[0] == '#' || len(bytes.TrimSpace(v)) == 0 {
 			continue
 		}
 
 		s.rooms[i][1] = v[0]
-		i+=1
+		i += 1
 
 	}
 
@@ -91,7 +91,6 @@ func solve(r io.Reader) {
 
 var solutions = 0
 
-
 func minCost(s state) int {
 	if done(s) {
 		solutions += 1
@@ -120,7 +119,7 @@ func minCost(s state) int {
 
 type move struct {
 	cost int
-	s state
+	s    state
 }
 
 func validMoves(s state) []move {
@@ -181,7 +180,7 @@ func hallwayMoves(s state, hallwayPos int) []move {
 			break
 		}
 
-		if j % 2 == 0 && j > 0 && j < 10 {
+		if j%2 == 0 && j > 0 && j < 10 {
 			spots = append(spots, j)
 		}
 	}
@@ -191,7 +190,7 @@ func hallwayMoves(s state, hallwayPos int) []move {
 			break
 		}
 
-		if j % 2 == 0 && j > 0 && j < 10 {
+		if j%2 == 0 && j > 0 && j < 10 {
 			spots = append(spots, j)
 		}
 	}
@@ -199,13 +198,13 @@ func hallwayMoves(s state, hallwayPos int) []move {
 	for _, j := range spots {
 		possibleRoom := (j / 2) - 1
 
-		for possibleSpot := len(s.rooms[possibleRoom]) - 1; possibleSpot >= 0; possibleSpot -- {
+		for possibleSpot := len(s.rooms[possibleRoom]) - 1; possibleSpot >= 0; possibleSpot-- {
 			if roomFits(s, possibleRoom, which, possibleSpot) {
 				newState := s
 				newState.hallway[hallwayPos] = 0
 				newState.rooms[possibleRoom][possibleSpot] = which
 				ret = append(ret, move{
-					cost: cost(which, abs(hallwayPos - j) + possibleSpot + 1),
+					cost: cost(which, abs(hallwayPos-j)+possibleSpot+1),
 					s:    newState,
 				})
 
@@ -227,7 +226,7 @@ func abs(v int) int {
 
 func roomMove(s state, room, spot int) []move {
 	// blocked to leave room
-	for i := spot - 1; i >=0; i-- {
+	for i := spot - 1; i >= 0; i-- {
 		if s.rooms[room][i] != 0 {
 			return nil
 		}
@@ -237,7 +236,6 @@ func roomMove(s state, room, spot int) []move {
 	//if which == 0 {
 	//	panic(which)
 	//}
-
 
 	// don't leave if you're in the right spot and everyone behind of you is in the right spot
 	if destRoom(which) == room {
@@ -265,7 +263,7 @@ func roomMove(s state, room, spot int) []move {
 			break
 		}
 
-		if j ==2 || j == 4 || j ==6 || j == 8 {
+		if j == 2 || j == 4 || j == 6 || j == 8 {
 			continue
 		}
 
@@ -277,8 +275,7 @@ func roomMove(s state, room, spot int) []move {
 			break
 		}
 
-
-		if j == 2 || j == 4 || j ==6 || j == 8 {
+		if j == 2 || j == 4 || j == 6 || j == 8 {
 			continue
 		}
 
@@ -290,7 +287,7 @@ func roomMove(s state, room, spot int) []move {
 		newState.hallway[j] = which
 		newState.rooms[room][spot] = 0
 
-		c := cost(which, abs(hallwayPos - j) + spot + 1)
+		c := cost(which, abs(hallwayPos-j)+spot+1)
 		ret = append(ret, move{
 			cost: c,
 			s:    newState,
@@ -300,20 +297,18 @@ func roomMove(s state, room, spot int) []move {
 			return []move{
 				{
 					cost: c + v.cost,
-					s: v.s,
+					s:    v.s,
 				},
 			} // if we found a hallway it's the best possible one, don't try others
 		}
 	}
 
-
 	return ret
 }
 
-
 func cost(which byte, steps int) int {
 	switch which {
-	case 'A' :
+	case 'A':
 		return steps
 	case 'B':
 		return 10 * steps
@@ -331,7 +326,6 @@ func roomFits(s state, room int, which byte, spot int) bool {
 		return false
 	}
 
-
 	// can't enter if blocked
 	for i := 0; i <= spot; i++ {
 		if s.rooms[room][i] != 0 {
@@ -348,7 +342,6 @@ func roomFits(s state, room int, which byte, spot int) bool {
 
 	return true
 }
-
 
 func destRoom(which byte) int {
 	return int(which - 65)
@@ -370,7 +363,7 @@ func destRoom(which byte) int {
 func done(s state) bool {
 	for i := 0; i < len(s.rooms); i++ {
 		for j := 0; j < len(s.rooms[i]); j++ {
-			if int(s.rooms[i][j]) != 65 + i {
+			if int(s.rooms[i][j]) != 65+i {
 				return false
 			}
 		}
@@ -378,7 +371,6 @@ func done(s state) bool {
 
 	return true
 }
-
 
 func main() {
 	//solve(strings.NewReader("#############\n#...........#\n###B#C#B#D###\n  #A#D#C#A#\n  #########"))

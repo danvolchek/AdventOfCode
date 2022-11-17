@@ -120,7 +120,7 @@ func count(scanners [][]pos, scannerPositions map[int]pos) int {
 	return len(beaconSet)
 }
 
-type try struct {solved, unsolved int}
+type try struct{ solved, unsolved int }
 
 func normalize(scanners [][]pos, scannerPositions map[int]pos, tried map[try]bool) bool {
 	for solvedIndex, solvedBeacons := range scanners {
@@ -134,7 +134,7 @@ func normalize(scanners [][]pos, scannerPositions map[int]pos, tried map[try]boo
 				continue
 			}
 
-			thisTry := try{solved: solvedIndex, unsolved:unsolvedIndex}
+			thisTry := try{solved: solvedIndex, unsolved: unsolvedIndex}
 			if tried[thisTry] {
 				continue
 			}
@@ -200,7 +200,7 @@ func mul(x, y, z int) func(pos) pos {
 	}
 }
 
-func swap(doSwap bool) func(pos)pos {
+func swap(doSwap bool) func(pos) pos {
 	return func(p pos) pos {
 		if doSwap {
 			return pos{
@@ -216,7 +216,6 @@ func swap(doSwap bool) func(pos)pos {
 // 1 2 3
 // 3 1 2 right 1
 // 2 3 1 right 2
-
 
 // 2 1 3
 // 3 2 1

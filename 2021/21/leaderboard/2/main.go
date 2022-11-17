@@ -25,7 +25,7 @@ type stats struct {
 
 type gameState struct {
 	p1, p2 stats
-	turn bool
+	turn   bool
 }
 
 type result struct {
@@ -33,7 +33,6 @@ type result struct {
 }
 
 var wins = make(map[gameState]result)
-
 
 func solve(r io.Reader) {
 	scanner := bufio.NewScanner(r)
@@ -88,7 +87,7 @@ func numWins(g gameState) result {
 			p1Wins: 1,
 		}
 	} else if g.p2.score >= 21 {
-		return result {
+		return result{
 			p2Wins: 1,
 		}
 	}
@@ -141,12 +140,11 @@ func fillRolls() {
 	for i := 1; i <= 3; i++ {
 		for j := 1; j <= 3; j++ {
 			for k := 1; k <= 3; k++ {
-				possibleRolls = append(possibleRolls, i + j + k)
+				possibleRolls = append(possibleRolls, i+j+k)
 			}
 		}
 	}
 }
-
 
 func main() {
 	fillRolls()

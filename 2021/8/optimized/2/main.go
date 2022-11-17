@@ -86,7 +86,7 @@ c -> 6 8
 d -> 0 8
 e 8 -> 9
 f ->
- */
+*/
 
 // findSignalSegmentMapping finds the mapping which satisfies all digits in patterns, or in other words
 // the mapping which results in all translated patterns being valid digits.

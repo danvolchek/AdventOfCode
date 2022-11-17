@@ -36,22 +36,22 @@ func solve(r io.Reader) {
 		panic(scanner.Err())
 	}
 
-	i:=0
+	i := 0
 
 	for move(cucumbers) {
-		i+=1
+		i += 1
 	}
 
 	fmt.Println(i)
 }
 
-type pos struct {i, j int}
-type swap struct {p1, p2 pos}
+type pos struct{ i, j int }
+type swap struct{ p1, p2 pos }
 
 func move(cucumbers [][]byte) bool {
 	moved := false
 
-	var swaps[]swap
+	var swaps []swap
 
 	for i := 0; i < len(cucumbers); i++ {
 		for j := 0; j < len(cucumbers[i]); j++ {
@@ -59,14 +59,14 @@ func move(cucumbers [][]byte) bool {
 				continue
 			}
 
-			nextJ := j+1
+			nextJ := j + 1
 			if nextJ == len(cucumbers[i]) {
 				nextJ = 0
 			}
 
 			if cucumbers[i][nextJ] == '.' {
 				moved = true
-				swaps = append(swaps, swap{p1: pos{i,j}, p2:pos{i, nextJ}})
+				swaps = append(swaps, swap{p1: pos{i, j}, p2: pos{i, nextJ}})
 			}
 		}
 	}
@@ -83,14 +83,14 @@ func move(cucumbers [][]byte) bool {
 				continue
 			}
 
-			nextI := i+1
+			nextI := i + 1
 			if nextI == len(cucumbers) {
 				nextI = 0
 			}
 
 			if cucumbers[nextI][j] == '.' {
 				moved = true
-				swaps = append(swaps, swap{p1: pos{i,j}, p2:pos{nextI, j}})
+				swaps = append(swaps, swap{p1: pos{i, j}, p2: pos{nextI, j}})
 			}
 		}
 	}
