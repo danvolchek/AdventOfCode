@@ -1,6 +1,10 @@
 package lib
 
-import "strconv"
+import (
+	"golang.org/x/exp/constraints"
+	"math"
+	"strconv"
+)
 
 // Must return value if err is non-nil and panics otherwise.
 func Must[T any](value T, err error) T {
@@ -19,8 +23,8 @@ func NoPanic(err error) {
 }
 
 // Min returns the smallest value in values.
-func Min(values ...int) int {
-	min := 0
+func Min[T constraints.Ordered](values ...T) T {
+	var min T
 
 	for i, value := range values {
 		if i == 0 || value < min {
@@ -59,6 +63,13 @@ func Remove[T any](items []T, index int) []T {
 	return result
 }
 
+// Clone returns a copy of items.
+func Clone[T any](items []T) []T {
+	result := make([]T, len(items))
+	copy(result, items)
+	return result
+}
+
 // Keys returns the keys of a map.
 func Keys[T comparable, V any](items map[T]V) []T {
 	keys := make([]T, len(items))
@@ -94,6 +105,40 @@ func Filter[T any](items []T, filter func(T) bool) []T {
 	}
 
 	return result
+}
+
+// SumSlice returns the sum of items.
+func SumSlice[T constraints.Integer | constraints.Float](items []T) T {
+	var sum T
+	for _, val := range items {
+		sum += val
+	}
+
+	return sum
+}
+
+// MinSlice returns the min of items.
+func MinSlice[T constraints.Ordered](items []T) T {
+	var min T
+	for i, val := range items {
+		if i == 0 || val < min {
+			min = val
+		}
+	}
+
+	return min
+}
+
+// MaxSlice returns the max of items.
+func MaxSlice[T constraints.Ordered](items []T) T {
+	var max T
+	for i, val := range items {
+		if i == 0 || val > max {
+			max = val
+		}
+	}
+
+	return max
 }
 
 // Permutations returns all possible permutations of items.
@@ -137,4 +182,31 @@ func Permutations[T any](items []T) [][]T {
 	}
 
 	return results
+}
+
+// Subsets returns all subsets of items by enumerating the 2**n-1 possible combinations, using the bits in the
+// counter as whether to include an item or not.
+func Subsets[T any](items []T) [][]T {
+	if len(items) == 0 {
+		return nil
+	}
+
+	var result [][]T
+
+	n := len(items)
+
+	for i := 0; i < int(math.Pow(2, float64(n))); i++ {
+		var subset []T
+
+		for bit := 0; bit < n; bit++ {
+			if (i>>bit)&1 == 1 {
+				subset = append(subset, items[bit])
+
+			}
+		}
+
+		result = append(result, subset)
+	}
+
+	return result
 }
