@@ -70,7 +70,7 @@ func Clone[T any](items []T) []T {
 	return result
 }
 
-// Keys returns the keys of a map.
+// Keys returns the keys of a map. It does not return the items in a consistent order.
 func Keys[T comparable, V any](items map[T]V) []T {
 	keys := make([]T, len(items))
 
