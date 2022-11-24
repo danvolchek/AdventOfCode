@@ -9,7 +9,7 @@ import (
 
 type happinessChange struct {
 	target, neighbor string
-	change           int
+	value            int
 }
 
 var parseRegExp = regexp.MustCompile(`(.*) would (.*) (.*) happiness units by sitting next to (.*)\.`)
@@ -28,7 +28,7 @@ func parse(parts []string) happinessChange {
 	return happinessChange{
 		target:   parts[0],
 		neighbor: parts[3],
-		change:   multiplier * lib.Atoi(parts[2]),
+		value:    multiplier * lib.Atoi(parts[2]),
 	}
 }
 
@@ -38,7 +38,7 @@ func solve(changes []happinessChange) int {
 		if _, ok := peopleMap[change.target]; !ok {
 			peopleMap[change.target] = map[string]int{}
 		}
-		peopleMap[change.target][change.neighbor] = change.change
+		peopleMap[change.target][change.neighbor] = change.value
 	}
 
 	people := lib.Keys(peopleMap)
