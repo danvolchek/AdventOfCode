@@ -36,6 +36,11 @@ func BFS[I comparable, T NodeConstraint[I, T]](start T, target I) []T {
 				if !ok {
 					break
 				}
+
+				if curr.Id() == start.Id() {
+					result = append(result, curr)
+					break
+				}
 			}
 			rev := make([]T, len(result))
 			for i, item := range result {

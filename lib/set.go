@@ -6,6 +6,12 @@ type Set[T comparable] struct {
 	items map[T]struct{}
 }
 
+// Contains returns whether the Set contains the item.
+func (s *Set[T]) Contains(item T) bool {
+	_, ok := s.items[item]
+	return ok
+}
+
 // Add adds an item to the Set. It returns whether the item was added.
 func (s *Set[T]) Add(item T) bool {
 	if s.items == nil {

@@ -26,6 +26,24 @@ func TestSet_Size(t *testing.T) {
 	}
 }
 
+func TestSet_Contains(t *testing.T) {
+	var s lib.Set[int]
+
+	if s.Contains(1) {
+		t.Fatalf("Set should not contain 0")
+	}
+
+	s.Add(1)
+	if !s.Contains(1) {
+		t.Fatalf("Set should contain 1")
+	}
+
+	s.Remove(1)
+	if s.Contains(1) {
+		t.Fatalf("Set should not contain 1")
+	}
+}
+
 func TestSet(t *testing.T) {
 	var q lib.Set[int]
 
