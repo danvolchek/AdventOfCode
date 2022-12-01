@@ -133,6 +133,32 @@ func ParseStringFunc[T any](parse func(input string) T) func(r io.Reader) T {
 	}
 }
 
+// ParseLineChunked is like ParseLine except when it sees a blank line, it parses all the lines seen previously as a single chunk.
+func ParseLineChunked[T, V any](parse func(line string) T, parseChunk func(lines []T) V) func(r io.Reader) []V {
+	return func(r io.Reader) []V {
+		var chunks []V
+		var lines []T
+
+		scanner := bufio.NewScanner(r)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if line == "" {
+				chunks = append(chunks, parseChunk(lines))
+				lines = nil
+			} else {
+				lines = append(lines, parse(line))
+			}
+		}
+		if scanner.Err() != nil {
+			panic(scanner.Err())
+		}
+
+		chunks = append(chunks, parseChunk(lines))
+
+		return chunks
+	}
+}
+
 // ParseLine is a top level function helper that splits parsing into one line at a time, returning a slice of items.
 // It accepts a parse function to parse each line seen.
 func ParseLine[T any](parse func(line string) T) func(r io.Reader) []T {
