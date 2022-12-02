@@ -13,33 +13,34 @@ func parse(line string) Round {
 	}
 }
 
+const (
+	rock     = 1
+	paper    = 2
+	scissors = 3
+
+	win  = 6
+	tie  = 3
+	lose = 0
+)
+
 var score = map[string]map[string]int{
 	// Rock
 	"A": {
-		// Lose, Scissors
-		"X": 0 + 3,
-		// Tie, Rock
-		"Y": 3 + 1,
-		// Win, Paper
-		"Z": 6 + 2,
+		"X": lose + scissors,
+		"Y": tie + rock,
+		"Z": win + paper,
 	},
 	// Paper
 	"B": {
-		// Lose, Rock
-		"X": 0 + 1,
-		// Tie, Paper
-		"Y": 3 + 2,
-		// Win, Scissors
-		"Z": 6 + 3,
+		"X": lose + rock,
+		"Y": tie + paper,
+		"Z": win + scissors,
 	},
 	// Scissors
 	"C": {
-		// Lose, Paper
-		"X": 0 + 2,
-		// Tie, Scissors
-		"Y": 3 + 3,
-		// Win, Rock
-		"Z": 6 + 1,
+		"X": lose + paper,
+		"Y": tie + scissors,
+		"Z": win + rock,
 	},
 }
 

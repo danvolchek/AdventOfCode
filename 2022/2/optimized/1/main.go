@@ -13,33 +13,35 @@ func parse(line string) Round {
 	}
 }
 
+const (
+	rock     = 1
+	paper    = 2
+	scissors = 3
+
+	win  = 6
+	tie  = 3
+	lose = 0
+)
+
+// score[x][y] returns the score for you when your opponent chooses x, and you choose y
 var score = map[string]map[string]int{
 	// Rock
 	"A": {
-		// Tie, Rock
-		"X": 3 + 1,
-		// Win, Paper
-		"Y": 6 + 2,
-		// Lose, Scissors
-		"Z": 0 + 3,
+		"X": tie + rock,
+		"Y": win + paper,
+		"Z": lose + scissors,
 	},
 	// Paper
 	"B": {
-		// Lose, Rock
-		"X": 0 + 1,
-		// Tie, Paper
-		"Y": 3 + 2,
-		// Win, Scissors
-		"Z": 6 + 3,
+		"X": lose + rock,
+		"Y": tie + paper,
+		"Z": win + scissors,
 	},
 	// Scissors
 	"C": {
-		// Win, Rock
-		"X": 6 + 1,
-		// Lose, Paper
-		"Y": 0 + 2,
-		// Tie, Scissors
-		"Z": 3 + 3,
+		"X": win + rock,
+		"Y": lose + paper,
+		"Z": tie + scissors,
 	},
 }
 
