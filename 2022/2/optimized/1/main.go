@@ -8,102 +8,49 @@ import (
 func parse(line string) Round {
 	parts := strings.Split(line, " ")
 	return Round{
-		opponent: parseChoice(parts[0]),
-		you:      parseChoice(parts[1]),
+		opponent: parts[0],
+		you:      parts[1],
 	}
 }
 
-func parseChoice(str string) Choice {
-	switch str {
-	case "A", "X":
-		return Rock
-	case "B", "Y":
-		return Paper
-	case "C", "Z":
-		return Scissors
-	default:
-		panic(str)
-	}
-}
-
-//go:generate go run golang.org/x/tools/cmd/stringer -type=Choice,Outcome -output enums_string.go
-
-// Choice represents a choice in the game of rock paper scissors.
-type Choice int
-
-const (
-	Rock Choice = iota
-	Paper
-	Scissors
-)
-
-// Outcome represents the outcome of a round of rock paper scissors.
-type Outcome int
-
-const (
-	Win Outcome = iota
-	Tie
-	Lose
-)
-
-// Score returns the score of an outcome for you.
-func (o Outcome) Score() int {
-	switch o {
-	case Win:
-		return 6
-	case Tie:
-		return 3
-	case Lose:
-		return 0
-	default:
-		panic(o)
-	}
-}
-
-// beats[a][b] returns whether a beats b.
-var beats = map[Choice]map[Choice]bool{
-	Rock:     {Scissors: true},
-	Paper:    {Rock: true},
-	Scissors: {Paper: true},
-}
-
-// Beats returns the outcome of c against other.
-func (c Choice) Beats(other Choice) Outcome {
-	if beats[c][other] {
-		return Win
-	} else if c == other {
-		return Tie
-	} else {
-		return Lose
-	}
-}
-
-// Score returns the score of a choice for you.
-func (c Choice) Score() int {
-	switch c {
-	case Rock:
-		return 1
-	case Paper:
-		return 2
-	case Scissors:
-		return 3
-	default:
-		panic(c)
-	}
+var score = map[string]map[string]int{
+	// Rock
+	"A": {
+		// Tie, Rock
+		"X": 3 + 1,
+		// Win, Paper
+		"Y": 6 + 2,
+		// Lose, Scissors
+		"Z": 0 + 3,
+	},
+	// Paper
+	"B": {
+		// Lose, Rock
+		"X": 0 + 1,
+		// Tie, Paper
+		"Y": 3 + 2,
+		// Win, Scissors
+		"Z": 6 + 3,
+	},
+	// Scissors
+	"C": {
+		// Win, Rock
+		"X": 6 + 1,
+		// Lose, Paper
+		"Y": 0 + 2,
+		// Tie, Scissors
+		"Z": 3 + 3,
+	},
 }
 
 // Round represents a round of rock paper scissors.
 type Round struct {
-	opponent, you Choice
+	opponent, you string
 }
 
 // Score returns the score of a round for you.
 func (r Round) Score() int {
-	// The outcome of a round is whether your choice beats your opponents choice.
-	outcome := r.you.Beats(r.opponent)
-
-	// The score of a round is the score of the outcome plus the score of your choice.
-	return outcome.Score() + r.you.Score()
+	return score[r.opponent][r.you]
 }
 
 func solve(rounds []Round) int {
