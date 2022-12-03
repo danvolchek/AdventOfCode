@@ -182,6 +182,11 @@ func AsIs(line string) string {
 	return line
 }
 
+// ToByteSlice is a parse function helper that turns the value to a byte slice. Useful with ParseLine.
+func ToByteSlice(line string) []byte {
+	return []byte(line)
+}
+
 // ParseRegexp is a parse function helper that returns substring matches from a string. Useful with ParseLine.
 // There should only be one match of reg in the string; others will be ignored.
 func ParseRegexp[T any](reg *regexp.Regexp, parse func(parts []string) T) func(line string) T {
