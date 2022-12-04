@@ -5,42 +5,45 @@ import (
 	"regexp"
 )
 
-type SectionRange struct {
+type Assignment struct {
 	start, stop int
 }
 
-func (s SectionRange) Overlap(o SectionRange) bool {
-	return !(s.start > o.stop || s.stop < o.start)
-}
-
 type Pair struct {
-	first, second SectionRange
+	first, second Assignment
 }
 
 var reg = regexp.MustCompile(`(\d+)-(\d+),(\d+)-(\d+)`)
 
 func parse(parts []string) Pair {
 	return Pair{
-		first: SectionRange{
+		first: Assignment{
 			start: lib.Atoi(parts[0]),
 			stop:  lib.Atoi(parts[1]),
 		},
-		second: SectionRange{
+		second: Assignment{
 			start: lib.Atoi(parts[2]),
 			stop:  lib.Atoi(parts[3]),
 		},
 	}
 }
 
-func solve(lines []Pair) int {
-	amount := 0
-	for _, line := range lines {
-		if line.second.Overlap(line.first) {
-			amount += 1
+func solve(elfPairs []Pair) int {
+	sum := 0
+
+	// overlap returns whether s overlaps with f
+	overlap := func(f, s Assignment) bool {
+		return !(s.start > f.stop || s.stop < f.start)
+	}
+
+	// count the pairs where the elves overlap
+	for _, elfPair := range elfPairs {
+		if overlap(elfPair.first, elfPair.second) {
+			sum += 1
 		}
 	}
 
-	return amount
+	return sum
 }
 
 func main() {
@@ -50,5 +53,5 @@ func main() {
 	}
 
 	solver.Expect("2-4,6-8\n2-3,4-5\n5-7,7-9\n2-8,3-7\n6-6,4-6\n2-6,4-8\n", 4)
-	solver.Solve()
+	solver.Verify(849)
 }
