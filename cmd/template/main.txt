@@ -20,11 +20,10 @@ func solve(lines []any) int {
 
 func main() {
 	solver := lib.Solver[[]any, int]{
-        ParseF: lib.ParseLine(parse),
-        SolveF: solve,
-    }
+		ParseF: lib.ParseLine(parse),
+		SolveF: solve,
+	}
 
 	solver.Expect("foo", 1)
-	solver.Expect("bar", 2)
 	solver.Solve()
 }
