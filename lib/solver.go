@@ -205,3 +205,18 @@ func ToString[T any](solve func(T) []byte) func(T) string {
 		return string(solve(input))
 	}
 }
+
+var intsReg = regexp.MustCompile(`\d+`)
+
+// Ints returns all the positive integers in line.
+func Ints(line string) []int {
+	numbers := intsReg.FindAllString(line, -1)
+
+	result := make([]int, len(numbers))
+
+	for i, number := range numbers {
+		result[i] = Atoi(number)
+	}
+
+	return result
+}

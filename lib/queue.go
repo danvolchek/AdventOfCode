@@ -18,7 +18,7 @@ func (q *Queue[T]) Push(item T) {
 
 // Pop removes an item from the queue.
 func (q *Queue[T]) Pop() T {
-	if len(q.items) == 0 {
+	if q.Empty() {
 		panic("empty queue!")
 	}
 
