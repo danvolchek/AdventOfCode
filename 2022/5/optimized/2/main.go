@@ -17,20 +17,13 @@ type Puzzle struct {
 	instructions []Instruction
 }
 
-func parse(inp string) Puzzle {
-	crates, instructions, found := strings.Cut(inp, "\n\n")
-	if !found {
-		panic("bad input")
-	}
-
-	var p Puzzle
-
+func parseCrates(crates string, p *Puzzle) {
 	cratesByLine := strings.Split(crates, "\n")
 	for lineIndex := range cratesByLine {
 		// parse in reverse order so stack is built properly
 		line := cratesByLine[len(cratesByLine)-1-lineIndex]
 
-		for i := 0; i < len(line); i++ {
+		for i := 1; i < len(line); i += 4 {
 			if line[i] >= 'A' && line[i] <= 'Z' {
 				stackNumber := (i - 1) / 4
 
@@ -44,18 +37,18 @@ func parse(inp string) Puzzle {
 			}
 		}
 	}
+}
 
+func parseInstructions(instructions string, p *Puzzle) {
 	for _, instruction := range strings.Split(strings.TrimSpace(instructions), "\n") {
 		nums := lib.Ints(instruction)
 
 		p.instructions = append(p.instructions, Instruction{
 			amount: nums[0],
-			from:   nums[1],
-			to:     nums[2],
+			from:   nums[1] - 1,
+			to:     nums[2] - 1,
 		})
 	}
-
-	return p
 }
 
 func solve(puzzle Puzzle) string {
@@ -80,7 +73,7 @@ func solve(puzzle Puzzle) string {
 
 func main() {
 	solver := lib.Solver[Puzzle, string]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: lib.ParseStringChunks(parseCrates, parseInstructions),
 		SolveF: solve,
 	}
 
