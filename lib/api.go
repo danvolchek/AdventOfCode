@@ -61,6 +61,10 @@ func (a *aocClient) retrieveInput() ([]byte, error) {
 		return nil, errors.New("not logged in")
 	}
 
+	if bytes.Contains(input, []byte("You don't seem to be solving the right level.  Did you already complete it?")) {
+		return nil, errors.New("already solved")
+	}
+
 	return input, nil
 }
 
