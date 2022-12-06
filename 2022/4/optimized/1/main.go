@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/danvolchek/AdventOfCode/lib"
-	"regexp"
 )
 
 type Assignment struct {
@@ -13,17 +12,17 @@ type Pair struct {
 	first, second Assignment
 }
 
-var reg = regexp.MustCompile(`(\d+)-(\d+),(\d+)-(\d+)`)
+func parse(line string) Pair {
+	ints := lib.Ints(line)
 
-func parse(parts []string) Pair {
 	return Pair{
 		first: Assignment{
-			start: lib.Atoi(parts[0]),
-			stop:  lib.Atoi(parts[1]),
+			start: ints[0],
+			stop:  ints[1],
 		},
 		second: Assignment{
-			start: lib.Atoi(parts[2]),
-			stop:  lib.Atoi(parts[3]),
+			start: ints[2],
+			stop:  ints[3],
 		},
 	}
 }
@@ -48,7 +47,7 @@ func solve(elfPairs []Pair) int {
 
 func main() {
 	solver := lib.Solver[[]Pair, int]{
-		ParseF: lib.ParseLine(lib.ParseRegexp(reg, parse)),
+		ParseF: lib.ParseLine(parse),
 		SolveF: solve,
 	}
 
