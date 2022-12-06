@@ -1,7 +1,7 @@
 package lib
 
 // Set is a simple set implementation that only holds unique values. It is not safe to use concurrently.
-// The zero value is an empty queue.
+// The zero value is an empty set.
 type Set[T comparable] struct {
 	items map[T]struct{}
 }
