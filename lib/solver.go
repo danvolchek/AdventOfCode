@@ -22,6 +22,8 @@ type Solver[T, V any] struct {
 
 	// SolveF is the function which solves the puzzle using the parsed input.
 	SolveF func(parsed T) V
+
+	expectsRun, expectsCorrect int
 }
 
 // Parse parses input and prints the result.
@@ -43,12 +45,15 @@ func (s Solver[T, V]) ParseExpect(input string, expected T) {
 }
 
 // Expect runs the solution against input, compares it to expected, and prints the result.
-func (s Solver[T, V]) Expect(input string, expected V) {
+func (s *Solver[T, V]) Expect(input string, expected V) {
 	actual, dur := s.solve(strings.NewReader(input))
+
+	s.expectsRun += 1
 
 	if !reflect.DeepEqual(expected, actual) {
 		fmt.Printf("(fail)     test: \"%v\" -> expected %v, got %v%v\n", formatInput(input), expected, actual, dur)
 	} else {
+		s.expectsCorrect += 1
 		fmt.Printf("(success)  test: \"%v\" -> got %v%v\n", formatInput(input), actual, dur)
 	}
 }
@@ -92,16 +97,7 @@ func (s Solver[T, V]) Solve() {
 		return
 	}
 
-	fmt.Println("submit? y/n")
-
-	reader := bufio.NewReader(os.Stdin)
-	text, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Printf("note: failed to read response: %s\n", err)
-		return
-	}
-
-	if strings.ToLower(strings.TrimSpace(text)) == "y" {
+	if s.shouldSubmit() {
 		fmt.Println("submitting...")
 		output, err := client.submitSolution(fmt.Sprint(solution))
 		if err != nil {
@@ -110,6 +106,33 @@ func (s Solver[T, V]) Solve() {
 			fmt.Printf("output:\n%s\n", output)
 		}
 	}
+}
+
+// shouldSubmit returns whether the solution should be automatically submitted.
+func (s Solver[T, V]) shouldSubmit() bool {
+	// auto submit if all expects passed
+	if s.expectsRun > 0 && s.expectsCorrect == s.expectsRun {
+		fmt.Println("note: auto submitting because all expects passed")
+		return true
+	}
+
+	// don't submit if some expects failed
+	if s.expectsRun != 0 {
+		fmt.Println("note: not auto submitting because some expects failed")
+		return false
+	}
+
+	// otherwise ask user
+	fmt.Println("submit? y/n")
+
+	reader := bufio.NewReader(os.Stdin)
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf("note: failed to read response: %s\n", err)
+		return false
+	}
+
+	return strings.ToLower(strings.TrimSpace(text)) == "y"
 }
 
 // solve runs the solution against input and returns the result and elapsed time.
