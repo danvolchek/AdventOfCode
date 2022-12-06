@@ -4,28 +4,25 @@ import (
 	"github.com/danvolchek/AdventOfCode/lib"
 )
 
-func parse(line string) any {
-	return line
-}
+const numUnique = 4
 
-func solve(lines string) int {
-	for j := range lines {
-		if j < 3 {
+func solve(input string) int {
+	for index := range input {
+		if index < numUnique-1 {
 			continue
 		}
 
 		var s lib.Set[byte]
-		s.Add(lines[j])
-		s.Add(lines[j-1])
-		s.Add(lines[j-2])
-		s.Add(lines[j-3])
+		for i := 0; i < numUnique; i++ {
+			s.Add(input[index-i])
+		}
 
-		if s.Size() == 4 {
-			return j + 1
+		if s.Size() == numUnique {
+			return index + 1
 		}
 	}
 
-	panic("asd")
+	panic("not found")
 }
 
 func main() {
@@ -38,5 +35,5 @@ func main() {
 	solver.Expect("nppdvjthqldpwncqszvftbrmjlhg", 6)
 	solver.Expect("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10)
 
-	solver.Solve()
+	solver.Verify(1640)
 }

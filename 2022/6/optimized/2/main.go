@@ -4,27 +4,25 @@ import (
 	"github.com/danvolchek/AdventOfCode/lib"
 )
 
-func parse(line string) any {
-	return line
-}
+const numUnique = 14
 
-func solve(lines string) int {
-	for j := range lines {
-		if j < 13 {
+func solve(input string) int {
+	for index := range input {
+		if index < numUnique-1 {
 			continue
 		}
 
 		var s lib.Set[byte]
-		for i := 0; i < 14; i++ {
-			s.Add(lines[j-i])
+		for i := 0; i < numUnique; i++ {
+			s.Add(input[index-i])
 		}
 
-		if s.Size() == 14 {
-			return j + 1
+		if s.Size() == numUnique {
+			return index + 1
 		}
 	}
 
-	panic("asd")
+	panic("not found")
 }
 
 func main() {
@@ -39,5 +37,5 @@ func main() {
 	solver.Expect("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29)
 	solver.Expect("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26)
 
-	solver.Solve()
+	solver.Verify(3613)
 }
