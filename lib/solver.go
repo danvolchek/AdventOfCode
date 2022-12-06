@@ -2,6 +2,7 @@ package lib
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -60,7 +61,13 @@ func (s Solver[T, V]) Test(input string) {
 
 // Verify runs the solution against the real input, compares it to expected, and prints the result.
 func (s Solver[T, V]) Verify(expected V) {
-	actual, dur := s.solve(getRealInput())
+	input, ok := getRealInput()
+	if !ok {
+		fmt.Printf("(fail)     real: empty input file\n")
+		return
+	}
+
+	actual, dur := s.solve(input)
 
 	if !reflect.DeepEqual(expected, actual) {
 		fmt.Printf("(fail)     real: expected %v, got %v%v\n", expected, actual, dur)
@@ -71,8 +78,38 @@ func (s Solver[T, V]) Verify(expected V) {
 
 // Solve runs the solution against the real input and prints the result.
 func (s Solver[T, V]) Solve() {
-	solution, dur := s.solve(getRealInput())
+	input, ok := getRealInput()
+	if !ok {
+		fmt.Printf("(fail)     real: empty input file\n")
+		return
+	}
+
+	solution, dur := s.solve(input)
 	fmt.Printf("real: %v%v\n", solution, dur)
+
+	if client.sessionCookieErr != nil {
+		fmt.Printf("note: can't submit solution: %s\n", client.sessionCookieErr)
+		return
+	}
+
+	fmt.Println("submit? y/n")
+
+	reader := bufio.NewReader(os.Stdin)
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf("note: failed to read response: %s\n", err)
+		return
+	}
+
+	if strings.ToLower(strings.TrimSpace(text)) == "y" {
+		fmt.Println("submitting...")
+		output, err := client.submitSolution(fmt.Sprint(solution))
+		if err != nil {
+			fmt.Printf("note: failed to submit solution: %s", err)
+		} else {
+			fmt.Printf("output:\n%s\n", output)
+		}
+	}
 }
 
 // solve runs the solution against input and returns the result and elapsed time.
@@ -85,7 +122,53 @@ func (s Solver[T, V]) solve(input io.Reader) (V, formatDur) {
 }
 
 // getRealInput returns a reader which reads the input file.
-func getRealInput() io.Reader {
+func getRealInput() (io.Reader, bool) {
+	year, day, _ := getSolutionMetadata()
+
+	fileBytes := readInputFile(year, day)
+
+	if len(fileBytes) != 0 {
+		return bytes.NewReader(fileBytes), true
+	}
+
+	fmt.Println("retrieving input because it's not found...")
+
+	input, err := client.retrieveInput()
+	if err != nil {
+		fmt.Printf("note: tried to retrieve input, failed: %s\n", err)
+		return nil, false
+	}
+
+	writeInputFile(year, day, input)
+
+	return bytes.NewReader(input), true
+}
+
+// readInputFile returns the contents of the input file for year and day.
+func readInputFile(year, day string) []byte {
+	file := Must(os.Open(path.Join(year, day, "input.txt")))
+
+	return Must(io.ReadAll(file))
+}
+
+// writeInputFile writes data to the input file for year and day.
+func writeInputFile(year, day string, data []byte) {
+	file, err := os.Create(path.Join(year, day, "input.txt"))
+	if err != nil {
+		fmt.Printf("note: tried to create input file, failed: %s\n", err)
+		return
+	}
+	defer file.Close()
+
+	_, err = file.Write(data)
+	if err != nil {
+		fmt.Printf("note: tried to write input to file, failed: %s\n", err)
+		return
+	}
+}
+
+// getSolutionMetadata returns the year, day, and part the current execution is for.
+func getSolutionMetadata() (string, string, string) {
 	buildInfo, ok := debug.ReadBuildInfo()
 	if !ok {
 		panic(ok)
@@ -94,7 +177,7 @@ func getRealInput() io.Reader {
 	// path is of the form github.com/danvolchek/AdventOfCode/2015/16/leaderboard/1
 	parts := strings.Split(buildInfo.Path, string(os.PathSeparator))
 
-	return Must(os.Open(path.Join(parts[3], parts[4], "input.txt")))
+	return parts[3], parts[4], parts[6]
 }
 
 type formatInput string
