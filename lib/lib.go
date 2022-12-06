@@ -48,6 +48,15 @@ func Max(values ...int) int {
 	return max
 }
 
+// Abs returns the absolute value of v.
+func Abs[T constraints.Integer | constraints.Float](v T) T {
+	if v < 0 {
+		return -v
+	}
+
+	return v
+}
+
 // Atoi is a convenience wrapper on [strconv.Atoi] that panics if it fails.
 func Atoi(s string) int {
 	return Must(strconv.Atoi(s))
