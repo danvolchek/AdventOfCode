@@ -38,5 +38,5 @@ func main() {
 	solver.Expect("nppdvjthqldpwncqszvftbrmjlhg", 6)
 	solver.Expect("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 10)
 
-	solver.Solve()
+	solver.Verify(1640)
 }

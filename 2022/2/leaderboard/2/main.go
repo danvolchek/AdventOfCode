@@ -98,5 +98,5 @@ func main() {
 	}
 
 	solver.Expect("A Y\nB X\nC Z", 12)
-	solver.Solve()
+	solver.Verify(11998)
 }

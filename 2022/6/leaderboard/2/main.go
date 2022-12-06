@@ -39,5 +39,5 @@ func main() {
 	solver.Expect("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", 29)
 	solver.Expect("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", 26)
 
-	solver.Solve()
+	solver.Verify(3613)
 }

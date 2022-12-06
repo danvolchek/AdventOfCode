@@ -63,5 +63,5 @@ func main() {
 	}
 
 	solver.Expect("A Y\nB X\nC Z", 15)
-	solver.Solve()
+	solver.Verify(8933)
 }
