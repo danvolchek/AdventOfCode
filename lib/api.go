@@ -65,6 +65,10 @@ func (a *aocClient) retrieveInput() ([]byte, error) {
 		return nil, errors.New("already solved")
 	}
 
+	if bytes.Contains(input, []byte("Please don't repeatedly request this endpoint before it unlocks!")) {
+		return nil, errors.New("not unlocked yet")
+	}
+
 	return input, nil
 }
 
