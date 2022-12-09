@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/danvolchek/AdventOfCode/lib"
-	"strings"
 )
 
 type Motion struct {
@@ -67,6 +66,12 @@ func touching(a, b *Pos) bool {
 	return dist <= 2
 }
 
+func sgn(a int) int {
+	if a == 0 {
+		return 0
+	}
+	return a / lib.Abs(a)
+}
 func (s *Segment) Step(xStep, yStep int) (int, int) {
 	s.Head.Move(xStep, yStep)
 
@@ -75,33 +80,8 @@ func (s *Segment) Step(xStep, yStep int) (int, int) {
 		return 0, 0
 	}
 
-	wasSameRowOrCol := s.Head.x == s.Tail.x || s.Head.y == s.Tail.y
-
-	var possibs []Pos
-	for x := -1; x <= 1; x++ {
-		for y := -1; y <= 1; y++ {
-			possib := Pos{s.Tail.x + x, s.Tail.y + y}
-
-			if touching(s.Head, &possib) {
-				possibs = append(possibs, Pos{x, y})
-			}
-		}
-	}
-
-	possibs = lib.Filter(possibs, func(p Pos) bool {
-		isSameRowOrColMove := p.x == 0 || p.y == 0
-
-		return wasSameRowOrCol == isSameRowOrColMove
-	})
-
-	if len(possibs) == 0 {
-		panic("what")
-	} else if len(possibs) == 1 {
-		return possibs[0].x, possibs[0].y
-	} else {
-		panic("zorp")
-	}
-
+	// actually just this, part 1 isn't updated
+	return sgn(s.Head.x - s.Tail.x), sgn(s.Head.y - s.Tail.y)
 }
 
 func vis(l lib.Set[Pos]) {
@@ -136,38 +116,6 @@ func vis(l lib.Set[Pos]) {
 		}
 		fmt.Println()
 	}
-}
-
-func stepTest(lines []Motion) string {
-	var knots []*Pos
-	for i := 0; i < 10; i++ {
-		knots = append(knots, &Pos{})
-	}
-
-	var segments []*Segment
-	for i := 0; i < 9; i++ {
-		segments = append(segments, &Segment{
-			Head: knots[i],
-			Tail: knots[i+1],
-		})
-	}
-
-	_ = Grid{
-		Segments: segments,
-		visited:  &lib.Set[Pos]{},
-	}
-
-	for _, line := range lines {
-		//fmt.Printf("Before: %+v\n", line)
-		for i := 0; i < line.amount; i++ {
-			//g.Step(line.dir)
-			//fmt.Println(g.String2())
-		}
-
-		//fmt.Printf("^After: %+v\n", line)
-	}
-
-	return strings.TrimSpace("")
 }
 
 func solve(lines []Motion) int {
@@ -224,13 +172,6 @@ func solve(lines []Motion) int {
 }
 
 func main() {
-	/*stepSolver := lib.Solver[[]Motion, string]{
-		ParseF: lib.ParseLine(parse),
-		SolveF: stepTest,
-	}
-	stepSolver.Expect("U 1\nR 1\nU 1", "...\n.H.\n.T.")
-	stepSolver.Expect("U 1\nR 1\nR 1", "...\nTH.\n...")*/
-
 	solver := lib.Solver[[]Motion, int]{
 		ParseF: lib.ParseLine(parse),
 		SolveF: solve,
