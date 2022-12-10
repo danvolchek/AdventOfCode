@@ -3,6 +3,7 @@ package lib
 import (
 	"golang.org/x/exp/constraints"
 	"math"
+	"regexp"
 	"strconv"
 )
 
@@ -215,6 +216,21 @@ func Subsets[T any](items []T) [][]T {
 		}
 
 		result = append(result, subset)
+	}
+
+	return result
+}
+
+var intsReg = regexp.MustCompile(`\d+`)
+
+// Ints returns all the positive integers in line.
+func Ints(line string) []int {
+	numbers := intsReg.FindAllString(line, -1)
+
+	result := make([]int, len(numbers))
+
+	for i, number := range numbers {
+		result[i] = Atoi(number)
 	}
 
 	return result
