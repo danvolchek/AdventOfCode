@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type Effect struct {
+type PendingCommand struct {
 	countdown int
 	action    func(*CPU)
 }
@@ -15,77 +15,94 @@ type CPU struct {
 
 	cycle int
 
-	effects []*Effect
+	commands []*PendingCommand
 }
 
-func (c *CPU) addCommand(command string) {
-	if strings.Contains(command, "noop") {
-		c.effects = append(c.effects, &Effect{
-			countdown: 1,
-			action: func(cpu *CPU) {
+type Command interface {
+	Cycles() int
+	Run(*CPU)
+}
 
-			},
-		})
-	} else if strings.Contains(command, "addx") {
-		arg := lib.Atoi(command[len("addx "):])
-		c.effects = append(c.effects, &Effect{
-			countdown: 2,
-			action: func(cpu *CPU) {
-				cpu.x += arg
-			},
-		})
-	}
+type NoOpCommand struct {
+}
+
+func (n NoOpCommand) Cycles() int {
+	return 1
+}
+
+func (n NoOpCommand) Run(cpu *CPU) {
+}
+
+type AddXCommand struct {
+	arg int
+}
+
+func (a AddXCommand) Cycles() int {
+	return 2
+}
+
+func (a AddXCommand) Run(cpu *CPU) {
+	cpu.x += a.arg
+}
+
+func (c *CPU) addCommand(command Command) {
+	c.commands = append(c.commands, &PendingCommand{
+		countdown: command.Cycles(),
+		action:    command.Run,
+	})
 }
 
 func (c *CPU) step() {
-	defer func() {
-		c.cycle += 1
-	}()
-
-	if len(c.effects) > 0 {
-		c.effects[0].countdown -= 1
-		if c.effects[0].countdown == 0 {
-			c.effects[0].action(c)
-			c.effects = c.effects[1:]
+	if len(c.commands) > 0 {
+		command := c.commands[0]
+		command.countdown -= 1
+		if command.countdown == 0 {
+			command.action(c)
+			c.commands = c.commands[1:]
 		}
 	}
+
+	c.cycle += 1
 }
 
-func parse(line string) string {
-	return line
+func parse(line string) Command {
+	if line == "noop" {
+		return NoOpCommand{}
+	} else if strings.Contains(line, "addx") {
+		arg := lib.Atoi(line[len("addx "):])
+		return AddXCommand{arg: arg}
+	}
+
+	panic(line)
 }
 
-func solve(lines []string) int {
+func solve(commands []Command) int {
 	strength := 0
 
-	var cpu CPU
-	cpu.x = 1
-	cpu.cycle = 1
+	cpu := CPU{
+		x:     1,
+		cycle: 1,
+	}
 
-	for _, line := range lines {
+	for _, line := range commands {
 		cpu.addCommand(line)
 	}
 
-	for len(cpu.effects) != 0 {
-		i := cpu.cycle
+	for len(cpu.commands) != 0 {
 		//fmt.Printf("During cycle %v, x is %v\n", i, cpu.x)
-		if i >= 20 && (i-20)%40 == 0 {
-			strength += i * cpu.x
-
-			//fmt.Printf("strength: %v * %v = %v\n", i, cpu.x, i*cpu.x)
+		if cpu.cycle >= 20 && (cpu.cycle-20)%40 == 0 {
+			strength += cpu.cycle * cpu.x
 		}
 
 		cpu.step()
-
 		//fmt.Printf("After cycle %v, x is %v\n", i, cpu.x)
-
 	}
 
 	return strength
 }
 
 func main() {
-	solver := lib.Solver[[]string, int]{
+	solver := lib.Solver[[]Command, int]{
 		ParseF: lib.ParseLine(parse),
 		SolveF: solve,
 	}
