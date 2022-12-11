@@ -112,10 +112,7 @@ func (d *Directory) Size() int {
 
 	totalFileSize := lib.SumSlice(lib.Map(d.files, File.Size))
 
-	// For some reason, using the method reference Directory.Size doesn't work here
-	totalSubdirectorySize := lib.SumSlice(lib.Map(d.subdirectories, func(sd *Directory) int {
-		return sd.Size()
-	}))
+	totalSubdirectorySize := lib.SumSlice(lib.Map(d.subdirectories, (*Directory).Size))
 
 	size := totalFileSize + totalSubdirectorySize
 
