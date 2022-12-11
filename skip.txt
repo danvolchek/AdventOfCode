@@ -1,5 +1,4 @@
 2022/9 # no time to optimize
-2022/8 # leaderboard is already optimized
 
 2015-2020
 
