@@ -110,7 +110,13 @@ func (a *aocClient) submitSolution(solution string) (string, error) {
 		return "", errors.New("couldn't parse response: missing </article>")
 	}
 
-	return outputStr[start+len("<article>") : end], nil
+	display := outputStr[start+len("<article>") : end]
+
+	if strings.Contains(display, "You don't seem to be solving the right level.  Did you already complete it?") {
+		return "", errors.New("already solved")
+	}
+
+	return display, nil
 }
 
 // getSessionCookie retrieves the AOC session cookie. It should be placed in a sessioncookie.txt file in the working directory
