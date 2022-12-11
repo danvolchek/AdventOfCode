@@ -22,7 +22,7 @@ func parse(lines string) []*Monkey {
 
 	var divisors []int
 	for _, chunk := range chunks {
-		divisors = append(divisors, lib.Ints(strings.Split(chunk, "\n")[3])[0])
+		divisors = append(divisors, lib.Int(strings.Split(chunk, "\n")[3]))
 	}
 
 	divisor := 1
@@ -56,12 +56,12 @@ func parse(lines string) []*Monkey {
 			}
 		}
 		monkey.test = func(i int) bool {
-			arg := lib.Ints(clines[3])[0]
+			arg := lib.Int(clines[3])
 
 			return i%arg == 0
 		}
-		monkey.true = lib.Ints(clines[4])[0]
-		monkey.false = lib.Ints(clines[5])[0]
+		monkey.true = lib.Int(clines[4])
+		monkey.false = lib.Int(clines[5])
 
 		monkeys = append(monkeys, &monkey)
 	}

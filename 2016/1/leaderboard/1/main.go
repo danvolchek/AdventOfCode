@@ -16,7 +16,7 @@ func parse(line string) []instruction {
 	return lib.Map(parts, func(p string) instruction {
 		return instruction{
 			left:     p[0] == 'L',
-			distance: lib.Ints(p)[0],
+			distance: lib.Int(p),
 		}
 	})
 }

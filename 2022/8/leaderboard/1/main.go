@@ -16,7 +16,7 @@ func parse(input string) [][]int {
 		var ret []int
 
 		for _, p := range parts {
-			ret = append(ret, lib.Ints(p)[0])
+			ret = append(ret, lib.Int(p))
 		}
 
 		result = append(result, ret)
@@ -84,5 +84,5 @@ func main() {
 	}
 
 	solver.Expect("30373\n25512\n65332\n33549\n35390\n", 21)
-	solver.Solve()
+	solver.Verify(1796)
 }

@@ -246,3 +246,14 @@ func Ints(line string) []int {
 
 	return result
 }
+
+// Int is like Ints except it returns the first int found.
+// See Atoi to convert a string representation of a number into an int.
+func Int(line string) int {
+	ints := Ints(line)
+	if len(ints) == 0 {
+		panic("no ints in '" + line + "'")
+	}
+
+	return ints[0]
+}

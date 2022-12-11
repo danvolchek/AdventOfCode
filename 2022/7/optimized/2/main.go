@@ -64,7 +64,7 @@ func parse(input string) []Command {
 				} else {
 					lsInstr.files = append(lsInstr.files, LsFile{
 						name: dir,
-						size: lib.Ints(lsLine)[0],
+						size: lib.Int(lsLine),
 					})
 				}
 

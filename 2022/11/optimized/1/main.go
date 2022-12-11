@@ -59,7 +59,7 @@ func parse(chunk string) *Monkey {
 
 	// Line 3:
 	// Test: divisible by 5
-	arg := lib.Ints(lines[3])[0]
+	arg := lib.Int(lines[3])
 	monkey.test = func(i int) bool {
 		return i%arg == 0
 	}
@@ -69,8 +69,8 @@ func parse(chunk string) *Monkey {
 	// Line 5:
 	// If false: throw to monkey 4
 	monkey.target = map[bool]int{
-		true:  lib.Ints(lines[4])[0],
-		false: lib.Ints(lines[5])[0],
+		true:  lib.Int(lines[4]),
+		false: lib.Int(lines[5]),
 	}
 
 	return &monkey

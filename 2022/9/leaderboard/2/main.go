@@ -13,7 +13,7 @@ type Motion struct {
 func parse(line string) Motion {
 	return Motion{
 		dir:    string(line[0]),
-		amount: lib.Ints(line)[0],
+		amount: lib.Int(line),
 	}
 }
 
