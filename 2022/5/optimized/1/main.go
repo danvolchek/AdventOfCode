@@ -66,7 +66,7 @@ func solve(puzzle Puzzle) string {
 
 func main() {
 	solver := lib.Solver[Puzzle, string]{
-		ParseF: lib.ParseStringChunks(parseCrates, parseInstructions),
+		ParseF: lib.ParseChunksUnique(parseCrates, parseInstructions),
 		SolveF: solve,
 	}
 

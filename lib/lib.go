@@ -127,6 +127,17 @@ func SumSlice[T constraints.Integer | constraints.Float](items []T) T {
 	return sum
 }
 
+// MulSlice returns the multiplication of items.
+func MulSlice[T constraints.Integer | constraints.Float](items []T) T {
+	var sum T = 1
+
+	for _, val := range items {
+		sum *= val
+	}
+
+	return sum
+}
+
 // MinSlice returns the min of items.
 func MinSlice[T constraints.Ordered](items []T) T {
 	var min T

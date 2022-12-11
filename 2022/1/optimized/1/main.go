@@ -2,11 +2,16 @@ package main
 
 import (
 	"github.com/danvolchek/AdventOfCode/lib"
+	"strings"
 )
+
+func parse(chunk string) int {
+	return lib.SumSlice(lib.Map(strings.Split(strings.TrimSpace(chunk), "\n"), lib.Atoi))
+}
 
 func main() {
 	solver := lib.Solver[[]int, int]{
-		ParseF: lib.ParseLineChunked(lib.Atoi, lib.SumSlice[int]),
+		ParseF: lib.ParseChunks(parse),
 		SolveF: lib.MaxSlice[int],
 	}
 

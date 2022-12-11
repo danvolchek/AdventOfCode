@@ -239,23 +239,6 @@ func ParseStringFunc[T any](parse func(input string) T) func(r io.Reader) T {
 	}
 }
 
-// ParseStringChunks is a top level parse function that uses a different parse function for every chunk of the input.
-func ParseStringChunks[T any](parsers ...func(chunk string, val *T)) func(r io.Reader) T {
-	return func(r io.Reader) T {
-		var start T
-
-		raw := ParseString(r)
-
-		chunks := strings.Split(raw, "\n\n")
-
-		for i, chunk := range chunks {
-			parsers[i](chunk, &start)
-		}
-
-		return start
-	}
-}
-
 // ParseLine is a top level function helper that splits parsing into one line at a time, returning a slice of items.
 // It accepts a parse function to parse each line seen.
 func ParseLine[T any](parse func(line string) T) func(r io.Reader) []T {
@@ -274,29 +257,40 @@ func ParseLine[T any](parse func(line string) T) func(r io.Reader) []T {
 	}
 }
 
-// ParseLineChunked is like ParseLine except when it sees a blank line, it parses all the lines seen previously as a single chunk.
-func ParseLineChunked[T, V any](parse func(line string) T, parseChunk func(lines []T) V) func(r io.Reader) []V {
-	return func(r io.Reader) []V {
-		var chunks []V
+// ParseChunks is like ParseLine but parses lines delimited by two new lines, not one
+func ParseChunks[T any](parser func(chunk string) T) func(r io.Reader) []T {
+	return func(r io.Reader) []T {
 		var lines []T
 
-		scanner := bufio.NewScanner(r)
-		for scanner.Scan() {
-			line := scanner.Text()
-			if line == "" {
-				chunks = append(chunks, parseChunk(lines))
-				lines = nil
-			} else {
-				lines = append(lines, parse(line))
-			}
-		}
-		if scanner.Err() != nil {
-			panic(scanner.Err())
+		raw := ParseString(r)
+
+		chunks := strings.Split(raw, "\n\n")
+
+		for _, chunk := range chunks {
+			lines = append(lines, parser(chunk))
 		}
 
-		chunks = append(chunks, parseChunk(lines))
+		return lines
+	}
+}
 
-		return chunks
+// ParseChunksUnique is like ParseChunks but uses a unique parser for every chunk.
+// It's different from all the other functions in that it passes in a T to the parse func to modify as needed.
+// The intended use is for each parser to be able to return a different type safe type - this couldn't work with generics -
+// so T is intended a container for the result of each parser.
+func ParseChunksUnique[T any](parsers ...func(chunk string, val *T)) func(r io.Reader) T {
+	return func(r io.Reader) T {
+		var start T
+
+		raw := ParseString(r)
+
+		chunks := strings.Split(raw, "\n\n")
+
+		for i, chunk := range chunks {
+			parsers[i](chunk, &start)
+		}
+
+		return start
 	}
 }
 
