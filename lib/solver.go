@@ -239,6 +239,24 @@ func ParseStringFunc[T any](parse func(input string) T) func(r io.Reader) T {
 	}
 }
 
+// ParseGrid parses a grid of characters.
+func ParseGrid[T any](parse func(s string) T) func(r io.Reader) [][]T {
+	return func(r io.Reader) [][]T {
+		rawGrid := bytes.Split(bytes.TrimSpace(Must(io.ReadAll(r))), []byte{'\n'})
+
+		var grid [][]T
+
+		for i, row := range rawGrid {
+			grid = append(grid, make([]T, len(row)))
+			for j := range row {
+				grid[i][j] = parse(string(row[j]))
+			}
+		}
+
+		return grid
+	}
+}
+
 // ParseLine is a top level function helper that splits parsing into one line at a time, returning a slice of items.
 // It accepts a parse function to parse each line seen.
 func ParseLine[T any](parse func(line string) T) func(r io.Reader) []T {
