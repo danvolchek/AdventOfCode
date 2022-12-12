@@ -1,7 +1,7 @@
-package lib_test
+package internal_test
 
 import (
-	"github.com/danvolchek/AdventOfCode/cmd/lib"
+	"github.com/danvolchek/AdventOfCode/cmd/internal"
 	"testing"
 )
 
@@ -26,7 +26,7 @@ func TestMultiWriteCloser(t *testing.T) {
 	data1, data2 := []byte("hello"), []byte("world")
 	wc1, wc2 := &testWriteCloser{}, &testWriteCloser{}
 
-	mw := &lib.MultiWriteCloser{}
+	mw := &internal.MultiWriteCloser{}
 
 	mw.Add(wc1)
 

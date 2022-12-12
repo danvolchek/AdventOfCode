@@ -1,32 +1,56 @@
-package lib
+package internal
 
 import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/danvolchek/AdventOfCode/lib"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 )
 
-type SkipRange struct {
+type Skipper struct {
+	skips []skip
+}
+
+func (s *Skipper) Skip(typ *Type) bool {
+	for _, skip := range s.skips {
+		if skip.shouldSkip(typ) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func NewSkipper(path string) *Skipper {
+	if !exists(path) {
+		return &Skipper{}
+	}
+
+	return &Skipper{skips: parseSkips(lib.Must(os.Open(path)))}
+}
+
+type skipRange struct {
 	Min, Max int
 }
 
-func (s SkipRange) contains(value int) bool {
+func (s skipRange) contains(value int) bool {
 	return value >= s.Min && value <= s.Max
 }
 
-type SkipSolution struct {
-	Year, Day SkipRange
+type skip struct {
+	Year, Day skipRange
 }
 
-func (s SkipSolution) ShouldSkip(sol Solution) bool {
-	return s.Year.contains(sol.Year) && (s.Day.Max == 0 || s.Day.contains(sol.Day))
+func (s skip) shouldSkip(t *Type) bool {
+	return s.Year.contains(t.Year.Number) && (s.Day.Max == 0 || s.Day.contains(t.Day.Number))
 }
 
-func ParseSkips(r io.Reader) []SkipSolution {
-	var solutionsToSkip []SkipSolution
+func parseSkips(r io.Reader) []skip {
+	var solutionsToSkip []skip
 
 	scanner := bufio.NewScanner(r)
 
@@ -46,7 +70,7 @@ func ParseSkips(r io.Reader) []SkipSolution {
 			panic(fmt.Sprintf("bad skip: %v: wrong number of parts", line))
 		}
 
-		var skip SkipSolution
+		var skip skip
 		var err error
 
 		if len(parts) >= 1 {
@@ -74,10 +98,10 @@ func ParseSkips(r io.Reader) []SkipSolution {
 	return solutionsToSkip
 }
 
-func parseRange(s string) (SkipRange, error) {
+func parseRange(s string) (skipRange, error) {
 	parts := strings.Split(s, "-")
 	if len(parts) > 2 {
-		return SkipRange{}, errors.New("range should have at most one separator")
+		return skipRange{}, errors.New("range should have at most one separator")
 	}
 
 	min, err := strconv.Atoi(parts[0])
@@ -87,11 +111,11 @@ func parseRange(s string) (SkipRange, error) {
 			errMsg = "isn't a number"
 		}
 
-		return SkipRange{}, errors.New(errMsg)
+		return skipRange{}, errors.New(errMsg)
 	}
 
 	if len(parts) == 1 {
-		return SkipRange{
+		return skipRange{
 			Min: min,
 			Max: min,
 		}, nil
@@ -99,10 +123,10 @@ func parseRange(s string) (SkipRange, error) {
 
 	max, err := strconv.Atoi(parts[1])
 	if err != nil {
-		return SkipRange{}, errors.New("max isn't a number")
+		return skipRange{}, errors.New("max isn't a number")
 	}
 
-	return SkipRange{
+	return skipRange{
 		Min: min,
 		Max: max,
 	}, nil

@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/danvolchek/AdventOfCode/cmd/lib"
+	"github.com/danvolchek/AdventOfCode/cmd/internal"
+	"github.com/danvolchek/AdventOfCode/lib"
 	"os"
-	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -32,7 +31,7 @@ func generateReadme(root string) error {
 		return err
 	}
 
-	before, _, found := Cut(readme, tableSection)
+	before, _, found := bytes.Cut(readme, tableSection)
 	if !found {
 		return errors.New("could not find where to write table in readme")
 	}
@@ -41,15 +40,16 @@ func generateReadme(root string) error {
 	completionBuffer.Write(tableSection)
 	completionBuffer.WriteString("\n")
 
-	years := lib.YearsWithSolutions(root)
-	sort.Sort(sort.Reverse(sort.IntSlice(years)))
+	years := internal.GetLocalSolutionInfo(root)
 
-	for _, year := range years {
+	for i := range years {
+		year := years[len(years)-i-1]
+
 		completionBuffer.WriteString("\n## ")
-		completionBuffer.WriteString(strconv.Itoa(year))
+		completionBuffer.WriteString(year.Name)
 		completionBuffer.WriteString("\n\n")
 
-		daysTable := createTable(root, year)
+		daysTable := createTable(year)
 		daysTable.ToBuffer(completionBuffer)
 	}
 
@@ -61,40 +61,29 @@ func generateReadme(root string) error {
 	return nil
 }
 
-func createTable(root string, year int) *lib.Table {
-	yearTable := &lib.Table{
-		NumRows: 2,
+func createTable(year *internal.Year) *internal.Table {
+	yearTable := &internal.Table{
+		NumRows: len(internal.SolutionTypes),
 	}
 
-	yearTable.AddColumn("", []string{"leaderboard", "optimized"})
+	yearTable.AddColumn("", internal.SolutionTypes)
 
-	for day := 1; day <= 25; day++ {
-		yearTable.AddColumn(strconv.Itoa(day), []string{
-			createLink(root, year, day, true),
-			createLink(root, year, day, false),
-		})
+	for _, day := range year.Days {
+		yearTable.AddColumn(day.Name, lib.Map(day.Types, createLink))
 	}
 
 	return yearTable
 }
 
-func createLink(root string, year, day int, leaderboard bool) string {
+func createLink(typ *internal.Type) string {
 	var parts []string
 
-	sol := lib.Solution{
-		Year:        year,
-		Day:         day,
-		Leaderboard: leaderboard,
-	}
+	for _, part := range typ.Parts {
+		if !part.Main.Exists() {
+			continue
+		}
 
-	partOnePath, ok := sol.PartOne(root)
-	if ok {
-		parts = append(parts, makeLink("1", partOnePath))
-	}
-
-	partTwoPath, ok := sol.PartTwo(root)
-	if ok {
-		parts = append(parts, makeLink("2", partTwoPath))
+		parts = append(parts, makeLink(part.Name, part.Main.Path()))
 	}
 
 	return strings.Join(parts, ",")
@@ -102,17 +91,4 @@ func createLink(root string, year, day int, leaderboard bool) string {
 
 func makeLink(visibleText, path string) string {
 	return fmt.Sprintf("[%s](%s)", visibleText, path)
-}
-
-// Cut cuts s around the first instance of sep,
-// returning the text before and after sep.
-// The found result reports whether sep appears in s.
-// If sep does not appear in s, cut returns s, "", false.
-//
-// Taken from https://github.com/golang/go/issues/46336 as 1.18 hasn't released yet
-func Cut(s, sep []byte) (before, after []byte, found bool) {
-	if i := bytes.Index(s, sep); i >= 0 {
-		return s[:i], s[i+len(sep):], true
-	}
-	return s, []byte{}, false
 }

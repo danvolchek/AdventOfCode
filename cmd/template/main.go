@@ -3,11 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/danvolchek/AdventOfCode/cmd/lib"
-	"io/ioutil"
+	"github.com/danvolchek/AdventOfCode/cmd/internal"
 	"os"
 	"path/filepath"
-	"strconv"
 	"text/template"
 )
 
@@ -15,17 +13,18 @@ var infer bool
 var dryRun bool
 
 var argSolTypes [2]bool
-var argSolution lib.Solution
+var argYear string
+var argDay string
 
 func init() {
-	flag.IntVar(&argSolution.Year, "year", 0, "solution year")
-	flag.IntVar(&argSolution.Day, "day", 0, "solution day")
+	flag.StringVar(&argYear, "year", "0", "solution year")
+	flag.StringVar(&argDay, "day", "0", "solution day")
 	flag.BoolVar(&argSolTypes[0], "l", false, "create leaderboard")
 	flag.BoolVar(&argSolTypes[1], "o", false, "create optimized")
 	flag.BoolVar(&dryRun, "dryrun", false, "print solution to create and exit")
 	flag.Parse()
 
-	if !(argSolTypes[0] || argSolTypes[1] || argSolution.Year != 0 || argSolution.Day != 0) {
+	if !(argSolTypes[0] || argSolTypes[1] || argYear != "0" || argDay != "0") {
 		infer = true
 		fmt.Println("Inferring solution to create")
 		return
@@ -37,11 +36,11 @@ func init() {
 		os.Exit(1)
 	}
 
-	if argSolution.Year == 0 {
+	if argYear == "0" {
 		fail("Year needed")
 	}
 
-	if argSolution.Day == 0 {
+	if argDay == "0" {
 		fail("Day needed")
 	}
 
@@ -51,7 +50,7 @@ func init() {
 }
 
 func main() {
-	sols := getSolutionsToCreate()
+	sols := getSolutionsToCreate(".")
 
 	for _, sol := range sols {
 		if dryRun {
@@ -69,41 +68,39 @@ func main() {
 	fmt.Println("Done!")
 }
 
-func getSolutionsToCreate() []lib.Solution {
+func getSolutionsToCreate(root string) []*internal.Type {
 	if infer {
-		skipFile, err := os.Open("skip.txt")
-		if err != nil {
-			panic(err)
-		}
+		years := internal.GetLocalSolutionInfo(root)
+		skipper := internal.NewSkipper(filepath.Join(root, "skips.txt"))
 
-		return []lib.Solution{lib.FirstUnsolvedSolution(".", lib.ParseSkips(skipFile))}
+		return []*internal.Type{internal.FirstUnsolvedSolution(root, years, skipper)}
 	}
 
-	var solutions []lib.Solution
+	var solutions []*internal.Type
 
 	for _, i := range []int{0, 1} {
 		if argSolTypes[i] {
-			clone := argSolution
-			clone.Leaderboard = i == 0
-			solutions = append(solutions, clone)
+
+			typ := internal.TypeLeaderboard
+			if i == 1 {
+				typ = internal.TypeOptimized
+			}
+
+			solutions = append(solutions, internal.NewType(root, argYear, argDay, typ))
 		}
 	}
 
 	return solutions
 }
 
-func createSolution(sol lib.Solution) error {
-	solutionFolder := filepath.Join(strconv.Itoa(sol.Year), strconv.Itoa(sol.Day))
-
-	err := os.MkdirAll(solutionFolder, os.ModePerm)
+func createSolution(sol *internal.Type) error {
+	err := os.MkdirAll(sol.Day.Path(), os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("couldn't create solution folder: %s", err)
 	}
 
-	inputFile := filepath.Join(solutionFolder, "input.txt")
-
-	if !lib.Exists(inputFile) {
-		input, err := os.Create(inputFile)
+	if !sol.Input.Exists() {
+		input, err := os.Create(sol.Input.Path())
 		defer input.Close()
 		if err != nil {
 			return fmt.Errorf("couldn't create input file: %s", err)
@@ -116,30 +113,17 @@ func createSolution(sol lib.Solution) error {
 	}
 
 	anyCreated := false
-	stubsWriter := &lib.MultiWriteCloser{}
+	stubsWriter := &internal.MultiWriteCloser{}
 	defer stubsWriter.Close()
 
-	for _, partOne := range []bool{true, false} {
-		// day 25 only has 1 part
-		if sol.Day == 25 && !partOne {
+	for _, part := range sol.Parts {
+		if part.Exists() {
 			continue
 		}
 
-		var solPath string
-		var exists bool
-		if partOne {
-			solPath, exists = sol.PartOne(".")
-		} else {
-			solPath, exists = sol.PartTwo(".")
-		}
-
-		if exists {
-			continue
-		}
-
-		stubFile, err := createFileAndDirectories(solPath)
+		stubFile, err := createFileAndDirectories(part.Main.Path())
 		if err != nil {
-			return fmt.Errorf("couldn't create stub file %s: %s", solPath, err)
+			return fmt.Errorf("couldn't create stub file %s: %s", part.Main.Path(), err)
 		}
 
 		anyCreated = true
@@ -161,7 +145,7 @@ func createSolution(sol lib.Solution) error {
 }
 
 func loadTemplate(path string) (*template.Template, error) {
-	contents, err := ioutil.ReadFile(path)
+	contents, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't read template file: %s", err)
 	}

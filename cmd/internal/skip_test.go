@@ -1,13 +1,12 @@
-package lib_test
+package internal
 
 import (
-	"github.com/danvolchek/AdventOfCode/cmd/lib"
 	"strings"
 	"testing"
 )
 
-func singleValueRange(value int) lib.SkipRange {
-	return lib.SkipRange{
+func singleValueRange(value int) skipRange {
+	return skipRange{
 		Min: value,
 		Max: value,
 	}
@@ -15,7 +14,7 @@ func singleValueRange(value int) lib.SkipRange {
 
 func TestParseSkips_Valid(t *testing.T) {
 	rawSkips := "1\n2/3\n4#foo\n\n\n#bar\n5 # bar\n6/7 # baz\n8 \n9-10\n11/12-13\n14-15/16-17"
-	expectedSkips := []lib.SkipSolution{
+	expectedSkips := []skip{
 		{
 			Year: singleValueRange(1),
 		},
@@ -37,24 +36,24 @@ func TestParseSkips_Valid(t *testing.T) {
 			Year: singleValueRange(8),
 		},
 		{
-			Year: lib.SkipRange{
+			Year: skipRange{
 				Min: 9,
 				Max: 10,
 			},
 		},
 		{
 			Year: singleValueRange(11),
-			Day: lib.SkipRange{
+			Day: skipRange{
 				Min: 12,
 				Max: 13,
 			},
 		},
 		{
-			Year: lib.SkipRange{
+			Year: skipRange{
 				Min: 14,
 				Max: 15,
 			},
-			Day: lib.SkipRange{
+			Day: skipRange{
 				Min: 16,
 				Max: 17,
 			},
@@ -68,7 +67,7 @@ func TestParseSkips_Valid(t *testing.T) {
 		}
 	}()
 
-	actualSkips := lib.ParseSkips(strings.NewReader(rawSkips))
+	actualSkips := parseSkips(strings.NewReader(rawSkips))
 
 	if len(expectedSkips) != len(actualSkips) {
 		t.Fatalf("expected: len %v, actual: len %v", len(expectedSkips), len(actualSkips))
@@ -145,7 +144,7 @@ func TestParseSkips_Invalid(t *testing.T) {
 				}
 			}()
 
-			lib.ParseSkips(strings.NewReader(testCase.rawSkip))
+			parseSkips(strings.NewReader(testCase.rawSkip))
 		}()
 	}
 }

@@ -1,8 +1,8 @@
-package lib_test
+package internal_test
 
 import (
 	"bytes"
-	"github.com/danvolchek/AdventOfCode/cmd/lib"
+	"github.com/danvolchek/AdventOfCode/cmd/internal"
 	"testing"
 )
 
@@ -112,7 +112,7 @@ func TestTable(t *testing.T) {
 	} {
 		testCase := testCase
 		t.Run(testCase.name, func(t *testing.T) {
-			tbl := &lib.Table{NumRows: testCase.numRows}
+			tbl := &internal.Table{NumRows: testCase.numRows}
 
 			for _, testColumn := range testCase.columns {
 				tbl.AddColumn(testColumn.header, testColumn.rows)
