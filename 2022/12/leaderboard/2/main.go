@@ -110,7 +110,14 @@ func solve(grid [][]int) int {
 				ret = 9999999999999999
 			}
 		}()
-		return len(lib.BFS(s, end)) - 1
+		result, ok := lib.BFS(s, func(n *node) bool {
+			return n.Id() == end
+		})
+		if !ok {
+			panic("not found")
+		}
+
+		return len(result) - 1
 	})
 
 	return lib.MinSlice(distances)

@@ -64,12 +64,15 @@ func (n *node) Adjacent() []*node {
 }
 
 func explore(input Input) []string {
-	start := &node{
+	/*start := &node{
 		molecule:     "e",
 		replacements: input.replacements,
-	}
+	}*/
 
-	return lib.Map(lib.BFS(start, input.target), func(n *node) string { return n.molecule })
+	// Removing the id field from lib.BFS makes this at-runtime creation of adjacent nodes not work anymore
+	// This approach didn't work anyway - the search space got way too large, BFS probably isn't right
+	//return lib.Map(lib.BFS(start, input.target), func(n *node) string { return n.molecule })
+	return nil
 }
 
 func solve(input Input) int {

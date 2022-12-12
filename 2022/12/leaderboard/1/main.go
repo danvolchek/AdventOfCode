@@ -96,7 +96,12 @@ func solve(grid [][]int) int {
 		}
 	}
 
-	result := lib.BFS(start, end)
+	result, ok := lib.BFS(start, func(n *node) bool {
+		return n.Id() == end
+	})
+	if !ok {
+		panic("not found")
+	}
 	fmt.Println(result)
 	return len(result) - 1
 }
