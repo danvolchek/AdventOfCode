@@ -71,7 +71,7 @@ func main() {
 func getSolutionsToCreate(root string) []*internal.Type {
 	if infer {
 		years := internal.GetLocalSolutionInfo(root)
-		skipper := internal.NewSkipper(filepath.Join(root, "skips.txt"))
+		skipper := internal.NewSkipper(filepath.Join(root, "skip.txt"))
 
 		return []*internal.Type{internal.FirstUnsolvedSolution(root, years, skipper)}
 	}
