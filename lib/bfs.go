@@ -1,17 +1,13 @@
 package lib
 
-type Node[T any] interface {
+type BFSNode[T any] interface {
+	comparable
 	Adjacent() []T
 }
 
-type BFSConstraint[T any] interface {
-	comparable
-	Node[T]
-}
-
 // BFS runs breadth-first-search from start until target returns true.
-// T must be a type that 1. has a method to return adjacent nodes (see Node[T]) and 2. is comparable.
-func BFS[T BFSConstraint[T]](start T, target func(T) bool) ([]T, bool) {
+// T must be a type that 1. has a method to return adjacent nodes and 2. is comparable.
+func BFS[T BFSNode[T]](start T, target func(T) bool) ([]T, bool) {
 	var q Queue[T]
 
 	explored := map[T]bool{}
