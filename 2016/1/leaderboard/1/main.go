@@ -61,7 +61,7 @@ func solve(lines []instruction) int {
 
 func main() {
 	solver := lib.Solver[[]instruction, int]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: parse,
 		SolveF: solve,
 	}
 

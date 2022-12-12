@@ -39,16 +39,18 @@ func parseCrates(crates string, p *Puzzle) {
 	}
 }
 
-func parseInstructions(instructions string, p *Puzzle) {
-	for _, instruction := range strings.Split(strings.TrimSpace(instructions), "\n") {
-		nums := lib.Ints(instruction)
+func parseInstruction(instruction string) Instruction {
+	nums := lib.Ints(instruction)
 
-		p.instructions = append(p.instructions, Instruction{
-			amount: nums[0],
-			from:   nums[1] - 1,
-			to:     nums[2] - 1,
-		})
+	return Instruction{
+		amount: nums[0],
+		from:   nums[1] - 1,
+		to:     nums[2] - 1,
 	}
+}
+
+func parseInstructions(instructions string, p *Puzzle) {
+	p.instructions = lib.ParseLine(parseInstruction)(instructions)
 }
 
 func solve(puzzle Puzzle) string {
@@ -56,11 +58,11 @@ func solve(puzzle Puzzle) string {
 		// simulate lifting crates with order preserved by putting them into a temporary stack and popping that onto to
 		var temp lib.Stack[string]
 		for i := 0; i < instr.amount; i++ {
-			temp.Push(puzzle.stacks[instr.from-1].Pop())
+			temp.Push(puzzle.stacks[instr.from].Pop())
 		}
 
 		for i := 0; i < instr.amount; i++ {
-			puzzle.stacks[instr.to-1].Push(temp.Pop())
+			puzzle.stacks[instr.to].Push(temp.Pop())
 		}
 	}
 

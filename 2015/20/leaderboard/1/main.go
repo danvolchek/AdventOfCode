@@ -42,7 +42,7 @@ func solve(target int) int {
 
 func main() {
 	presentsSolver := lib.Solver[int, int]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: parse,
 		SolveF: presents,
 	}
 	presentsSolver.Expect("1", 10)
@@ -56,7 +56,7 @@ func main() {
 	presentsSolver.Expect("9", 130)
 
 	solver := lib.Solver[int, int]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: parse,
 		SolveF: solve,
 	}
 

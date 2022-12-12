@@ -78,7 +78,7 @@ func solve(input Input) int {
 
 func main() {
 	graphSolver := lib.Solver[Input, []string]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: parse,
 		SolveF: explore,
 	}
 
@@ -86,7 +86,7 @@ func main() {
 	graphSolver.Expect("e => H\ne => O\nH => HO\nH => OH\nO => HH\n\nHOHOHO\n", []string{"e", "H", "HO", "HHH", "HHHO", "HHOHO", "HOHOHO"})
 
 	solver := lib.Solver[Input, int]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: parse,
 		SolveF: solve,
 	}
 

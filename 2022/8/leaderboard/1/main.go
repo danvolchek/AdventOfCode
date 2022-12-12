@@ -79,7 +79,7 @@ func solve(lines [][]int) int {
 
 func main() {
 	solver := lib.Solver[[][]int, int]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: parse,
 		SolveF: solve,
 	}
 

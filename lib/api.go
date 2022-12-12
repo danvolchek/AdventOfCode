@@ -10,9 +10,6 @@ import (
 	"strings"
 )
 
-// client is a client for the AoC service.
-var client = newAocClient(getSolutionMetadata())
-
 type aocClient struct {
 	year, day, part string
 

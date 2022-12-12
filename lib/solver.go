@@ -2,7 +2,6 @@ package lib
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -16,26 +15,28 @@ import (
 
 // Solver is a wrapper around running a solution, providing helper methods to simplify boilerplate.
 type Solver[T, V any] struct {
-	// ParseF is a top level parse function that accepts an [io.Reader] and returns the parsed value.
-	// See below for common top level parse functions.
-	ParseF func(input io.Reader) T
+	// ParseF is a parse function that accepts a string and returns the parsed value.
+	// See below for common parse functions.
+	ParseF func(input string) T
 
 	// SolveF is the function which solves the puzzle using the parsed input.
 	SolveF func(parsed T) V
 
 	expectsRun, expectsCorrect int
+
+	client *aocClient
 }
 
 // Parse parses input and prints the result.
-func (s Solver[T, V]) Parse(input string) {
-	actual := s.ParseF(strings.NewReader(input))
+func (s *Solver[T, V]) Parse(input string) {
+	actual := s.ParseF(input)
 
 	fmt.Printf("parse: \"%v\" -> %+v\n", formatInput(input), actual)
 }
 
 // ParseExpect parses input, compares it to expected, and prints the result.
-func (s Solver[T, V]) ParseExpect(input string, expected T) {
-	actual := s.ParseF(strings.NewReader(input))
+func (s *Solver[T, V]) ParseExpect(input string, expected T) {
+	actual := s.ParseF(input)
 
 	if !reflect.DeepEqual(expected, actual) {
 		fmt.Printf("(fail)    parse: \"%v\" -> expected %+v, got %+v\n", formatInput(input), expected, actual)
@@ -46,7 +47,7 @@ func (s Solver[T, V]) ParseExpect(input string, expected T) {
 
 // Expect runs the solution against input, compares it to expected, and prints the result.
 func (s *Solver[T, V]) Expect(input string, expected V) {
-	actual, dur := s.solve(strings.NewReader(input))
+	actual, dur := s.solve(input)
 
 	s.expectsRun += 1
 
@@ -59,14 +60,14 @@ func (s *Solver[T, V]) Expect(input string, expected V) {
 }
 
 // Test runs the solution against input and prints the result.
-func (s Solver[T, V]) Test(input string) {
-	solution, dur := s.solve(strings.NewReader(input))
+func (s *Solver[T, V]) Test(input string) {
+	solution, dur := s.solve(input)
 	fmt.Printf("test: \"%v\" -> %v%v\n", formatInput(input), solution, dur)
 }
 
 // Verify runs the solution against the real input, compares it to expected, and prints the result.
-func (s Solver[T, V]) Verify(expected V) {
-	input, ok := getRealInput()
+func (s *Solver[T, V]) Verify(expected V) {
+	input, ok := s.getRealInput()
 	if !ok {
 		fmt.Printf("(fail)     real: empty input file\n")
 		return
@@ -82,8 +83,8 @@ func (s Solver[T, V]) Verify(expected V) {
 }
 
 // Solve runs the solution against the real input and prints the result.
-func (s Solver[T, V]) Solve() {
-	input, ok := getRealInput()
+func (s *Solver[T, V]) Solve() {
+	input, ok := s.getRealInput()
 	if !ok {
 		fmt.Printf("(fail)     real: empty input file\n")
 		return
@@ -92,14 +93,14 @@ func (s Solver[T, V]) Solve() {
 	solution, dur := s.solve(input)
 	fmt.Printf("real: %v%v\n", solution, dur)
 
-	if client.sessionCookieErr != nil {
-		fmt.Printf("note: can't submit solution: %s\n", client.sessionCookieErr)
+	if s.client.sessionCookieErr != nil {
+		fmt.Printf("note: can't submit solution: %s\n", s.client.sessionCookieErr)
 		return
 	}
 
 	if s.shouldSubmit() {
 		fmt.Println("submitting...")
-		output, err := client.submitSolution(fmt.Sprint(solution))
+		output, err := s.client.submitSolution(fmt.Sprint(solution))
 		if err != nil {
 			fmt.Printf("note: failed to submit solution: %s", err)
 		} else {
@@ -109,7 +110,7 @@ func (s Solver[T, V]) Solve() {
 }
 
 // shouldSubmit returns whether the solution should be automatically submitted.
-func (s Solver[T, V]) shouldSubmit() bool {
+func (s *Solver[T, V]) shouldSubmit() bool {
 	// auto submit if all expects passed
 	if s.expectsRun > 0 && s.expectsCorrect == s.expectsRun {
 		fmt.Println("note: auto submitting because all expects passed")
@@ -136,7 +137,7 @@ func (s Solver[T, V]) shouldSubmit() bool {
 }
 
 // solve runs the solution against input and returns the result and elapsed time.
-func (s Solver[T, V]) solve(input io.Reader) (V, formatDur) {
+func (s *Solver[T, V]) solve(input string) (V, formatDur) {
 	now := time.Now()
 
 	solution := s.SolveF(s.ParseF(input))
@@ -145,26 +146,30 @@ func (s Solver[T, V]) solve(input io.Reader) (V, formatDur) {
 }
 
 // getRealInput returns a reader which reads the input file.
-func getRealInput() (io.Reader, bool) {
-	year, day, _ := getSolutionMetadata()
+func (s *Solver[T, V]) getRealInput() (string, bool) {
+	year, day, part := getSolutionMetadata()
+
+	if s.client == nil {
+		s.client = newAocClient(year, day, part)
+	}
 
 	fileBytes := readInputFile(year, day)
 
 	if len(fileBytes) != 0 {
-		return bytes.NewReader(fileBytes), true
+		return string(fileBytes), true
 	}
 
 	fmt.Println("retrieving input because it's not found...")
 
-	input, err := client.retrieveInput()
+	input, err := s.client.retrieveInput()
 	if err != nil {
 		fmt.Printf("note: tried to retrieve input, failed: %s\n", err)
-		return nil, false
+		return "", false
 	}
 
 	writeInputFile(year, day, input)
 
-	return bytes.NewReader(input), true
+	return string(input), true
 }
 
 // readInputFile returns the contents of the input file for year and day.
@@ -215,34 +220,22 @@ func (f formatDur) String() string {
 	return " (" + time.Duration(f).String() + ")"
 }
 
-// ParseBytes is a top level parse function that returns the raw bytes read.
-func ParseBytes(input io.Reader) []byte {
-	return Must(io.ReadAll(input))
+// ParseBytes is a parse function that returns the raw bytes read.
+func ParseBytes(input string) []byte {
+	return []byte(input)
 }
 
-// ParseBytesFunc is a top level parse function that returns a parsed value of the raw bytes read.
-func ParseBytesFunc[T any](parse func(input []byte) T) func(r io.Reader) T {
-	return func(r io.Reader) T {
-		return parse(ParseBytes(r))
-	}
-}
-
-// ParseString is a top level parse function that returns the string representation of the raw bytes read.
-func ParseString(input io.Reader) string {
-	return string(Must(io.ReadAll(input)))
-}
-
-// ParseStringFunc is a top level parse function that returns a parsed value of the raw bytes read.
-func ParseStringFunc[T any](parse func(input string) T) func(r io.Reader) T {
-	return func(r io.Reader) T {
-		return parse(ParseString(r))
+// ParseBytesFunc is a parse function that returns a parsed value of the raw bytes read.
+func ParseBytesFunc[T any](parse func(input []byte) T) func(input string) T {
+	return func(input string) T {
+		return parse(ParseBytes(input))
 	}
 }
 
 // ParseGrid parses a grid of characters.
-func ParseGrid[T any](parse func(s string) T) func(r io.Reader) [][]T {
-	return func(r io.Reader) [][]T {
-		rawGrid := bytes.Split(bytes.TrimSpace(Must(io.ReadAll(r))), []byte{'\n'})
+func ParseGrid[T any](parse func(s string) T) func(input string) [][]T {
+	return func(input string) [][]T {
+		rawGrid := strings.Split(strings.TrimSpace(input), "\n")
 
 		var grid [][]T
 
@@ -257,38 +250,22 @@ func ParseGrid[T any](parse func(s string) T) func(r io.Reader) [][]T {
 	}
 }
 
-// ParseLine is a top level function helper that splits parsing into one line at a time, returning a slice of items.
+// ParseLine is a parse function that splits parsing into one line at a time, returning a slice of items.
 // It accepts a parse function to parse each line seen.
-func ParseLine[T any](parse func(line string) T) func(r io.Reader) []T {
-	return func(r io.Reader) []T {
-		var lines []T
+func ParseLine[T any](parse func(line string) T) func(input string) []T {
+	return func(input string) []T {
+		rawLines := strings.Split(strings.TrimSpace(input), "\n")
 
-		scanner := bufio.NewScanner(r)
-		for scanner.Scan() {
-			lines = append(lines, parse(scanner.Text()))
-		}
-		if scanner.Err() != nil {
-			panic(scanner.Err())
-		}
-
-		return lines
+		return Map(rawLines, parse)
 	}
 }
 
 // ParseChunks is like ParseLine but parses lines delimited by two new lines, not one
-func ParseChunks[T any](parser func(chunk string) T) func(r io.Reader) []T {
-	return func(r io.Reader) []T {
-		var lines []T
+func ParseChunks[T any](parse func(chunk string) T) func(input string) []T {
+	return func(input string) []T {
+		rawChunks := strings.Split(strings.TrimSpace(input), "\n\n")
 
-		raw := ParseString(r)
-
-		chunks := strings.Split(raw, "\n\n")
-
-		for _, chunk := range chunks {
-			lines = append(lines, parser(chunk))
-		}
-
-		return lines
+		return Map(rawChunks, parse)
 	}
 }
 
@@ -296,15 +273,13 @@ func ParseChunks[T any](parser func(chunk string) T) func(r io.Reader) []T {
 // It's different from all the other functions in that it passes in a T to the parse func to modify as needed.
 // The intended use is for each parser to be able to return a different type safe type - this couldn't work with generics -
 // so T is intended a container for the result of each parser.
-func ParseChunksUnique[T any](parsers ...func(chunk string, val *T)) func(r io.Reader) T {
-	return func(r io.Reader) T {
+func ParseChunksUnique[T any](parsers ...func(chunk string, val *T)) func(input string) T {
+	return func(input string) T {
 		var start T
 
-		raw := ParseString(r)
+		rawChunks := strings.Split(input, "\n\n")
 
-		chunks := strings.Split(raw, "\n\n")
-
-		for i, chunk := range chunks {
+		for i, chunk := range rawChunks {
 			parsers[i](chunk, &start)
 		}
 

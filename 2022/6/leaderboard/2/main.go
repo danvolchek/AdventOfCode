@@ -29,7 +29,7 @@ func solve(lines string) int {
 
 func main() {
 	solver := lib.Solver[string, int]{
-		ParseF: lib.ParseString,
+		ParseF: lib.AsIs,
 		SolveF: solve,
 	}
 

@@ -50,7 +50,7 @@ func solve(input Input) int {
 
 func main() {
 	solver := lib.Solver[Input, int]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: parse,
 		SolveF: solve,
 	}
 

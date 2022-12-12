@@ -38,16 +38,18 @@ func parseCrates(crates string, p *Puzzle) {
 	}
 }
 
-func parseInstructions(instructions string, p *Puzzle) {
-	for _, instruction := range strings.Split(strings.TrimSpace(instructions), "\n") {
-		nums := lib.Ints(instruction)
+func parseInstruction(instruction string) Instruction {
+	nums := lib.Ints(instruction)
 
-		p.instructions = append(p.instructions, Instruction{
-			amount: nums[0],
-			from:   nums[1] - 1,
-			to:     nums[2] - 1,
-		})
+	return Instruction{
+		amount: nums[0],
+		from:   nums[1] - 1,
+		to:     nums[2] - 1,
 	}
+}
+
+func parseInstructions(instructions string, p *Puzzle) {
+	p.instructions = lib.ParseLine(parseInstruction)(instructions)
 }
 
 func solve(puzzle Puzzle) string {

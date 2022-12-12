@@ -120,7 +120,7 @@ func solve(puzz puzzle) string {
 
 func main() {
 	solver := lib.Solver[puzzle, string]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: parse,
 		SolveF: solve,
 	}
 

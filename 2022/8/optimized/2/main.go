@@ -2,28 +2,7 @@ package main
 
 import (
 	"github.com/danvolchek/AdventOfCode/lib"
-	"strings"
 )
-
-func parse(input string) [][]int {
-	var result [][]int
-
-	lines := strings.Split(strings.TrimSpace(input), "\n")
-
-	for _, line := range lines {
-		parts := strings.Split(line, "")
-
-		var ret []int
-
-		for _, p := range parts {
-			ret = append(ret, lib.Int(p))
-		}
-
-		result = append(result, ret)
-	}
-
-	return result
-}
 
 func viewingDistance(x, y int, grid [][]int) int {
 	v := grid[x][y]

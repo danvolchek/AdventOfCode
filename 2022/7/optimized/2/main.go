@@ -226,7 +226,7 @@ func solve(commands []Command) int {
 
 func main() {
 	solver := lib.Solver[[]Command, int]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: parse,
 		SolveF: solve,
 	}
 

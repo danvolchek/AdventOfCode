@@ -172,7 +172,7 @@ outer:
 
 func main() {
 	solver := lib.Solver[[]instruction, int]{
-		ParseF: lib.ParseStringFunc(parse),
+		ParseF: parse,
 		SolveF: solve,
 	}
 
