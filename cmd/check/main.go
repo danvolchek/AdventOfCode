@@ -53,6 +53,8 @@ func check(path string) error {
 
 	defer os.Remove(tmp.Name())
 
+	path = "." + string(os.PathSeparator) + path
+
 	cmd := fmt.Sprintf("go build -o %s %s && %s", tmp.Name(), path, tmp.Name())
 
 	command := exec.Command("/bin/sh", "-c", cmd)
