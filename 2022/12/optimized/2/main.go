@@ -58,36 +58,32 @@ func parse(char string) *Node {
 }
 
 func solve(grid [][]*Node) int {
-	var starts []*Node
+	var end *Node
 
 	for y, line := range grid {
 		for x, node := range line {
-			if node.height == 0 {
-				starts = append(starts, node)
+			if node.nodeType == End {
+				end = node
 			}
 
 			adjacent := lib.Adjacent(false, y, x, grid)
 			reachable := lib.Filter(adjacent, func(n *Node) bool {
-				return node.height >= n.height-1
+				return n.height >= node.height-1 // reversed from part 1, since we're going the opposite direction
 			})
 
 			node.adjacent = reachable
 		}
 	}
 
-	paths := lib.Map(starts, func(start *Node) int {
-		path, ok := lib.BFS(start, func(n *Node) bool {
-			return n.nodeType == End
-		})
-
-		if !ok {
-			return 99999999
-		}
-
-		return len(path) - 1
+	path, ok := lib.BFS(end, func(n *Node) bool {
+		return n.height == 0
 	})
 
-	return lib.MinSlice(paths)
+	if !ok {
+		panic("not found")
+	}
+
+	return len(path) - 1
 }
 
 func main() {
