@@ -1,10 +1,10 @@
 package lib
 
-type Node[T comparable] interface {
+type Node[T any] interface {
 	Adjacent() []T
 }
 
-type BFSConstraint[T comparable] interface {
+type BFSConstraint[T any] interface {
 	comparable
 	Node[T]
 }
