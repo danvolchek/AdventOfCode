@@ -227,7 +227,7 @@ func GetLocalSolutionInfo(root string) []*Year {
 				// Day 25 only has 1 part
 				parts := SolutionParts
 				if dayNum == LastDayNum {
-					parts = []string{"1"}
+					parts = []string{PartOne}
 				}
 
 				for _, partNum := range parts {
