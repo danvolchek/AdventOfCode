@@ -93,8 +93,8 @@ func TestFirstUnsolvedSolution(t *testing.T) {
 		actual := FirstUnsolvedSolution(testCase.root, years, &Skipper{skips: testCase.skips})
 		expected := testCase.expected
 
-		if actual.Year.Name != expected.Year {
-			t.Errorf("root %v: year: expected %v, actual %v", testCase.root, expected.Year, actual.Year)
+		if actual.Day.Year.Name != expected.Year {
+			t.Errorf("root %v: year: expected %v, actual %v", testCase.root, expected.Year, actual.Day.Year)
 		}
 
 		if actual.Day.Name != expected.Day {

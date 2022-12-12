@@ -5,6 +5,7 @@ import (
 	"github.com/danvolchek/AdventOfCode/lib"
 	"golang.org/x/exp/slices"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -30,33 +31,16 @@ var (
 	SolutionParts = []string{PartOne, PartTwo}
 )
 
-type hasPath interface {
-	Path() string
+type hasPath struct {
+	Path string
 }
 
-type rootPath struct {
-	path string
-}
-
-func (r rootPath) Path() string {
-	return r.path
-}
-
-type pathed struct {
-	part   string
-	parent hasPath
-}
-
-func (p pathed) Path() string {
-	return p.parent.Path() + string(os.PathSeparator) + p.part
-}
-
-func (p pathed) Exists() bool {
-	return exists(p.Path())
+func (p hasPath) Exists() bool {
+	return exists(p.Path)
 }
 
 type Year struct {
-	pathed
+	hasPath
 
 	Name   string
 	Number int
@@ -69,9 +53,8 @@ func (y Year) String() string {
 
 func newYear(root, name string) *Year {
 	return &Year{
-		pathed: pathed{
-			part:   name,
-			parent: rootPath{path: root},
+		hasPath: hasPath{
+			Path: filepath.Join(root, name),
 		},
 		Name:   name,
 		Number: lib.Atoi(name),
@@ -79,8 +62,8 @@ func newYear(root, name string) *Year {
 }
 
 type Day struct {
-	pathed
-	*Year
+	hasPath
+	Year *Year
 
 	Name   string
 	Number int
@@ -94,9 +77,8 @@ func (d Day) String() string {
 
 func newDay(year *Year, name string) *Day {
 	day := Day{
-		pathed: pathed{
-			part:   name,
-			parent: year,
+		hasPath: hasPath{
+			Path: filepath.Join(year.Path, name),
 		},
 		Year:   year,
 		Number: lib.Atoi(name),
@@ -110,7 +92,7 @@ func newDay(year *Year, name string) *Day {
 }
 
 type Input struct {
-	pathed
+	hasPath
 }
 
 func (i Input) String() string {
@@ -119,9 +101,8 @@ func (i Input) String() string {
 
 func newInput(day *Day) *Input {
 	input := Input{
-		pathed: pathed{
-			part:   "input.txt",
-			parent: day,
+		hasPath: hasPath{
+			Path: filepath.Join(day.Path, "input.txt"),
 		},
 	}
 
@@ -129,8 +110,8 @@ func newInput(day *Day) *Input {
 }
 
 type Type struct {
-	pathed
-	*Day
+	hasPath
+	Day *Day
 
 	Name  string
 	Parts []*Part
@@ -142,9 +123,8 @@ func (t Type) String() string {
 
 func newType(day *Day, name string) *Type {
 	typ := Type{
-		pathed: pathed{
-			part:   name,
-			parent: day,
+		hasPath: hasPath{
+			Path: filepath.Join(day.Path, name),
 		},
 		Day:  day,
 		Name: name,
@@ -166,8 +146,8 @@ func NewType(root, yearN, dayN, typN string) *Type {
 }
 
 type Part struct {
-	pathed
-	*Type
+	hasPath
+	Type *Type
 
 	Main *Main
 	Name string
@@ -179,9 +159,8 @@ func (p Part) String() string {
 
 func newPart(typ *Type, name string) *Part {
 	part := Part{
-		pathed: pathed{
-			part:   name,
-			parent: typ,
+		hasPath: hasPath{
+			Path: filepath.Join(typ.Path, name),
 		},
 		Type: typ,
 		Name: name,
@@ -194,14 +173,13 @@ func newPart(typ *Type, name string) *Part {
 }
 
 type Main struct {
-	pathed
+	hasPath
 }
 
 func newMain(part *Part) *Main {
 	main := Main{
-		pathed: pathed{
-			part:   "main.go",
-			parent: part,
+		hasPath: hasPath{
+			Path: filepath.Join(part.Path, "main.go"),
 		},
 	}
 

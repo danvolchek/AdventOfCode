@@ -27,8 +27,8 @@ func TestGetLocalSolutionInfo_Years(t *testing.T) {
 			t.Errorf("year %d: inccorrect name: expected %s, actual %s", i, strconv.Itoa(expectedYear), actualYear.Name)
 		}
 
-		if actualYear.Path() != filepath.Join(root, strconv.Itoa(expectedYear)) {
-			t.Errorf("year %d: inccorrect path: expected %s, actual %s", i, filepath.Join(root, strconv.Itoa(expectedYear)), actualYear.Path())
+		if actualYear.Path != filepath.Join(root, strconv.Itoa(expectedYear)) {
+			t.Errorf("year %d: inccorrect path: expected %s, actual %s", i, filepath.Join(root, strconv.Itoa(expectedYear)), actualYear.Path)
 		}
 	}
 }
@@ -52,8 +52,8 @@ func TestGetLocalSolutionInfo_Days(t *testing.T) {
 			t.Errorf("day %d: incorrect number: expected %s, got %s", i, strconv.Itoa(i), day.Name)
 		}
 
-		if day.Path() != filepath.Join(root, "2015", strconv.Itoa(i)) {
-			t.Errorf("day %d: incorrect path: expected %s, actual %s", i, filepath.Join(root, "2015", strconv.Itoa(i)), day.Path())
+		if day.Path != filepath.Join(root, "2015", strconv.Itoa(i)) {
+			t.Errorf("day %d: incorrect path: expected %s, actual %s", i, filepath.Join(root, "2015", strconv.Itoa(i)), day.Path)
 		}
 	}
 }

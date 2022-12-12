@@ -94,13 +94,13 @@ func getSolutionsToCreate(root string) []*internal.Type {
 }
 
 func createSolution(sol *internal.Type) error {
-	err := os.MkdirAll(sol.Day.Path(), os.ModePerm)
+	err := os.MkdirAll(sol.Day.Path, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("couldn't create solution folder: %s", err)
 	}
 
-	if !sol.Input.Exists() {
-		input, err := os.Create(sol.Input.Path())
+	if !sol.Day.Input.Exists() {
+		input, err := os.Create(sol.Day.Input.Path)
 		defer input.Close()
 		if err != nil {
 			return fmt.Errorf("couldn't create input file: %s", err)
@@ -121,9 +121,9 @@ func createSolution(sol *internal.Type) error {
 			continue
 		}
 
-		stubFile, err := createFileAndDirectories(part.Main.Path())
+		stubFile, err := createFileAndDirectories(part.Main.Path)
 		if err != nil {
-			return fmt.Errorf("couldn't create stub file %s: %s", part.Main.Path(), err)
+			return fmt.Errorf("couldn't create stub file %s: %s", part.Main.Path, err)
 		}
 
 		anyCreated = true

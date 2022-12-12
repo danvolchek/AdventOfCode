@@ -46,7 +46,7 @@ type skip struct {
 }
 
 func (s skip) shouldSkip(t *Type) bool {
-	return s.Year.contains(t.Year.Number) && (s.Day.Max == 0 || s.Day.contains(t.Day.Number))
+	return s.Year.contains(t.Day.Year.Number) && (s.Day.Max == 0 || s.Day.contains(t.Day.Number))
 }
 
 func parseSkips(r io.Reader) []skip {

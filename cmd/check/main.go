@@ -35,11 +35,9 @@ func main() {
 						continue
 					}
 
-					path := part.Path()
-
-					fmt.Println("Checking", path)
-					if err := check(path); err != nil {
-						fmt.Printf("%v: failed: %s\n", path, err)
+					fmt.Println("Checking", part.Path)
+					if err := check(part.Path); err != nil {
+						fmt.Printf("%v: failed: %s\n", part.Path, err)
 					}
 				}
 			}

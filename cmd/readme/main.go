@@ -83,7 +83,7 @@ func createLink(typ *internal.Type) string {
 			continue
 		}
 
-		parts = append(parts, makeLink(part.Name, part.Main.Path()))
+		parts = append(parts, makeLink(part.Name, part.Main.Path))
 	}
 
 	return strings.Join(parts, ",")
