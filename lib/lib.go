@@ -117,6 +117,16 @@ func Filter[T any](items []T, filter func(T) bool) []T {
 	return result
 }
 
+// Reverse returns a new slice which is items in reverse order.
+func Reverse[T any](items []T) []T {
+	result := make([]T, len(items))
+	for i, item := range items {
+		result[len(result)-i-1] = item
+	}
+	return result
+
+}
+
 // SumSlice returns the sum of items.
 func SumSlice[T constraints.Integer | constraints.Float](items []T) T {
 	var sum T
@@ -160,6 +170,34 @@ func MaxSlice[T constraints.Ordered](items []T) T {
 	}
 
 	return max
+}
+
+// Adjacent returns the adjacent items in a 2d grid of items. Diag controls whether diagonals are considered as adjacent.
+func Adjacent[T any](diag bool, i, j int, grid [][]T) []T {
+	var results []T
+
+	for di := -1; di <= 1; di += 1 {
+		for dj := -1; dj <= 1; dj += 1 {
+			if di == 0 && dj == 0 {
+				continue
+			}
+
+			if !diag && Abs(di)+Abs(dj) == 2 {
+				continue
+			}
+
+			adjI := i + di
+			adjJ := j + dj
+
+			if adjI < 0 || adjJ < 0 || adjI >= len(grid) || adjJ >= len(grid[adjI]) {
+				continue
+			}
+
+			results = append(results, grid[adjI][adjJ])
+		}
+	}
+
+	return results
 }
 
 // Permutations returns all possible permutations of items.
