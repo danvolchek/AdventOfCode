@@ -4,23 +4,31 @@ import (
 	"github.com/danvolchek/AdventOfCode/lib"
 )
 
+type NodeType int
+
+const (
+	Start NodeType = iota
+	End
+	Neither
+)
+
 type Node struct {
 	height int
 
-	isStart, isEnd bool
+	nodeType NodeType
 
 	adjacent []*Node
 }
 
 func (n *Node) String() string {
-	if n.isStart {
+	switch n.nodeType {
+	case Start:
 		return "S"
-	}
-	if n.isEnd {
+	case End:
 		return "E"
+	default:
+		return string(rune('a' + n.height))
 	}
-
-	return string(rune('a' + n.height))
 }
 
 func (n *Node) Adjacent() []*Node {
@@ -28,21 +36,25 @@ func (n *Node) Adjacent() []*Node {
 }
 
 func parse(char string) *Node {
-	node := &Node{
-		height:  int(char[0] - 'a'),
-		isStart: char == "S",
-		isEnd:   char == "E",
+	var height int
+	var nodeType NodeType
+
+	switch char {
+	case "S":
+		nodeType = Start
+		height = 0
+	case "E":
+		nodeType = End
+		height = 26
+	default:
+		nodeType = Neither
+		height = int(char[0] - 'a')
 	}
 
-	if node.isStart {
-		node.height = 0
+	return &Node{
+		height:   height,
+		nodeType: nodeType,
 	}
-
-	if node.isEnd {
-		node.height = int('z' - 'a')
-	}
-
-	return node
 }
 
 func solve(grid [][]*Node) int {
@@ -63,19 +75,19 @@ func solve(grid [][]*Node) int {
 		}
 	}
 
-	results := lib.Map(starts, func(start *Node) int {
-		result, ok := lib.BFS(start, func(n *Node) bool {
-			return n.isEnd
+	paths := lib.Map(starts, func(start *Node) int {
+		path, ok := lib.BFS(start, func(n *Node) bool {
+			return n.nodeType == End
 		})
 
 		if !ok {
 			return 99999999
 		}
 
-		return len(result) - 1
+		return len(path) - 1
 	})
 
-	return lib.MinSlice(results)
+	return lib.MinSlice(paths)
 }
 
 func main() {
