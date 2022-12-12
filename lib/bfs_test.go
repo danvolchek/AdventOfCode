@@ -16,10 +16,6 @@ func (t *testNode) String() string {
 	return strconv.Itoa(t.id)
 }
 
-func (t *testNode) Id() int {
-	return t.id
-}
-
 func (t *testNode) Adjacent() []*testNode {
 	return t.neighbors
 }
@@ -105,9 +101,12 @@ func TestBFS(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			actual := lib.BFS(tc.start, tc.target)
+			actual, ok := lib.BFS(tc.start, func(n *testNode) bool { return n.id == tc.target })
+			if !ok {
+				t.Fatalf("path not found")
+			}
 
-			ids := lib.Map(actual, func(n *testNode) int { return n.Id() })
+			ids := lib.Map(actual, func(n *testNode) int { return n.id })
 
 			if !slices.Equal(tc.expected, ids) {
 				t.Errorf("got %+v, want %+v", actual, tc.expected)

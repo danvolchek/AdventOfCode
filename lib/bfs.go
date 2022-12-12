@@ -1,62 +1,61 @@
 package lib
 
-// Node is a node used to do BFS.
-type Node[I any, T any] interface {
-	// Id is the id of this node.
-	Id() I
-
-	// Adjacent is the list of nodes reachable from this node.
+type Node[T comparable] interface {
 	Adjacent() []T
 }
 
-type NodeConstraint[I, T any] interface {
+type BFSConstraint[T comparable] interface {
 	comparable
-	Node[I, T]
+	Node[T]
 }
 
-// BFS returns the shortest path from start to target.
-// The type of Start must be a Node.
-func BFS[I comparable, T NodeConstraint[I, T]](start T, target I) []T {
+// BFS runs breadth-first-search from start until target returns true.
+// T must be a type that 1. has a method to return adjacent nodes (see Node[T]) and 2. is comparable.
+func BFS[T BFSConstraint[T]](start T, target func(T) bool) ([]T, bool) {
 	var q Queue[T]
-	explored := map[I]bool{}
-	parent := map[I]T{}
+
+	explored := map[T]bool{}
+	parent := map[T]T{}
 
 	q.Push(start)
 
 	for !q.Empty() {
 		v := q.Pop()
-		if v.Id() == target {
-			var result []T
-			curr := v
-			for {
-				result = append(result, curr)
 
-				var ok bool
-				curr, ok = parent[curr.Id()]
-				if !ok {
-					break
-				}
-
-				if curr.Id() == start.Id() {
-					result = append(result, curr)
-					break
-				}
-			}
-			rev := make([]T, len(result))
-			for i, item := range result {
-				rev[len(result)-i-1] = item
-			}
-			return rev
+		if target(v) {
+			return reconstructPath(start, v, parent), true
 		}
 
 		for _, neighbor := range v.Adjacent() {
-			if !explored[neighbor.Id()] {
-				explored[neighbor.Id()] = true
-				parent[neighbor.Id()] = v
+			if !explored[neighbor] {
+				explored[neighbor] = true
+				parent[neighbor] = v
 				q.Push(neighbor)
 			}
 		}
 	}
 
-	panic("target not found")
+	return nil, false
+}
+
+// reconstructPath reconstructs the path from start to end using a parent map.
+func reconstructPath[T comparable](start, end T, parent map[T]T) []T {
+	result := []T{end}
+
+	if start == end {
+		return result
+	}
+
+	curr := end
+	for {
+		curr = parent[curr]
+
+		result = append(result, curr)
+
+		if curr == start {
+			break
+		}
+	}
+
+	return Reverse(result)
 }
