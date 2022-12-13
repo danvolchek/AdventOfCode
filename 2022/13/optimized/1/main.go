@@ -59,10 +59,6 @@ func parseValue(raw string) Value {
 	}
 }
 
-func parse(chunk string) []Value {
-	return lib.ParseLine(parseValue)(chunk)
-}
-
 func (v Value) Compare(o Value) Ordering {
 	// If both are ints, compare their values
 	if v.Items == nil && o.Items == nil {
@@ -117,7 +113,7 @@ func solve(packets [][]Value) int {
 
 func main() {
 	solver := lib.Solver[[][]Value, int]{
-		ParseF: lib.ParseChunks(parse),
+		ParseF: lib.ParseChunks(lib.ParseLine(parseValue)),
 		SolveF: solve,
 	}
 
