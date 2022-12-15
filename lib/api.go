@@ -113,6 +113,10 @@ func (a *aocClient) submitSolution(solution string) (string, error) {
 		return "", errors.New("already solved")
 	}
 
+	if strings.Contains(display, "You gave an answer too recently; you have to wait after submitting an answer before trying again.") {
+		return "", fmt.Errorf("rate limited: wait %s", display[strings.Index(display, "You have ")+len("You have "):strings.Index(display, " left to wait.")])
+	}
+
 	return display, nil
 }
 
