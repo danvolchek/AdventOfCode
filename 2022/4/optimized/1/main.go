@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/danvolchek/AdventOfCode/lib"
+	"strings"
 )
 
 type Assignment struct {
@@ -13,16 +14,17 @@ type Pair struct {
 }
 
 func parse(line string) Pair {
-	ints := lib.Ints(line)
+	pairs := strings.Split(line, ",")
+	numsF, numsS := strings.Split(pairs[0], "-"), strings.Split(pairs[1], "-")
 
 	return Pair{
 		first: Assignment{
-			start: ints[0],
-			stop:  ints[1],
+			start: lib.Atoi(numsF[0]),
+			stop:  lib.Atoi(numsF[1]),
 		},
 		second: Assignment{
-			start: ints[2],
-			stop:  ints[3],
+			start: lib.Atoi(numsS[0]),
+			stop:  lib.Atoi(numsS[1]),
 		},
 	}
 }

@@ -270,9 +270,9 @@ func Subsets[T any](items []T) [][]T {
 	return result
 }
 
-var intsReg = regexp.MustCompile(`\d+`)
+var intsReg = regexp.MustCompile(`-?\d+`)
 
-// Ints returns all the positive integers in line.
+// Ints returns all the integers in line.
 func Ints(line string) []int {
 	numbers := intsReg.FindAllString(line, -1)
 
