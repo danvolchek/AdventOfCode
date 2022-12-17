@@ -303,6 +303,9 @@ func ParseRegexp[T any](reg *regexp.Regexp, parse func(parts []string) T) func(l
 	return func(line string) T {
 		matches := reg.FindAllStringSubmatch(line, -1)
 
+		if len(matches) == 0 {
+			panic("can't parse line: " + line)
+		}
 		firstMatchSubmatches := matches[0][1:]
 
 		return parse(firstMatchSubmatches)
