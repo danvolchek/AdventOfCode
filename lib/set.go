@@ -12,19 +12,13 @@ func (s *Set[T]) Contains(item T) bool {
 	return ok
 }
 
-// Add adds an item to the Set. It returns whether the item was added.
-func (s *Set[T]) Add(item T) bool {
+// Add adds an item to the Set.
+func (s *Set[T]) Add(item T) {
 	if s.items == nil {
 		s.items = make(map[T]struct{})
 	}
 
-	_, ok := s.items[item]
-	if ok {
-		return false
-	}
-
 	s.items[item] = struct{}{}
-	return true
 }
 
 // Remove removes an item from the Set. It returns whether the item was removed.
