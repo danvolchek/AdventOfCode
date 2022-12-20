@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/danvolchek/AdventOfCode/lib"
 	"regexp"
-	"sort"
 	"strings"
 )
 
@@ -36,14 +35,19 @@ func (n *Node) Adjacent() []*Node {
 	return n.neighbors
 }
 
+var allNodes map[int]*Node
+
 func buildGraph(valves []Valve) *Node {
 	nodeMap := make(map[string]*Node)
+	allNodes = make(map[int]*Node)
 
 	for i, valve := range valves {
 		nodeMap[valve.name] = &Node{
 			name:     i,
 			flowRate: valve.flowRate,
 		}
+
+		allNodes[i] = nodeMap[valve.name]
 	}
 
 	for _, valve := range valves {
@@ -55,29 +59,25 @@ func buildGraph(valves []Valve) *Node {
 	return nodeMap["AA"]
 }
 
-func copyMap[T comparable, V any](m map[T]V) map[T]V {
-	r := make(map[T]V, len(m))
-	for k, v := range m {
-		r[k] = v
-	}
-	return r
+type releasedArgs struct {
+	pos  int
+	time int
 }
+
+type flowRateArgs struct {
+	pos  int
+	time int
+}
+
+type flowOutput struct{ rate, unrate int }
+
+var cacheFlowRate map[flowRateArgs]flowOutput
+var cacheReleasedRate map[releasedArgs]int
 
 type args struct {
-	you      int
-	elephant int
-	time     int
-	on       uint64
-}
-
-func hash(ints []int) uint64 {
-	var result uint64
-
-	for _, v := range ints {
-		result += 1 << v
-	}
-
-	return result
+	you  int
+	time int
+	on   uint64
 }
 
 var cache map[args]int
@@ -85,12 +85,6 @@ var total int
 var maxTime int
 
 var cacheSeenAtAll map[args]bool
-
-func onToStr(a map[string]bool) string {
-	v := lib.Keys(a)
-	sort.Strings(v)
-	return strings.Join(v, "")
-}
 
 func set2(index1 int, index2 int, on uint64) uint64 {
 	return on + 1<<index1 + 1<<index2
@@ -104,6 +98,21 @@ func isSet(index int, on uint64) bool {
 	return (on>>index)&1 == 1
 }
 
+func rate(on uint64) (int, int) {
+	unSum := 0
+	sum := 0
+	i := 0
+	for on > 0 {
+		sum += int(on&1) * allNodes[i].flowRate
+		unSum += (1 - int(on&1)) * allNodes[i].flowRate
+
+		on = on >> 1
+		i += 1
+	}
+
+	return sum, unSum
+}
+
 func size(on uint64) int {
 	sum := 0
 	for on > 0 {
@@ -115,32 +124,49 @@ func size(on uint64) int {
 	return sum
 }
 
-func exScore(you *Node, elephant *Node, time int, on uint64) int {
+func hash(you, elephant *Node) int {
+	if you.name < elephant.name {
+		return you.name*total + elephant.name
+	}
+
+	return elephant.name*total + you.name
+}
+
+func exScore(curr int, you *Node, elephant *Node, time int, on uint64) int {
 	// nothing more we can do if there's no time left
 	if time <= 0 {
-		return 0
+		return curr
 	}
 
 	onSize := size(on)
 	// if all the valves are on there's no point moving around more
 	if onSize == total {
-		return 0
+		return curr
 	}
 
-	aaargs := args{you.name, elephant.name, time, on}
+	youEleHash := hash(you, elephant)
+	aaargs := args{youEleHash, time, on}
 
-	if val, ok := cache[aaargs]; ok {
-		return val
+	if _, ok := cache[aaargs]; ok {
+		return curr
 	}
 
-	// if all the valves are open at a previous time, this path must be worse
-	for i := time + 1; i < maxTime-onSize; i++ {
-		if _, ok := cacheSeenAtAll[args{you.name, elephant.name, i, on}]; ok {
-			return 0
+	onRate, remRate := rate(on)
+	for i := maxTime; i > time; i-- {
+		val1, ok1 := cacheReleasedRate[releasedArgs{youEleHash, i}]
+		val, ok := cacheFlowRate[flowRateArgs{youEleHash, i}]
+
+		if ok1 && ok && val.rate > onRate && val.unrate > remRate && val1 >= curr {
+			return curr
 		}
 	}
 
-	cacheSeenAtAll[aaargs] = true
+	if a, ok := cacheReleasedRate[releasedArgs{youEleHash, time}]; !ok || curr > a {
+		cacheReleasedRate[releasedArgs{youEleHash, time}] = curr
+	}
+	if a, ok := cacheFlowRate[flowRateArgs{youEleHash, time}]; !ok || onRate > a.rate {
+		cacheFlowRate[flowRateArgs{youEleHash, time}] = flowOutput{onRate, remRate}
+	}
 
 	var max int
 
@@ -160,7 +186,7 @@ func exScore(you *Node, elephant *Node, time int, on uint64) int {
 		if scoreFromElephantOn != 0 {
 			// mr elephant opens his valve but I move on
 			turnedOn := set(elephant.name, on)
-			turnOnAndMove := scoreFromElephantOn + exScore(youNeighbor, elephant, time-1, turnedOn)
+			turnOnAndMove := exScore(curr+scoreFromElephantOn, youNeighbor, elephant, time-1, turnedOn)
 			max = lib.Max(max, turnOnAndMove)
 		}
 
@@ -168,19 +194,19 @@ func exScore(you *Node, elephant *Node, time int, on uint64) int {
 			// we both can open our valve
 			if scoreFromYouOn != 0 && scoreFromElephantOn != 0 {
 				turnedOn := set2(elephant.name, you.name, on)
-				turnOnAndMove := scoreFromYouOn + scoreFromElephantOn + exScore(you, elephant, time-1, turnedOn)
+				turnOnAndMove := exScore(curr+scoreFromYouOn+scoreFromElephantOn, you, elephant, time-1, turnedOn)
 				max = lib.Max(max, turnOnAndMove)
 			}
 
 			if scoreFromYouOn != 0 {
 				// I open my valve but mr elephant moves on
 				turnedOn := set(you.name, on)
-				turnOnAndMove := scoreFromYouOn + exScore(you, elephantNeighbor, time-1, turnedOn)
+				turnOnAndMove := exScore(curr+scoreFromYouOn, you, elephantNeighbor, time-1, turnedOn)
 				max = lib.Max(max, turnOnAndMove)
 			}
 
 			// neither of us open our valve
-			justMove := exScore(youNeighbor, elephantNeighbor, time-1, on)
+			justMove := exScore(curr, youNeighbor, elephantNeighbor, time-1, on)
 			max = lib.Max(max, justMove)
 		}
 	}
@@ -202,11 +228,13 @@ func solve(valves []Valve) int {
 	total = len(valves)
 	cache = make(map[args]int)
 	cacheSeenAtAll = make(map[args]bool)
+	cacheFlowRate = make(map[flowRateArgs]flowOutput)
+	cacheReleasedRate = make(map[releasedArgs]int)
 	maxTime = 26
 
-	r := exScore(graph, graph, 26, 0)
+	r := exScore(0, graph, graph, 26, 0)
 
-	if r == 3389 {
+	if r == 3389 || r == 2275 {
 		panic("that's not right")
 	}
 
