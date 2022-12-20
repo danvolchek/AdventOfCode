@@ -108,5 +108,5 @@ func main() {
 
 	solver.Expect("1\n2\n-3\n3\n-2\n0\n4", 1623178306)
 
-	solver.Solve()
+	solver.Verify(4275451658004)
 }
