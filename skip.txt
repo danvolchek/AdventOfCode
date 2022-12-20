@@ -1,3 +1,4 @@
+2022/19 # haven't solved yet
 2022/18 # didn't get to cleanup yet
 2022/17 # haven't solved part 2
 2022/16 # haven't solved part 2
