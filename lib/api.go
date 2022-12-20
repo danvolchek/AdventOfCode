@@ -11,20 +11,18 @@ import (
 )
 
 type aocClient struct {
-	year, day, part string
+	metadata solutionMetadata
 
 	sessionCookie    string
 	sessionCookieErr error
 }
 
 // newAocClient creates a new client.
-func newAocClient(year, day, part string) *aocClient {
+func newAocClient(metadata solutionMetadata) *aocClient {
 	sessionCookie, err := getSessionCookie()
 
 	return &aocClient{
-		year:             year,
-		day:              day,
-		part:             part,
+		metadata:         metadata,
 		sessionCookie:    sessionCookie,
 		sessionCookieErr: err,
 	}
@@ -36,7 +34,7 @@ func (a *aocClient) retrieveInput() ([]byte, error) {
 		return nil, fmt.Errorf("couldn't retrieve session cookie: %s", a.sessionCookieErr)
 	}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("https://adventofcode.com/%s/day/%s/input", a.year, a.day), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://adventofcode.com/%s/day/%s/input", a.metadata.year, a.metadata.day), nil)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create get request: %s", err)
 	}
@@ -75,9 +73,9 @@ func (a *aocClient) submitSolution(solution string) (string, error) {
 		return "", fmt.Errorf("couldn't retrieve session cookie: %s", a.sessionCookieErr)
 	}
 
-	body := fmt.Sprintf("level=%s&answer=%s", a.part, solution)
+	body := fmt.Sprintf("level=%s&answer=%s", a.metadata.part, solution)
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("https://adventofcode.com/%s/day/%s/answer", a.year, a.day), strings.NewReader(body))
+	req, err := http.NewRequest("POST", fmt.Sprintf("https://adventofcode.com/%s/day/%s/answer", a.metadata.year, a.metadata.day), strings.NewReader(body))
 	if err != nil {
 		return "", fmt.Errorf("couldn't create get request: %s", err)
 	}

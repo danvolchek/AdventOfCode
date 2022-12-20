@@ -2,10 +2,11 @@ package lib
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"os"
-	"path"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"runtime/debug"
@@ -21,6 +22,8 @@ type Solver[T, V any] struct {
 
 	// SolveF is the function which solves the puzzle using the parsed input.
 	SolveF func(parsed T) V
+
+	incorrectAnswers []V
 
 	expectsRun, expectsCorrect int
 
@@ -67,7 +70,9 @@ func (s *Solver[T, V]) Test(input string) {
 
 // Verify runs the solution against the real input, compares it to expected, and prints the result.
 func (s *Solver[T, V]) Verify(expected V) {
-	input, ok := s.getRealInput()
+	metadata := getSolutionMetadata()
+
+	input, ok := s.getRealInput(metadata)
 	if !ok {
 		fmt.Printf("(fail)     real: empty input file\n")
 		return
@@ -84,7 +89,9 @@ func (s *Solver[T, V]) Verify(expected V) {
 
 // Solve runs the solution against the real input and prints the result.
 func (s *Solver[T, V]) Solve() {
-	input, ok := s.getRealInput()
+	metadata := getSolutionMetadata()
+
+	input, ok := s.getRealInput(metadata)
 	if !ok {
 		fmt.Printf("(fail)     real: empty input file\n")
 		return
@@ -98,19 +105,34 @@ func (s *Solver[T, V]) Solve() {
 		return
 	}
 
-	if s.shouldSubmit() {
+	if s.shouldSubmit(solution) {
 		fmt.Println("submitting...")
 		output, err := s.client.submitSolution(fmt.Sprint(solution))
 		if err != nil {
 			fmt.Printf("note: failed to submit solution: %s", err)
 		} else {
 			fmt.Printf("output:\n%s\n", output)
+
+			s.modifySolutionFile(metadata, solution, output)
 		}
 	}
 }
 
+// Incorrect marks a solution as being not right; this makes it not be automatically submitted through the API.
+func (s *Solver[T, V]) Incorrect(solution V) {
+	s.incorrectAnswers = append(s.incorrectAnswers, solution)
+}
+
 // shouldSubmit returns whether the solution should be automatically submitted.
-func (s *Solver[T, V]) shouldSubmit() bool {
+func (s *Solver[T, V]) shouldSubmit(solution V) bool {
+	// don't submit if it's incorrect
+	for _, sol := range s.incorrectAnswers {
+		if reflect.DeepEqual(sol, solution) {
+			fmt.Println("note: not auto submitting because solution is incorrect")
+			return false
+		}
+	}
+
 	// auto submit if all expects passed
 	if s.expectsRun > 0 && s.expectsCorrect == s.expectsRun {
 		fmt.Println("note: auto submitting because all expects passed")
@@ -146,14 +168,14 @@ func (s *Solver[T, V]) solve(input string) (V, formatDur) {
 }
 
 // getRealInput returns a reader which reads the input file.
-func (s *Solver[T, V]) getRealInput() (string, bool) {
-	year, day, part := getSolutionMetadata()
-
+func (s *Solver[T, V]) getRealInput(metadata solutionMetadata) (string, bool) {
 	if s.client == nil {
-		s.client = newAocClient(year, day, part)
+		s.client = newAocClient(metadata)
 	}
 
-	fileBytes := readInputFile(year, day)
+	inputPath := filepath.Join(metadata.year, metadata.day, "input.txt")
+
+	fileBytes := readFile(inputPath)
 
 	if len(fileBytes) != 0 {
 		return string(fileBytes), true
@@ -167,36 +189,47 @@ func (s *Solver[T, V]) getRealInput() (string, bool) {
 		return "", false
 	}
 
-	writeInputFile(year, day, input)
+	writeFile(inputPath, input)
 
 	return string(input), true
 }
 
-// readInputFile returns the contents of the input file for year and day.
-func readInputFile(year, day string) []byte {
-	file := Must(os.Open(path.Join(year, day, "input.txt")))
+// modifySolutionFile updates the solution file with a call to [Solver.Verify] or
+// [Solver.Incorrect] as appropriate based on whether the solution is right or not.
+func (s *Solver[T, V]) modifySolutionFile(metadata solutionMetadata, solution V, output string) {
+	solFilePath := filepath.Join(metadata.year, metadata.day, metadata.solType, metadata.part, "main.go")
 
-	return Must(io.ReadAll(file))
+	if strings.Contains(output, "That's the right answer!") {
+		solFile := readFile(solFilePath)
+		solFile = bytes.ReplaceAll(solFile, []byte("solver.Solve()"), []byte(fmt.Sprintf("solver.Verify(%v)", solution)))
+		writeFile(solFilePath, solFile)
+		fmt.Println("note: modified solution file to add Verify call")
+	} else if strings.Contains(output, "That's not the right answer.") {
+		solFile := readFile(solFilePath)
+		solFile = bytes.ReplaceAll(solFile, []byte("solver.Solve()"), []byte(fmt.Sprintf("solver.Incorrect(%v)\n\tsolver.Solve()", solution)))
+		writeFile(solFilePath, solFile)
+		fmt.Println("note: modified solution file to add Incorrect call")
+	}
 }
 
-// writeInputFile writes data to the input file for year and day.
-func writeInputFile(year, day string, data []byte) {
-	file, err := os.Create(path.Join(year, day, "input.txt"))
-	if err != nil {
-		fmt.Printf("note: tried to create input file, failed: %s\n", err)
-		return
-	}
-	defer file.Close()
+// readFile returns the contents of the file at path.
+func readFile(path string) []byte {
+	return Must(io.ReadAll(Must(os.Open(path))))
+}
 
-	_, err = file.Write(data)
-	if err != nil {
-		fmt.Printf("note: tried to write input to file, failed: %s\n", err)
-		return
-	}
+// writeFile writes data to the file at path.
+func writeFile(path string, data []byte) {
+	file := Must(os.Create(path))
+	Must(file.Write(data))
+}
+
+// solutionMetadata describes the metadata the solution is for.
+type solutionMetadata struct {
+	year, day, solType, part string
 }
 
 // getSolutionMetadata returns the year, day, and part the current execution is for.
-func getSolutionMetadata() (string, string, string) {
+func getSolutionMetadata() solutionMetadata {
 	buildInfo, ok := debug.ReadBuildInfo()
 	if !ok {
 		panic(ok)
@@ -205,7 +238,12 @@ func getSolutionMetadata() (string, string, string) {
 	// path is of the form github.com/danvolchek/AdventOfCode/2015/16/leaderboard/1
 	parts := strings.Split(buildInfo.Path, string(os.PathSeparator))
 
-	return parts[3], parts[4], parts[6]
+	return solutionMetadata{
+		year:    parts[3],
+		day:     parts[4],
+		solType: parts[5],
+		part:    parts[6],
+	}
 }
 
 type formatInput string
