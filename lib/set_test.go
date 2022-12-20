@@ -48,16 +48,8 @@ func TestSet(t *testing.T) {
 	var q lib.Set[int]
 
 	for i := 0; i < 5; i++ {
-		added := q.Add(i)
-		if !added {
-			t.Fatalf("expected to be able to add item")
-		}
-	}
-	for i := 0; i < 5; i++ {
-		added := q.Add(i)
-		if added {
-			t.Fatalf("expected not to be able to add item")
-		}
+		q.Add(i)
+		q.Add(i)
 	}
 
 	actual := q.Items()
