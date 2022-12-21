@@ -119,8 +119,10 @@ func (s *Solver[T, V]) Solve() {
 }
 
 // Incorrect marks a solution as being not right; this makes it not be automatically submitted through the API.
-func (s *Solver[T, V]) Incorrect(solution V) {
-	s.incorrectAnswers = append(s.incorrectAnswers, solution)
+func (s *Solver[T, V]) Incorrect(solutions ...V) {
+	for _, solution := range solutions {
+		s.incorrectAnswers = append(s.incorrectAnswers, solution)
+	}
 }
 
 // shouldSubmit returns whether the solution should be automatically submitted.
