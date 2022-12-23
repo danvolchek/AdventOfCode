@@ -32,59 +32,48 @@ func round(elfMap *lib.Set[lib.Pos], dirs []Dir) {
 			continue
 		}
 
+		check := func(pos lib.Pos) bool {
+			target := elf.Add(pos)
+
+			allEmpty := true
+			for i := -1; i <= 1; i++ {
+				shouldBeEmpty := target
+				if pos.Row == 0 {
+					shouldBeEmpty.Row += i
+				} else {
+					shouldBeEmpty.Col += i
+				}
+
+				if elfMap.Contains(shouldBeEmpty) {
+					allEmpty = false
+					break
+				}
+			}
+
+			if allEmpty {
+				proposed[target] = append(proposed[target], elf)
+			}
+
+			return allEmpty
+		}
+
 	outer:
 		for _, dir := range dirs {
 			switch dir {
 			case North:
-				allEmpty := true
-				for i := -1; i <= 1; i++ {
-					if elfMap.Contains(lib.Pos{Row: elf.Row - 1, Col: elf.Col + i}) {
-						allEmpty = false
-						break
-					}
-				}
-				if allEmpty {
-					target := lib.Pos{Row: elf.Row - 1, Col: elf.Col}
-					proposed[target] = append(proposed[target], elf)
+				if check(lib.Pos{Row: -1}) {
 					break outer
 				}
 			case South:
-				allEmpty := true
-				for i := -1; i <= 1; i++ {
-					if elfMap.Contains(lib.Pos{Row: elf.Row + 1, Col: elf.Col + i}) {
-						allEmpty = false
-						break
-					}
-				}
-				if allEmpty {
-					target := lib.Pos{Row: elf.Row + 1, Col: elf.Col}
-					proposed[target] = append(proposed[target], elf)
+				if check(lib.Pos{Row: 1}) {
 					break outer
 				}
 			case West:
-				allEmpty := true
-				for i := -1; i <= 1; i++ {
-					if elfMap.Contains(lib.Pos{Row: elf.Row + i, Col: elf.Col - 1}) {
-						allEmpty = false
-						break
-					}
-				}
-				if allEmpty {
-					target := lib.Pos{Row: elf.Row, Col: elf.Col - 1}
-					proposed[target] = append(proposed[target], elf)
+				if check(lib.Pos{Col: -1}) {
 					break outer
 				}
 			case East:
-				allEmpty := true
-				for i := -1; i <= 1; i++ {
-					if elfMap.Contains(lib.Pos{Row: elf.Row + i, Col: elf.Col + 1}) {
-						allEmpty = false
-						break
-					}
-				}
-				if allEmpty {
-					target := lib.Pos{Row: elf.Row, Col: elf.Col + 1}
-					proposed[target] = append(proposed[target], elf)
+				if check(lib.Pos{Col: 1}) {
 					break outer
 				}
 			}
@@ -103,21 +92,8 @@ func bounds(elfMap *lib.Set[lib.Pos]) (lib.Pos, lib.Pos) {
 	var min, max lib.Pos
 
 	for _, elf := range elfMap.Items() {
-		if elf.Row < min.Row {
-			min.Row = elf.Row
-		}
-
-		if elf.Row > max.Row {
-			max.Row = elf.Row
-		}
-
-		if elf.Col < min.Col {
-			min.Col = elf.Col
-		}
-
-		if elf.Col > max.Col {
-			max.Col = elf.Col
-		}
+		min = min.Min(elf)
+		max = max.Max(elf)
 	}
 
 	return min, max
