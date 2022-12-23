@@ -201,12 +201,12 @@ func (s *Solver[T, V]) getRealInput(metadata solutionMetadata) (string, bool) {
 func (s *Solver[T, V]) modifySolutionFile(metadata solutionMetadata, solution V, output string) {
 	solFilePath := filepath.Join(metadata.year, metadata.day, metadata.solType, metadata.part, "main.go")
 
-	if strings.Contains(output, "That's the right answer!") {
+	if strings.Contains(output, "That's the right answer") {
 		solFile := readFile(solFilePath)
 		solFile = bytes.ReplaceAll(solFile, []byte("solver.Solve()"), []byte(fmt.Sprintf("solver.Verify(%v)", solution)))
 		writeFile(solFilePath, solFile)
 		fmt.Println("note: modified solution file to add Verify call")
-	} else if strings.Contains(output, "That's not the right answer.") {
+	} else if strings.Contains(output, "That's not the right answer") {
 		solFile := readFile(solFilePath)
 		solFile = bytes.ReplaceAll(solFile, []byte("solver.Solve()"), []byte(fmt.Sprintf("solver.Incorrect(%v)\n\tsolver.Solve()", solution)))
 		writeFile(solFilePath, solFile)
@@ -272,10 +272,17 @@ func ParseBytesFunc[T any](parse func(input []byte) T) func(input string) T {
 	}
 }
 
+// TrimSpace trims the input of leading/starting spaces before calling parse.
+func TrimSpace[T any](parse func(s string) T) func(input string) T {
+	return func(input string) T {
+		return parse(strings.TrimSpace(input))
+	}
+}
+
 // ParseGrid parses a grid of characters.
 func ParseGrid[T any](parse func(s string) T) func(input string) [][]T {
 	return func(input string) [][]T {
-		rawGrid := strings.Split(strings.TrimSpace(input), "\n")
+		rawGrid := strings.Split(input, "\n")
 
 		var grid [][]T
 

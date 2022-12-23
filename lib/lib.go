@@ -173,7 +173,7 @@ func MaxSlice[T constraints.Ordered](items []T) T {
 }
 
 // Adjacent returns the adjacent items in a 2d grid of items. Diag controls whether diagonals are considered as adjacent.
-func Adjacent[T any](diag bool, i, j int, grid [][]T) []T {
+func Adjacent[T any](diag bool, row, col int, grid [][]T) []T {
 	var results []T
 
 	for di := -1; di <= 1; di += 1 {
@@ -186,8 +186,8 @@ func Adjacent[T any](diag bool, i, j int, grid [][]T) []T {
 				continue
 			}
 
-			adjI := i + di
-			adjJ := j + dj
+			adjI := row + di
+			adjJ := col + dj
 
 			if adjI < 0 || adjJ < 0 || adjI >= len(grid) || adjJ >= len(grid[adjI]) {
 				continue

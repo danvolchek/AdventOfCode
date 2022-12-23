@@ -57,7 +57,7 @@ func solve(lines [][]int) int {
 
 func main() {
 	solver := lib.Solver[[][]int, int]{
-		ParseF: lib.ParseGrid(lib.Atoi),
+		ParseF: lib.TrimSpace(lib.ParseGrid(lib.Atoi)),
 		SolveF: solve,
 	}
 
