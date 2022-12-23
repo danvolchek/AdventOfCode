@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/danvolchek/AdventOfCode/lib"
 	"regexp"
-	"sort"
 	"strings"
 )
 
@@ -27,17 +26,24 @@ func parse(parts []string) Valve {
 }
 
 type Node struct {
-	name      int
-	flowRate  int
-	neighbors []*Node
+	index       int
+	name        string
+	flowRate    int
+	neighbors   []*Node
+	travelTimes []int
 }
 
-func buildGraph(valves []Valve) *Node {
+func (n *Node) Adjacent() []*Node {
+	return n.neighbors
+}
+
+func buildGraph(valves []Valve) map[string]*Node {
 	nodeMap := make(map[string]*Node)
 
 	for i, valve := range valves {
 		nodeMap[valve.name] = &Node{
-			name:     i,
+			index:    i,
+			name:     valve.name,
 			flowRate: valve.flowRate,
 		}
 	}
@@ -48,57 +54,98 @@ func buildGraph(valves []Valve) *Node {
 		}
 	}
 
-	return nodeMap["AA"]
+	return nodeMap
 }
 
-func copyMap[T comparable, V any](m map[T]V) map[T]V {
-	r := make(map[T]V, len(m))
-	for k, v := range m {
-		r[k] = v
-	}
-	return r
-}
+func buildGraphZeroesRemoved(nodeMap map[string]*Node) *Node {
+	newMap := make(map[string]*Node)
+	for name, node := range nodeMap {
+		if node.flowRate == 0 && name != "AA" {
+			continue
+		}
 
-type args struct {
-	you  int
-	time int
-	on   uint64
-}
-
-func hash(ints []int) uint64 {
-	var result uint64
-
-	for _, v := range ints {
-		result += 1 << v
+		newMap[name] = &Node{
+			index:    node.index,
+			name:     node.name,
+			flowRate: node.flowRate,
+		}
 	}
 
-	return result
+	for startName, start := range nodeMap {
+		if start.flowRate == 0 && startName != "AA" {
+			continue
+		}
+
+		for endName, end := range nodeMap {
+			if start == end {
+				continue
+			}
+
+			if end.flowRate == 0 && endName != "AA" {
+				continue
+			}
+
+			path, ok := lib.BFS(start, func(n *Node) bool { return n == end })
+			if !ok {
+				panic("disconnected valve")
+			}
+
+			for i := 0; i < len(path)-1; i++ {
+				curr := newMap[path[i].name]
+
+				counter := 1
+				nextNonZero := path[i+counter]
+				for nextNonZero.flowRate == 0 && nextNonZero.name != "AA" {
+					counter++
+					nextNonZero = path[i+counter]
+				}
+
+				nextNonZero = newMap[nextNonZero.name]
+
+				if curr != nil {
+					hasNeighbor := false
+					for _, n := range curr.neighbors {
+						if n == nextNonZero {
+							hasNeighbor = true
+							break
+						}
+					}
+
+					if hasNeighbor {
+						continue
+					}
+
+					curr.neighbors = append(curr.neighbors, nextNonZero)
+					curr.travelTimes = append(curr.travelTimes, counter)
+				}
+
+				i += counter - 1
+			}
+		}
+	}
+
+	return newMap["AA"]
 }
 
-var cache map[args]int
-var cacheSeenAtAll map[args]bool
-var total int
-var maxTime int
-
-func onToStr(a map[string]bool) string {
-	v := lib.Keys(a)
-	sort.Strings(v)
-	return strings.Join(v, "")
+type cacheArgs struct {
+	position string
+	timeLeft int
 }
 
-func set2(index1 int, index2 int, on uint64) uint64 {
-	return on + 1<<index1 + 1<<index2
+type cacheResult struct {
+	flowRate         int
+	pressureReleased int
 }
 
-func set(index int, on uint64) uint64 {
+func turnValveOn(index int, on uint64) uint64 {
 	return on + 1<<index
 }
 
-func isSet(index int, on uint64) bool {
+func isValveOn(index int, on uint64) bool {
 	return (on>>index)&1 == 1
 }
 
-func size(on uint64) int {
+func numValvesOn(on uint64) int {
 	sum := 0
 	for on > 0 {
 		sum += int(on & 1)
@@ -109,69 +156,68 @@ func size(on uint64) int {
 	return sum
 }
 
-func exScore(valve *Node, time int, on uint64, onSize int) int {
-	// nothing more we can do if there's no time left
-	if time <= 0 {
+var totalValves int
+var totalTime int
+var cache map[cacheArgs]cacheResult
+
+func findBestPressure(position *Node, pressureReleased int, timeLeft int, flowRate int, valves uint64) int {
+	if timeLeft <= 0 {
 		return 0
 	}
 
-	// if all the valves are on there's no point moving around more
-	if onSize == total {
+	if numValvesOn(valves) == totalValves {
 		return 0
 	}
 
-	aaargs := args{valve.name, time, on}
+	for time := timeLeft + 1; time < totalTime; time++ {
+		arg := cacheArgs{
+			position: position.name,
+			timeLeft: time,
+		}
 
-	if val, ok := cache[aaargs]; ok {
-		return val
-	}
-
-	// if all the valves are open at a previous time, this path must be worse
-	for i := time + 1; i < maxTime-onSize; i++ {
-		if _, ok := cacheSeenAtAll[args{valve.name, i, on}]; ok {
+		if v, ok := cache[arg]; ok && pressureReleased < v.pressureReleased && flowRate < v.flowRate {
 			return 0
 		}
 	}
 
-	cacheSeenAtAll[aaargs] = true
+	cache[cacheArgs{
+		position: position.name,
+		timeLeft: timeLeft,
+	}] = cacheResult{
+		flowRate:         flowRate,
+		pressureReleased: pressureReleased,
+	}
 
 	var max int
+	if !isValveOn(position.index, valves) && position.flowRate != 0 {
+		newPressureReleased := pressureReleased + flowRate
+		newFlowRate := flowRate + position.flowRate
+		newValves := turnValveOn(position.index, valves)
 
-	var scoreFromThisValve int
-	if !isSet(valve.name, on) {
-		// we can try turning the valve on
-		scoreFromThisValve = valve.flowRate * (time - 1)
-
-		turnedOn := set(valve.name, on)
-		turnOnAndMove := scoreFromThisValve + exScore(valve, time-1, turnedOn, onSize+1)
-		max = lib.Max(max, turnOnAndMove)
+		max = lib.Max(max, newPressureReleased+findBestPressure(position, newPressureReleased, timeLeft-1, newFlowRate, newValves))
 	}
 
-	for _, neighbor := range valve.neighbors {
-		justMove := exScore(neighbor, time-1, on, onSize)
-		max = lib.Max(max, justMove)
+	for i, neighbor := range position.neighbors {
+		travelTime := position.travelTimes[i]
+		newPressureReleased := pressureReleased + travelTime*flowRate
+
+		max = lib.Max(max, findBestPressure(neighbor, newPressureReleased, timeLeft-travelTime, flowRate, valves))
 	}
 
-	cache[aaargs] = max
 	return max
 }
 
 func solve(valves []Valve) int {
-	graph := buildGraph(valves)
+	originalGraph := buildGraph(valves)
+	newGraph := buildGraphZeroesRemoved(originalGraph)
 
-	var on uint64
-	for i, valve := range valves {
-		if valve.flowRate == 0 {
-			on = set(i, on)
-		}
-	}
+	totalValves = len(lib.Filter(valves, func(v Valve) bool { return v.flowRate != 0 }))
+	totalTime = 30
+	cache = make(map[cacheArgs]cacheResult)
 
-	total = len(valves)
-	cache = make(map[args]int)
-	cacheSeenAtAll = make(map[args]bool)
-	maxTime = 30
+	result := findBestPressure(newGraph, 0, totalTime, 0, 0)
 
-	return exScore(graph, 30, on, size(on))
+	return result
 }
 
 func main() {
