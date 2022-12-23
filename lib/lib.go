@@ -174,7 +174,37 @@ func MaxSlice[T constraints.Ordered](items []T) T {
 
 // Adjacent returns the adjacent items in a 2d grid of items. Diag controls whether diagonals are considered as adjacent.
 func Adjacent[T any](diag bool, row, col int, grid [][]T) []T {
-	var results []T
+	return Map(Filter(AdjacentPos(diag, row, col), func(pos Pos) bool {
+		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= len(grid) || pos.Col >= len(grid[pos.Row]))
+	}), func(pos Pos) T {
+		return grid[pos.Row][pos.Col]
+	})
+}
+
+// Pos represents a two-dimensional position.
+type Pos struct {
+	Row, Col int
+}
+
+// Add returns a new Pos that's the sum of the two rows and cols.
+func (p Pos) Add(o Pos) Pos {
+	return Pos{Row: p.Row + o.Row, Col: p.Col + o.Col}
+}
+
+// Min returns a new Pos that's the minimum of the two rows and cols.
+func (p Pos) Min(o Pos) Pos {
+	return Pos{Row: Min(p.Row, o.Row), Col: Min(p.Col, o.Col)}
+}
+
+// Max returns a new Pos that's the maximum of the two rows and cols.
+func (p Pos) Max(o Pos) Pos {
+	return Pos{Row: Max(p.Row, o.Row), Col: Max(p.Col, o.Col)}
+}
+
+// AdjacentPos returns the adjacent positions in a 2d grid of items.
+// Diag controls whether diagonals are considered as adjacent.
+func AdjacentPos(diag bool, row, col int) []Pos {
+	var results []Pos
 
 	for di := -1; di <= 1; di += 1 {
 		for dj := -1; dj <= 1; dj += 1 {
@@ -189,11 +219,7 @@ func Adjacent[T any](diag bool, row, col int, grid [][]T) []T {
 			adjI := row + di
 			adjJ := col + dj
 
-			if adjI < 0 || adjJ < 0 || adjI >= len(grid) || adjJ >= len(grid[adjI]) {
-				continue
-			}
-
-			results = append(results, grid[adjI][adjJ])
+			results = append(results, Pos{Row: adjI, Col: adjJ})
 		}
 	}
 

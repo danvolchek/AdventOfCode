@@ -4,6 +4,10 @@ import (
 	"github.com/danvolchek/AdventOfCode/lib"
 )
 
+func parse(char byte) int {
+	return int(char - '0')
+}
+
 func viewingDistance(x, y int, grid [][]int) int {
 	v := grid[x][y]
 
@@ -57,7 +61,7 @@ func solve(lines [][]int) int {
 
 func main() {
 	solver := lib.Solver[[][]int, int]{
-		ParseF: lib.TrimSpace(lib.ParseGrid(lib.Atoi)),
+		ParseF: lib.TrimSpace(lib.ParseGrid(parse)),
 		SolveF: solve,
 	}
 

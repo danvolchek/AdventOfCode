@@ -23,16 +23,16 @@ func (n *node) String() string {
 	return n.Id()
 }
 
-func parse(line string) int {
-	if line == "S" {
+func parse(char byte) int {
+	if char == 'S' {
 		return 9999999
 	}
 
-	if line == "E" {
+	if char == 'E' {
 		return -2
 	}
 
-	return int(line[0] - 'a')
+	return int(char - 'a')
 }
 
 func solve(grid [][]int) int {
@@ -69,11 +69,11 @@ func solve(grid [][]int) int {
 			gridMap[y][x] = n
 
 			if height == -2 {
-				grid[y][x] = parse("z")
+				grid[y][x] = parse('z')
 			}
 
 			if height == 9999999 {
-				grid[y][x] = parse("a")
+				grid[y][x] = parse('a')
 			}
 		}
 	}

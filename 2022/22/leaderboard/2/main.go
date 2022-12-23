@@ -51,13 +51,13 @@ type Input struct {
 	instructions []Instruction
 }
 
-func parseTile(char string) Tile {
+func parseTile(char byte) Tile {
 	switch char {
-	case " ":
+	case ' ':
 		return outOfBounds
-	case ".":
+	case '.':
 		return open
-	case "#":
+	case '#':
 		return wall
 	default:
 		panic(char)
@@ -225,7 +225,7 @@ func (t turnInstr) Act(state *State) {
 }
 
 func face(p Pos) int {
-
+	return 0
 }
 
 func firstNonEmptyTile(start Pos, dir Dir, grove [][]Tile) PosDir {
@@ -244,7 +244,7 @@ func firstNonEmptyTile(start Pos, dir Dir, grove [][]Tile) PosDir {
 		}
 
 		if grove[start.y][start.x] != outOfBounds {
-			return start
+			return PosDir{}
 		}
 
 		start.Step(dir)

@@ -280,7 +280,7 @@ func TrimSpace[T any](parse func(s string) T) func(input string) T {
 }
 
 // ParseGrid parses a grid of characters.
-func ParseGrid[T any](parse func(s string) T) func(input string) [][]T {
+func ParseGrid[T any](parse func(s byte) T) func(input string) [][]T {
 	return func(input string) [][]T {
 		rawGrid := strings.Split(input, "\n")
 
@@ -289,7 +289,7 @@ func ParseGrid[T any](parse func(s string) T) func(input string) [][]T {
 		for i, row := range rawGrid {
 			grid = append(grid, make([]T, len(row)))
 			for j := range row {
-				grid[i][j] = parse(string(row[j]))
+				grid[i][j] = parse(row[j])
 			}
 		}
 

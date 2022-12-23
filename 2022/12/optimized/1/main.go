@@ -35,20 +35,20 @@ func (n *Node) Adjacent() []*Node {
 	return n.adjacent
 }
 
-func parse(char string) *Node {
+func parse(char byte) *Node {
 	var height int
 	var nodeType NodeType
 
 	switch char {
-	case "S":
+	case 'S':
 		nodeType = Start
 		height = 0
-	case "E":
+	case 'E':
 		nodeType = End
 		height = 26
 	default:
 		nodeType = Neither
-		height = int(char[0] - 'a')
+		height = int(char - 'a')
 	}
 
 	return &Node{

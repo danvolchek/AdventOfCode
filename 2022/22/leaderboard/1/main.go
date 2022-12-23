@@ -31,13 +31,13 @@ type Input struct {
 	instructions []Instruction
 }
 
-func parseTile(char string) Tile {
+func parseTile(char byte) Tile {
 	switch char {
-	case " ":
+	case ' ':
 		return outOfBounds
-	case ".":
+	case '.':
 		return open
-	case "#":
+	case '#':
 		return wall
 	default:
 		panic(char)
