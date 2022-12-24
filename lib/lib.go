@@ -172,13 +172,14 @@ func MaxSlice[T constraints.Ordered](items []T) T {
 	return max
 }
 
-// Adjacent returns the adjacent items in a 2d grid of items. Diag controls whether diagonals are considered as adjacent.
+// Adjacent returns the adjacent items in a 2d grid of items.
+// Diag controls whether diagonals are considered as adjacent.
 func Adjacent[T any](diag bool, row, col int, grid [][]T) []T {
-	return Map(Filter(AdjacentPos(diag, row, col), func(pos Pos) bool {
-		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= len(grid) || pos.Col >= len(grid[pos.Row]))
-	}), func(pos Pos) T {
-		return grid[pos.Row][pos.Col]
-	})
+	return Map(
+		AdjacentPosBounds(diag, row, col, grid),
+		func(pos Pos) T {
+			return grid[pos.Row][pos.Col]
+		})
 }
 
 // Pos represents a two-dimensional position.
@@ -201,7 +202,7 @@ func (p Pos) Max(o Pos) Pos {
 	return Pos{Row: Max(p.Row, o.Row), Col: Max(p.Col, o.Col)}
 }
 
-// AdjacentPos returns the adjacent positions in a 2d grid of items.
+// AdjacentPos returns the adjacent positions in a 2d grid of items (excluding bounds checks).
 // Diag controls whether diagonals are considered as adjacent.
 func AdjacentPos(diag bool, row, col int) []Pos {
 	var results []Pos
@@ -224,6 +225,14 @@ func AdjacentPos(diag bool, row, col int) []Pos {
 	}
 
 	return results
+}
+
+// AdjacentPosBounds returns the adjacent positions in a 2d grid of items within the given bounds.
+// Diag controls whether diagonals are considered as adjacent.
+func AdjacentPosBounds[T any](diag bool, row, col int, grid [][]T) []Pos {
+	return Filter(AdjacentPos(diag, row, col), func(pos Pos) bool {
+		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= len(grid) || pos.Col >= len(grid[row]))
+	})
 }
 
 // Permutations returns all possible permutations of items.
