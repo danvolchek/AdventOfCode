@@ -330,3 +330,8 @@ func Int(line string) int {
 
 	return ints[0]
 }
+
+// Pow is like math.Pow but for integers.
+func Pow(num, pow int) int {
+	return int(math.Pow(float64(num), float64(pow)))
+}
