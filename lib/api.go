@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -69,6 +70,7 @@ func (a *aocClient) retrieveInput() ([]byte, error) {
 
 // submitSolution submits the solution for the given part.
 func (a *aocClient) submitSolution(solution string) (string, error) {
+	solution = url.QueryEscape(solution)
 	if a.sessionCookieErr != nil {
 		return "", fmt.Errorf("couldn't retrieve session cookie: %s", a.sessionCookieErr)
 	}
