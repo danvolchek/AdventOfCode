@@ -201,14 +201,19 @@ func (s *Solver[T, V]) getRealInput(metadata solutionMetadata) (string, bool) {
 func (s *Solver[T, V]) modifySolutionFile(metadata solutionMetadata, solution V, output string) {
 	solFilePath := filepath.Join(metadata.year, metadata.day, metadata.solType, metadata.part, "main.go")
 
+	solString := fmt.Sprintf("%v", solution)
+	if _, ok := any(solution).(string); ok {
+		solString = "\"" + solString + "\""
+	}
+
 	if strings.Contains(output, "That's the right answer") {
 		solFile := readFile(solFilePath)
-		solFile = bytes.ReplaceAll(solFile, []byte("solver.Solve()"), []byte(fmt.Sprintf("solver.Verify(%v)", solution)))
+		solFile = bytes.ReplaceAll(solFile, []byte("solver.Solve()"), []byte(fmt.Sprintf("solver.Verify(%v)", solString)))
 		writeFile(solFilePath, solFile)
 		fmt.Println("note: modified solution file to add Verify call")
 	} else if strings.Contains(output, "That's not the right answer") {
 		solFile := readFile(solFilePath)
-		solFile = bytes.ReplaceAll(solFile, []byte("solver.Solve()"), []byte(fmt.Sprintf("solver.Incorrect(%v)\n\tsolver.Solve()", solution)))
+		solFile = bytes.ReplaceAll(solFile, []byte("solver.Solve()"), []byte(fmt.Sprintf("solver.Incorrect(%v)\n\tsolver.Solve()", solString)))
 		writeFile(solFilePath, solFile)
 		fmt.Println("note: modified solution file to add Incorrect call")
 	}
