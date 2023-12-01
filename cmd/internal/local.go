@@ -239,8 +239,8 @@ func GetLocalSolutionInfo(root string) []*Year {
 		years = append(years, year)
 	}
 
-	slices.SortFunc(years, func(a, b *Year) bool {
-		return a.Number < b.Number
+	slices.SortFunc(years, func(a, b *Year) int {
+		return a.Number - b.Number
 	})
 	return years
 }
