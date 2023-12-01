@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/danvolchek/AdventOfCode/cmd/internal"
-	"github.com/danvolchek/AdventOfCode/lib"
 	"os"
+	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -40,16 +41,17 @@ func generateReadme(root string) error {
 	completionBuffer.Write(tableSection)
 	completionBuffer.WriteString("\n")
 
-	years := internal.GetLocalSolutionInfo(root)
+	solutions := internal.NewSolutionsDirectory(root)
 
-	for i := range years {
-		year := years[len(years)-i-1]
+	years := solutions.Years()
+	slices.Reverse(years)
 
+	for _, year := range years {
 		completionBuffer.WriteString("\n## ")
-		completionBuffer.WriteString(year.Name)
+		completionBuffer.WriteString(year)
 		completionBuffer.WriteString("\n\n")
 
-		daysTable := createTable(year)
+		daysTable := createTable(solutions, year)
 		daysTable.ToBuffer(completionBuffer)
 	}
 
@@ -61,32 +63,38 @@ func generateReadme(root string) error {
 	return nil
 }
 
-func createTable(year *internal.Year) *internal.Table {
+func createTable(solutions internal.SolutionDirectory, year string) *internal.Table {
 	yearTable := &internal.Table{
 		NumRows: len(internal.SolutionTypes),
 	}
 
 	yearTable.AddColumn("", internal.SolutionTypes)
 
-	for _, day := range year.Days {
-		yearTable.AddColumn(day.Name, lib.Map(day.Types, createLink))
+	for dayNum := internal.FirstDayNum; dayNum <= internal.LastDayNum; dayNum++ {
+		day := strconv.Itoa(dayNum)
+		solution := solutions.Get(year, day)
+
+		yearTable.AddColumn(day, []string{
+			createLinks(solution.Leaderboard),
+			createLinks(solution.Optimized),
+		})
 	}
 
 	return yearTable
 }
 
-func createLink(typ *internal.Type) string {
-	var parts []string
+func createLinks(solType internal.TTType) string {
+	var links []string
 
-	for _, part := range typ.Parts {
-		if !part.Main.Exists() {
-			continue
-		}
-
-		parts = append(parts, makeLink(part.Name, part.Main.Path))
+	if solType.PartOne.Exists {
+		links = append(links, makeLink(internal.PartOne, solType.PartOne.Main()))
 	}
 
-	return strings.Join(parts, ",")
+	if solType.PartTwo.Exists {
+		links = append(links, makeLink(internal.PartTwo, solType.PartTwo.Main()))
+	}
+
+	return strings.Join(links, ",")
 }
 
 func makeLink(visibleText, path string) string {

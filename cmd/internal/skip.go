@@ -15,9 +15,9 @@ type Skipper struct {
 	skips []skip
 }
 
-func (s *Skipper) Skip(typ *Type) bool {
+func (s *Skipper) Skip(year, day string) bool {
 	for _, skip := range s.skips {
-		if skip.shouldSkip(typ) {
+		if skip.shouldSkip(lib.Atoi(year), lib.Atoi(day)) {
 			return true
 		}
 	}
@@ -45,8 +45,8 @@ type skip struct {
 	Year, Day skipRange
 }
 
-func (s skip) shouldSkip(t *Type) bool {
-	return s.Year.contains(t.Day.Year.Number) && (s.Day.Max == 0 || s.Day.contains(t.Day.Number))
+func (s skip) shouldSkip(year, day int) bool {
+	return s.Year.contains(year) && (s.Day.Max == 0 || s.Day.contains(day))
 }
 
 func parseSkips(r io.Reader) []skip {

@@ -8,7 +8,7 @@ func FirstUnsolvedSolution(root string, years []*Year, skipper *Skipper) *Type {
 	for _, year := range years {
 		for _, day := range year.Days {
 			for _, typ := range day.Types {
-				if !typ.Exists() && !skipper.Skip(typ) {
+				if !typ.Exists() && !skipper.Skip(typ.Day.Year.Name, typ.Day.Name) {
 					return typ
 				}
 			}
