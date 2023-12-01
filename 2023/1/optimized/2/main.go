@@ -7,25 +7,24 @@ import (
 var numberWords = []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
 
 type stream struct {
-	pos    int
 	source string
 }
 
 func (s *stream) done() bool {
-	return s.pos >= len(s.source)
+	return len(s.source) == 0
 }
 
 func (s *stream) peek() int {
-	return int(s.source[s.pos])
+	return int(s.source[0])
 }
 
 func (s *stream) consume() {
-	s.pos += 1
+	s.source = s.source[1:]
 }
 
 func (s *stream) match(val string) bool {
-	if s.pos+len(val) <= len(s.source) && s.source[s.pos:s.pos+len(val)] == val {
-		s.pos += len(val) - 1 // -1 so that 'eightwo' only consumes 'eigh' and allows matching 'two'
+	if len(val) <= len(s.source) && s.source[:len(val)] == val {
+		s.source = s.source[len(val)-1:] // -1 so that 'eightwo' only consumes 'eigh' and allows matching 'two'
 		return true
 	}
 
