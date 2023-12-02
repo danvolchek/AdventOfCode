@@ -65,10 +65,10 @@ func generateReadme(root string) error {
 
 func createTable(solutions internal.SolutionDirectory, year string) *internal.Table {
 	yearTable := &internal.Table{
-		NumRows: len(internal.SolutionTypes),
+		NumRows: 2,
 	}
 
-	yearTable.AddColumn("", internal.SolutionTypes)
+	yearTable.AddColumn("", []string{internal.TypeLeaderboard, internal.TypeOptimized})
 
 	for dayNum := internal.FirstDayNum; dayNum <= internal.LastDayNum; dayNum++ {
 		day := strconv.Itoa(dayNum)
@@ -83,15 +83,15 @@ func createTable(solutions internal.SolutionDirectory, year string) *internal.Ta
 	return yearTable
 }
 
-func createLinks(solType internal.TTType) string {
+func createLinks(solType internal.SolutionType) string {
 	var links []string
 
 	if solType.PartOne.Exists {
-		links = append(links, makeLink(internal.PartOne, solType.PartOne.Main()))
+		links = append(links, makeLink(internal.PartOne, solType.PartOne.Main.Path))
 	}
 
 	if solType.PartTwo.Exists {
-		links = append(links, makeLink(internal.PartTwo, solType.PartTwo.Main()))
+		links = append(links, makeLink(internal.PartTwo, solType.PartTwo.Main.Path))
 	}
 
 	return strings.Join(links, ",")

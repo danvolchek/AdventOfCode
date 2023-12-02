@@ -12,19 +12,20 @@ import (
 var infer bool
 var dryRun bool
 
-var argSolTypes [2]bool
+var argCreateLeaderboard bool
+var argCreateOptimized bool
 var argYear string
 var argDay string
 
 func init() {
 	flag.StringVar(&argYear, "year", "0", "solution year")
 	flag.StringVar(&argDay, "day", "0", "solution day")
-	flag.BoolVar(&argSolTypes[0], "l", false, "create leaderboard")
-	flag.BoolVar(&argSolTypes[1], "o", false, "create optimized")
+	flag.BoolVar(&argCreateLeaderboard, "l", false, "create leaderboard")
+	flag.BoolVar(&argCreateOptimized, "o", false, "create optimized")
 	flag.BoolVar(&dryRun, "dryrun", false, "print solution to create and exit")
 	flag.Parse()
 
-	if !(argSolTypes[0] || argSolTypes[1] || argYear != "0" || argDay != "0") {
+	if !(argCreateLeaderboard || argCreateOptimized || argYear != "0" || argDay != "0") {
 		infer = true
 		fmt.Println("Inferring solution to create")
 		return
@@ -44,22 +45,22 @@ func init() {
 		fail("Day needed")
 	}
 
-	if !argSolTypes[0] && !argSolTypes[1] {
+	if !argCreateLeaderboard && !argCreateOptimized {
 		fail("Specify at least leaderboard or optimized")
 	}
 }
 
 func main() {
-	sols := getSolutionsToCreate(".")
+	solution, types := getSolutionsToCreate(".")
 
-	for _, sol := range sols {
+	for _, solutionType := range types {
 		if dryRun {
-			fmt.Println("Would create:", sol)
+			fmt.Printf("Would create: Year %s Day %s Type %s\n", solution.Year, solution.Day, solutionType)
 			continue
 		}
-		fmt.Println("Creating solution:", sol)
+		fmt.Printf("Creating: Year %s Day %s Type %s\n", solution.Year, solution.Day, solutionType)
 
-		err := createSolution(sol)
+		err := createSolution(solution, solutionType)
 		if err != nil {
 			panic(err)
 		}
@@ -68,39 +69,36 @@ func main() {
 	fmt.Println("Done!")
 }
 
-func getSolutionsToCreate(root string) []*internal.Type {
+func getSolutionsToCreate(root string) (internal.Solution, []string) {
+	solutions := internal.NewSolutionsDirectory(root)
+
 	if infer {
-		years := internal.GetLocalSolutionInfo(root)
-		skipper := internal.NewSkipper(filepath.Join(root, "skip.txt"))
-
-		return []*internal.Type{internal.FirstUnsolvedSolution(root, years, skipper)}
+		solution, solutionType := solutions.FirstUnsolvedSolutionType()
+		return solution, []string{solutionType}
 	}
 
-	var solutions []*internal.Type
+	solution := solutions.Get(argYear, argDay)
 
-	for _, i := range []int{0, 1} {
-		if argSolTypes[i] {
-
-			typ := internal.TypeLeaderboard
-			if i == 1 {
-				typ = internal.TypeOptimized
-			}
-
-			solutions = append(solutions, internal.NewType(root, argYear, argDay, typ))
-		}
+	var solutionTypes []string
+	if argCreateLeaderboard {
+		solutionTypes = append(solutionTypes, internal.TypeLeaderboard)
 	}
 
-	return solutions
+	if argCreateOptimized {
+		solutionTypes = append(solutionTypes, internal.TypeOptimized)
+	}
+
+	return solution, solutionTypes
 }
 
-func createSolution(sol *internal.Type) error {
-	err := os.MkdirAll(sol.Day.Path, os.ModePerm)
+func createSolution(solution internal.Solution, solutionType string) error {
+	err := os.MkdirAll(solution.pathy, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("couldn't create solution folder: %s", err)
 	}
 
-	if !sol.Day.Input.Exists() {
-		input, err := os.Create(sol.Day.Input.Path)
+	if !solution.Input.Exists {
+		input, err := os.Create(solution.Input.Path)
 		defer input.Close()
 		if err != nil {
 			return fmt.Errorf("couldn't create input file: %s", err)
@@ -113,11 +111,20 @@ func createSolution(sol *internal.Type) error {
 	}
 
 	anyCreated := false
+
+	var parts []internal.SolutionPart
+	switch solutionType {
+	case internal.TypeLeaderboard:
+		parts = append(parts, solution.Leaderboard.PartOne, solution.Leaderboard.PartTwo)
+	case internal.TypeOptimized:
+		parts = append(parts, solution.Optimized.PartOne, solution.Optimized.PartTwo)
+	}
+
 	stubsWriter := &internal.MultiWriteCloser{}
 	defer stubsWriter.Close()
 
-	for _, part := range sol.Parts {
-		if part.Exists() {
+	for _, part := range parts {
+		if part.Main.Exists {
 			continue
 		}
 
@@ -136,7 +143,7 @@ func createSolution(sol *internal.Type) error {
 		return nil
 	}
 
-	err = tmpl.Execute(stubsWriter, sol)
+	err = tmpl.Execute(stubsWriter, solution)
 	if err != nil {
 		return fmt.Errorf("couldn't write template to stubs: %s", err)
 	}

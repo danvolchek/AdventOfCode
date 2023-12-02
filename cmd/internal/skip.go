@@ -15,7 +15,7 @@ type Skipper struct {
 	skips []skip
 }
 
-func (s *Skipper) Skip(year, day string) bool {
+func (s Skipper) Skip(year, day string) bool {
 	for _, skip := range s.skips {
 		if skip.shouldSkip(lib.Atoi(year), lib.Atoi(day)) {
 			return true
@@ -25,12 +25,12 @@ func (s *Skipper) Skip(year, day string) bool {
 	return false
 }
 
-func NewSkipper(path string) *Skipper {
+func NewSkipper(path string) Skipper {
 	if !exists(path) {
-		return &Skipper{}
+		return Skipper{}
 	}
 
-	return &Skipper{skips: parseSkips(lib.Must(os.Open(path)))}
+	return Skipper{skips: parseSkips(lib.Must(os.Open(path)))}
 }
 
 type skipRange struct {
