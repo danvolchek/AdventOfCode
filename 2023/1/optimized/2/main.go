@@ -10,18 +10,22 @@ type stream struct {
 	source string
 }
 
+// done returns whether there's anything left in the source string
 func (s *stream) done() bool {
 	return len(s.source) == 0
 }
 
+// peek retrieves the current character without consuming it
 func (s *stream) peek() int {
 	return int(s.source[0])
 }
 
+// consume consumes the current character
 func (s *stream) consume() {
 	s.source = s.source[1:]
 }
 
+// match consumes an entire string if it matches the source string, but does nothing otherwise
 func (s *stream) match(val string) bool {
 	if len(val) <= len(s.source) && s.source[:len(val)] == val {
 		s.source = s.source[len(val)-1:] // -1 so that 'eightwo' only consumes 'eigh' and allows matching 'two'
