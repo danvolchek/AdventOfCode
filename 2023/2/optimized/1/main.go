@@ -60,8 +60,8 @@ func parseGame(parts []string) game {
 	}
 }
 
-func solve(lines []game) int {
-	return lib.SumSlice(lib.Map(lib.Filter(lines, game.valid), game.Id))
+func solve(games []game) int {
+	return lib.SumSlice(lib.Map(lib.Filter(games, game.valid), game.Id))
 }
 
 func main() {

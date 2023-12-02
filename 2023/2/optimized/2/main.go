@@ -49,16 +49,16 @@ func parseGame(parts []string) game {
 	}
 }
 
-func setPower(cubes map[string]int) int {
+func setPower(cubeSet map[string]int) int {
 	val := 1
-	for _, num := range cubes {
+	for _, num := range cubeSet {
 		val *= num
 	}
 	return val
 }
 
-func solve(lines []game) int {
-	return lib.SumSlice(lib.Map(lib.Map(lines, game.minSet), setPower))
+func solve(games []game) int {
+	return lib.SumSlice(lib.Map(lib.Map(games, game.minSet), setPower))
 }
 
 func main() {
