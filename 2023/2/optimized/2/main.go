@@ -11,18 +11,22 @@ type game struct {
 	cubeSets []map[string]int
 }
 
-func (g game) minSetPower() int {
-	minSet := make(map[string]int)
+func (g game) minSet() map[string]int {
+	result := make(map[string]int)
 
 	for _, pull := range g.cubeSets {
 		for pullColor, pullAmount := range pull {
-			minSet[pullColor] = max(minSet[pullColor], pullAmount)
+			result[pullColor] = max(result[pullColor], pullAmount)
 		}
 	}
 
+	return result
+}
+
+func setPower(cubeSet map[string]int) int {
 	power := 1
-	for _, amount := range minSet {
-		power *= amount
+	for _, num := range cubeSet {
+		power *= num
 	}
 	return power
 }
@@ -54,7 +58,7 @@ func parseGame(parts []string) game {
 }
 
 func solve(games []game) int {
-	return lib.SumSlice(lib.Map(games, game.minSetPower))
+	return lib.SumSlice(lib.Map(lib.Map(games, game.minSet), setPower))
 }
 
 func main() {
