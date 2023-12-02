@@ -17,6 +17,8 @@ const (
 
 var tableSection = []byte("# Completion")
 
+// readme keeps the readme up to date with the currently solved solutions.
+// The completion section needs to be the last section in the readme.
 func main() {
 	err := generateReadme(".")
 	if err != nil {
@@ -63,13 +65,24 @@ func generateReadme(root string) error {
 	return nil
 }
 
+// createTable creates a table for a year of puzzle solutions.
+// The table format is:
+//
+//		            |  1      | 2   | 3
+//		Leaderboard | <links> | ... | ...
+//	    Optimized   | <links> | ... | ...
+//
+// In other words, it's 2 rows (solution type) x 25 columns (for each day).
+// The text in each box contains links to both parts, if they exist.
 func createTable(solutions internal.SolutionDirectory, year string) *internal.Table {
 	yearTable := &internal.Table{
 		NumRows: 2,
 	}
 
+	// The first column is the left header.
 	yearTable.AddColumn("", []string{internal.TypeLeaderboard, internal.TypeOptimized})
 
+	// Each subsequent column is the day number, followed by the links to the main files.
 	for dayNum := internal.FirstDayNum; dayNum <= internal.LastDayNum; dayNum++ {
 		day := strconv.Itoa(dayNum)
 		solution := solutions.Get(year, day)
@@ -83,6 +96,8 @@ func createTable(solutions internal.SolutionDirectory, year string) *internal.Ta
 	return yearTable
 }
 
+// createLinks creates links for a solution type, in the form of individual links for each part
+// separated by a comma.
 func createLinks(solType internal.SolutionType) string {
 	var links []string
 
@@ -97,6 +112,7 @@ func createLinks(solType internal.SolutionType) string {
 	return strings.Join(links, ",")
 }
 
+// makeLink creates a markdown link of the form [visibleText](path/to/link).
 func makeLink(visibleText, path string) string {
 	return fmt.Sprintf("[%s](%s)", visibleText, path)
 }

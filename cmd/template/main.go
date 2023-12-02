@@ -56,6 +56,9 @@ func init() {
 	}
 }
 
+// template creates template files for a new solution day. See the arg list above. They're all optional, and if not provided
+// template will infer the next solution to create by finding the first unsolved solution.
+// template creates the input file and main.go files for each solution part and type, plus any necessary parent directories.
 func main() {
 	solution, types := getSolutionToCreate(".")
 
@@ -103,6 +106,7 @@ func getSolutionToCreate(root string) (internal.Solution, []string) {
 func getFilesToCreate(solution internal.Solution, solutionType string) ([]fileToCreate, error) {
 	var files []fileToCreate
 
+	// the input file - created as an empty file if it doesn't exist
 	if !solution.Input.Exists {
 		files = append(files, fileToCreate{
 			Path:     solution.Input.Path,
@@ -110,6 +114,8 @@ func getFilesToCreate(solution internal.Solution, solutionType string) ([]fileTo
 		})
 	}
 
+	// the main files - leaderboard files use the template file
+	//                - optimized files use their corresponding leaderboard files if they exist, otherwise the template file
 	template, err := os.ReadFile(filepath.Join("cmd", "template", "main.txt"))
 	if err != nil {
 		return nil, fmt.Errorf("couldn't read template: %s", err)
@@ -159,11 +165,11 @@ func createFiles(files []fileToCreate) error {
 	var errs []error
 	for _, file := range files {
 		fmt.Printf("%s: %s\n", verb, file.Path)
-
 		if dryRun {
 			continue
 		}
 
+		// first create any necessary parent folders, otherwise file creation will fail.
 		err := os.MkdirAll(filepath.Dir(file.Path), os.ModePerm)
 		if err != nil {
 			errs = append(errs, err)
