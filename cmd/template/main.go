@@ -1,12 +1,12 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/danvolchek/AdventOfCode/cmd/internal"
 	"os"
 	"path/filepath"
-	"text/template"
 )
 
 var infer bool
@@ -17,6 +17,8 @@ var argCreateOptimized bool
 var argYear string
 var argDay string
 
+var verb string
+
 func init() {
 	flag.StringVar(&argYear, "year", "0", "solution year")
 	flag.StringVar(&argDay, "day", "0", "solution day")
@@ -25,9 +27,13 @@ func init() {
 	flag.BoolVar(&dryRun, "dryrun", false, "print solution to create and exit")
 	flag.Parse()
 
+	verb = "Creating"
+	if dryRun {
+		verb = "Would create"
+	}
+
 	if !(argCreateLeaderboard || argCreateOptimized || argYear != "0" || argDay != "0") {
 		infer = true
-		fmt.Println("Inferring solution to create")
 		return
 	}
 
@@ -51,16 +57,17 @@ func init() {
 }
 
 func main() {
-	solution, types := getSolutionsToCreate(".")
+	solution, types := getSolutionToCreate(".")
 
 	for _, solutionType := range types {
-		if dryRun {
-			fmt.Printf("Would create: Year %s Day %s Type %s\n", solution.Year, solution.Day, solutionType)
-			continue
-		}
-		fmt.Printf("Creating: Year %s Day %s Type %s\n", solution.Year, solution.Day, solutionType)
+		fmt.Printf("%s: %s %s %s\n", verb, solution.Year, solution.Day, solutionType)
 
-		err := createSolution(solution, solutionType)
+		filesToCreate, err := getFilesToCreate(solution, solutionType)
+		if err != nil {
+			panic(err)
+		}
+
+		err = createFiles(filesToCreate)
 		if err != nil {
 			panic(err)
 		}
@@ -69,7 +76,8 @@ func main() {
 	fmt.Println("Done!")
 }
 
-func getSolutionsToCreate(root string) (internal.Solution, []string) {
+// getSolutionToCreate figures out which solution and which types for it need to be created.
+func getSolutionToCreate(root string) (internal.Solution, []string) {
 	solutions := internal.NewSolutionsDirectory(root)
 
 	if infer {
@@ -91,96 +99,95 @@ func getSolutionsToCreate(root string) (internal.Solution, []string) {
 	return solution, solutionTypes
 }
 
-func createSolution(solution internal.Solution, solutionType string) error {
-	err := os.MkdirAll(solution.pathy, os.ModePerm)
-	if err != nil {
-		return fmt.Errorf("couldn't create solution folder: %s", err)
-	}
+// getFilesToCreate figures out which files to create for a solution and a type.
+func getFilesToCreate(solution internal.Solution, solutionType string) ([]fileToCreate, error) {
+	var files []fileToCreate
 
 	if !solution.Input.Exists {
-		input, err := os.Create(solution.Input.Path)
-		defer input.Close()
-		if err != nil {
-			return fmt.Errorf("couldn't create input file: %s", err)
+		files = append(files, fileToCreate{
+			Path:     solution.Input.Path,
+			Contents: nil,
+		})
+	}
+
+	template, err := os.ReadFile(filepath.Join("cmd", "template", "main.txt"))
+	if err != nil {
+		return nil, fmt.Errorf("couldn't read template: %s", err)
+	}
+
+	addMainFile := func(part internal.SolutionPart, contents []byte) {
+		if !part.Main.Exists {
+			files = append(files, fileToCreate{
+				Path:     part.Main.Path,
+				Contents: contents,
+			})
 		}
 	}
 
-	tmpl, err := loadTemplate(filepath.Join("cmd", "template", "main.txt"))
-	if err != nil {
-		return fmt.Errorf("couldn't load template: %s", err)
+	addMainFileFromPrevious := func(part internal.SolutionPart, previous internal.SolutionPart, fallback []byte) {
+		contents := fallback
+		if previous.Main.Exists {
+			var err error
+			contents, err = os.ReadFile(previous.Main.Path)
+			if err != nil {
+				panic(err)
+			}
+		}
+
+		addMainFile(part, contents)
 	}
 
-	anyCreated := false
-
-	var parts []internal.SolutionPart
 	switch solutionType {
 	case internal.TypeLeaderboard:
-		parts = append(parts, solution.Leaderboard.PartOne, solution.Leaderboard.PartTwo)
+		addMainFile(solution.Leaderboard.PartOne, template)
+		addMainFile(solution.Leaderboard.PartTwo, template)
 	case internal.TypeOptimized:
-		parts = append(parts, solution.Optimized.PartOne, solution.Optimized.PartTwo)
+		addMainFileFromPrevious(solution.Optimized.PartOne, solution.Leaderboard.PartOne, template)
+		addMainFileFromPrevious(solution.Optimized.PartTwo, solution.Leaderboard.PartTwo, template)
 	}
 
-	stubsWriter := &internal.MultiWriteCloser{}
-	defer stubsWriter.Close()
+	return files, nil
+}
 
-	for _, part := range parts {
-		if part.Main.Exists {
-			continue
-		}
-
-		stubFile, err := createFileAndDirectories(part.Main.Path)
-		if err != nil {
-			return fmt.Errorf("couldn't create stub file %s: %s", part.Main.Path, err)
-		}
-
-		anyCreated = true
-
-		stubsWriter.Add(stubFile)
-	}
-
-	if !anyCreated {
-		fmt.Println("all files already exist, couldn't create anything")
+// createFiles creates files to be created.
+func createFiles(files []fileToCreate) error {
+	if len(files) == 0 {
+		fmt.Println("all files already exist, nothing to create")
 		return nil
 	}
 
-	err = tmpl.Execute(stubsWriter, solution)
-	if err != nil {
-		return fmt.Errorf("couldn't write template to stubs: %s", err)
+	var errs []error
+	for _, file := range files {
+		fmt.Printf("%s: %s\n", verb, file.Path)
+
+		if dryRun {
+			continue
+		}
+
+		err := os.MkdirAll(filepath.Dir(file.Path), os.ModePerm)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+
+		err = os.WriteFile(file.Path, file.Contents, 0666)
+		if err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if len(errs) != 0 {
+		return fmt.Errorf("couldn't create files: %s", errors.Join(errs...))
 	}
 
 	return nil
 }
 
-func loadTemplate(path string) (*template.Template, error) {
-	contents, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't read template file: %s", err)
-	}
+// fileToCreate represents a file to be created.
+type fileToCreate struct {
+	// Path is the path to the file.
+	Path string
 
-	tmpl, err := template.New("main").Parse(string(contents))
-	if err != nil {
-		return nil, fmt.Errorf("couldn't parse template: %s", err)
-	}
-
-	return tmpl, nil
-}
-
-func createFileAndDirectories(path string) (*os.File, error) {
-	parent := filepath.Dir(path)
-	child, err := filepath.Rel(parent, path)
-	if err != nil {
-		return nil, err
-	}
-
-	err = os.MkdirAll(parent, os.ModePerm)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't make directories: %s", err)
-	}
-
-	file, err := os.Create(filepath.Join(parent, child))
-	if err != nil {
-		return nil, fmt.Errorf("couldn't create file: %s", err)
-	}
-
-	return file, nil
+	// Contents is the contents the file will have after creation.
+	Contents []byte
 }
