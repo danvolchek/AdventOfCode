@@ -15,7 +15,7 @@ type Cell struct {
 	number int
 	symbol string
 
-	row, col int
+	pos lib.Pos
 }
 
 func (c Cell) isNum() bool {
@@ -56,8 +56,10 @@ func parse(input []byte) Grid {
 			if !lib.IsDigit(char) {
 				symbol := Cell{
 					symbol: string(char),
-					row:    row,
-					col:    col,
+					pos: lib.Pos{
+						Row: row,
+						Col: col,
+					},
 				}
 				set(row, col, symbol)
 				symbols = append(symbols, symbol)
@@ -77,8 +79,10 @@ func parse(input []byte) Grid {
 
 			cell := Cell{
 				number: lib.Atoi(digits),
-				row:    row,
-				col:    col,
+				pos: lib.Pos{
+					Row: row,
+					Col: col,
+				},
 			}
 
 			for i := col; i < digitIndex; i++ {
@@ -103,7 +107,7 @@ func getPartNumbers(grid Grid) lib.Set[Cell] {
 	var partNumbers lib.Set[Cell]
 
 	for _, symbol := range grid.symbols {
-		adjacentCells := lib.Adjacent[Cell](symbol.row, symbol.col, true)
+		adjacentCells := lib.Adjacent[Cell](symbol.pos, grid, true)
 
 		adjacentPartNumbers := lib.Filter(adjacentCells, Cell.isNum)
 
@@ -119,7 +123,7 @@ func solve(grid Grid) int {
 	partNumbers := getPartNumbers(grid)
 
 	for _, gear := range lib.Filter(grid.symbols, Cell.isGear) {
-		adjacentCells := lib.Adjacent[Cell](gear.row, gear.col, true)
+		adjacentCells := lib.Adjacent[Cell](gear.pos, grid, true)
 
 		adjacentPartNumbers := lib.Unique(lib.Filter(adjacentCells, partNumbers.Contains))
 
