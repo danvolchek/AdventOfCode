@@ -184,7 +184,7 @@ func MaxSlice[T constraints.Ordered](items []T) T {
 type Grid[T any] interface {
 	GRows() int
 	GCols(row int) int
-	Get(row, col int) (T, bool)
+	Get(pos Pos) (T, bool)
 }
 
 // SliceGrid is an implementation of Grid using a two-dimensional slice.
@@ -199,8 +199,8 @@ func (s SliceGrid[T]) GCols(row int) int {
 	return len(s.Grid[row])
 }
 
-func (s SliceGrid[T]) Get(row, col int) (T, bool) {
-	return s.Grid[row][col], true // bounds check?
+func (s SliceGrid[T]) Get(pos Pos) (T, bool) {
+	return s.Grid[pos.Row][pos.Col], true // bounds check?
 }
 
 // MapGrid is an implementation of Grid using a two-dimensional map.
@@ -216,18 +216,18 @@ func (m MapGrid[T]) GCols(row int) int {
 	return m.Cols
 }
 
-func (m MapGrid[T]) Get(row, col int) (T, bool) {
-	val, ok := m.Grid[row][col]
+func (m MapGrid[T]) Get(pos Pos) (T, bool) {
+	val, ok := m.Grid[pos.Row][pos.Col]
 	return val, ok
 }
 
 // Adjacent returns the adjacent items in a grid of items.
 // Diag controls whether diagonals are considered as adjacent.
-func Adjacent[T any](diag bool, row, col int, grid Grid[T]) []T {
+func Adjacent[T any](pos Pos, grid Grid[T], diag bool) []T {
 	var result []T
 
-	for _, pos := range AdjacentPos(diag, row, col, grid) {
-		val, ok := grid.Get(pos.Row, pos.Col)
+	for _, pos := range AdjacentPos(diag, pos, grid) {
+		val, ok := grid.Get(pos)
 		if ok {
 			result = append(result, val)
 		}
@@ -258,7 +258,7 @@ func (p Pos) Max(o Pos) Pos {
 
 // AdjacentPosNoBoundsChecks returns the adjacent positions in a 2d grid of items (excluding bounds checks).
 // Diag controls whether diagonals are considered as adjacent.
-func AdjacentPosNoBoundsChecks(diag bool, row, col int) []Pos {
+func AdjacentPosNoBoundsChecks(pos Pos, diag bool) []Pos {
 	var results []Pos
 
 	for di := -1; di <= 1; di += 1 {
@@ -271,8 +271,8 @@ func AdjacentPosNoBoundsChecks(diag bool, row, col int) []Pos {
 				continue
 			}
 
-			adjI := row + di
-			adjJ := col + dj
+			adjI := pos.Row + di
+			adjJ := pos.Col + dj
 
 			results = append(results, Pos{Row: adjI, Col: adjJ})
 		}
@@ -283,8 +283,8 @@ func AdjacentPosNoBoundsChecks(diag bool, row, col int) []Pos {
 
 // AdjacentPos returns the adjacent positions in a Grid of items.
 // Diag controls whether diagonals are considered as adjacent.
-func AdjacentPos[T any](diag bool, row, col int, grid Grid[T]) []Pos {
-	return Filter(AdjacentPosNoBoundsChecks(diag, row, col), func(pos Pos) bool {
+func AdjacentPos[T any](diag bool, pos Pos, grid Grid[T]) []Pos {
+	return Filter(AdjacentPosNoBoundsChecks(pos, diag), func(pos Pos) bool {
 		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= grid.GRows() || pos.Col >= grid.GCols(pos.Row))
 	})
 }

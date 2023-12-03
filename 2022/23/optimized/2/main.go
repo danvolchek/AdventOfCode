@@ -22,7 +22,7 @@ func round(elves *lib.Set[lib.Pos], dirs []Dir) bool {
 
 	for _, elf := range elves.Items() {
 		adjacent := lib.Filter(
-			lib.AdjacentPosNoBoundsChecks(true, elf.Row, elf.Col),
+			lib.AdjacentPosNoBoundsChecks(elf, true),
 			func(p lib.Pos) bool {
 				return elves.Contains(p)
 			},

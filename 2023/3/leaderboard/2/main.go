@@ -161,7 +161,7 @@ func main() {
 
 // copied over from lib, as this was made private later
 func adjacentPosBounds(diag bool, row, col, rows, cols int) []lib.Pos {
-	return lib.Filter(lib.AdjacentPosNoBoundsChecks(diag, row, col), func(pos lib.Pos) bool {
+	return lib.Filter(lib.AdjacentPosNoBoundsChecks(lib.Pos{Row: row, Col: col}, diag), func(pos lib.Pos) bool {
 		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= rows || pos.Col >= cols)
 	})
 }

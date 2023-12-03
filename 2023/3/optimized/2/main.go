@@ -103,7 +103,7 @@ func getPartNumbers(grid Grid) lib.Set[Cell] {
 	var partNumbers lib.Set[Cell]
 
 	for _, symbol := range grid.symbols {
-		adjacentCells := lib.Adjacent[Cell](true, symbol.row, symbol.col, grid)
+		adjacentCells := lib.Adjacent[Cell](symbol.row, symbol.col, true)
 
 		adjacentPartNumbers := lib.Filter(adjacentCells, Cell.isNum)
 
@@ -119,7 +119,7 @@ func solve(grid Grid) int {
 	partNumbers := getPartNumbers(grid)
 
 	for _, gear := range lib.Filter(grid.symbols, Cell.isGear) {
-		adjacentCells := lib.Adjacent[Cell](true, gear.row, gear.col, grid)
+		adjacentCells := lib.Adjacent[Cell](gear.row, gear.col, true)
 
 		adjacentPartNumbers := lib.Unique(lib.Filter(adjacentCells, partNumbers.Contains))
 

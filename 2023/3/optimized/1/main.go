@@ -15,7 +15,7 @@ type Cell struct {
 	number int
 	symbol string
 
-	row, col int
+	pos lib.Pos
 }
 
 func (c Cell) isNum() bool {
@@ -52,8 +52,10 @@ func parse(input []byte) Grid {
 			if !lib.IsDigit(char) {
 				symbol := Cell{
 					symbol: string(char),
-					row:    row,
-					col:    col,
+					pos: lib.Pos{
+						Row: row,
+						Col: col,
+					},
 				}
 				set(row, col, symbol)
 				symbols = append(symbols, symbol)
@@ -73,8 +75,10 @@ func parse(input []byte) Grid {
 
 			cell := Cell{
 				number: lib.Atoi(digits),
-				row:    row,
-				col:    col,
+				pos: lib.Pos{
+					Row: row,
+					Col: col,
+				},
 			}
 
 			for i := col; i < digitIndex; i++ {
@@ -99,7 +103,7 @@ func solve(grid Grid) int {
 	var partNumbers lib.Set[Cell]
 
 	for _, symbol := range grid.symbols {
-		adjacentCells := lib.Adjacent[Cell](true, symbol.row, symbol.col, grid)
+		adjacentCells := lib.Adjacent[Cell](symbol.pos, grid, true)
 
 		adjacentPartNumbers := lib.Filter(adjacentCells, Cell.isNum)
 
