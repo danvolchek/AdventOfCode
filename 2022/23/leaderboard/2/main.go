@@ -22,7 +22,7 @@ func round(elfMap *lib.Set[lib.Pos], dirs []Dir) bool {
 	proposed := make(map[lib.Pos][]lib.Pos)
 
 	for _, elf := range elfMap.Items() {
-		adj := lib.Filter(lib.AdjacentPos(true, elf.Row, elf.Col),
+		adj := lib.Filter(lib.AdjacentPosNoBoundsChecks(true, elf.Row, elf.Col),
 			func(p lib.Pos) bool {
 				return elfMap.Contains(p)
 			},

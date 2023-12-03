@@ -3,13 +3,10 @@ package main
 import (
 	"bytes"
 	"github.com/danvolchek/AdventOfCode/lib"
-	"strconv"
-	"strings"
 )
 
 type Grid struct {
-	rows, cols int
-	cells      map[int]map[int]Cell
+	lib.MapGrid[Cell]
 
 	symbols []Cell
 }
@@ -19,6 +16,10 @@ type Cell struct {
 	symbol string
 
 	row, col int
+}
+
+func (c Cell) isNum() bool {
+	return c.number != 0
 }
 
 func (c Cell) num() int {
@@ -33,8 +34,6 @@ func parse(input []byte) Grid {
 	cells := make(map[int]map[int]Cell)
 	var symbols []Cell
 
-	rows := bytes.Split(bytes.TrimSpace(input), []byte{'\n'})
-
 	set := func(row, col int, cell Cell) {
 		rowCells, ok := cells[row]
 		if !ok {
@@ -45,6 +44,7 @@ func parse(input []byte) Grid {
 		rowCells[col] = cell
 	}
 
+	rows := bytes.Split(bytes.TrimSpace(input), []byte{'\n'})
 	for row, line := range rows {
 		for col := 0; col < len(line); col++ {
 			char := line[col]
@@ -53,7 +53,7 @@ func parse(input []byte) Grid {
 				continue
 			}
 
-			if _, ok := lib.AsDigit(char); !ok {
+			if !lib.IsDigit(char) {
 				symbol := Cell{
 					symbol: string(char),
 					row:    row,
@@ -65,22 +65,18 @@ func parse(input []byte) Grid {
 			}
 
 			digitIndex := col
-			var digits []int
+			var digits string
 			for {
-				if digitIndex == len(line) {
-					break
-				}
-				digit, ok := lib.AsDigit(line[digitIndex])
-				if !ok {
+				if digitIndex == len(line) || !lib.IsDigit(line[digitIndex]) {
 					break
 				}
 
-				digits = append(digits, digit)
+				digits += string(line[digitIndex])
 				digitIndex++
 			}
 
 			cell := Cell{
-				number: lib.Atoi(strings.Join(lib.Map(digits, strconv.Itoa), "")),
+				number: lib.Atoi(digits),
 				row:    row,
 				col:    col,
 			}
@@ -94,9 +90,11 @@ func parse(input []byte) Grid {
 	}
 
 	return Grid{
-		rows:    len(rows),
-		cols:    len(rows[0]),
-		cells:   cells,
+		MapGrid: lib.MapGrid[Cell]{
+			Rows: len(rows),
+			Cols: len(rows[0]),
+			Grid: cells,
+		},
 		symbols: symbols,
 	}
 }
@@ -105,13 +103,11 @@ func getPartNumbers(grid Grid) lib.Set[Cell] {
 	var partNumbers lib.Set[Cell]
 
 	for _, symbol := range grid.symbols {
-		for _, adj := range lib.AdjacentPosBounds(true, symbol.row, symbol.col, grid.rows, grid.cols) {
-			adjCell := grid.cells[adj.Row][adj.Col]
+		adjacentCells := lib.Adjacent[Cell](true, symbol.row, symbol.col, grid)
 
-			if adjCell.number != 0 {
-				partNumbers.Add(adjCell)
-			}
-		}
+		adjacentPartNumbers := lib.Filter(adjacentCells, Cell.isNum)
+
+		partNumbers.Add(adjacentPartNumbers...)
 	}
 
 	return partNumbers
@@ -123,18 +119,12 @@ func solve(grid Grid) int {
 	partNumbers := getPartNumbers(grid)
 
 	for _, gear := range lib.Filter(grid.symbols, Cell.isGear) {
-		var adjacentPartNumbers lib.Set[Cell]
-		
-		for _, adj := range lib.AdjacentPosBounds(true, gear.row, gear.col, grid.rows, grid.cols) {
-			adjCell := grid.cells[adj.Row][adj.Col]
+		adjacentCells := lib.Adjacent[Cell](true, gear.row, gear.col, grid)
 
-			if partNumbers.Contains(adjCell) {
-				adjacentPartNumbers.Add(adjCell)
-			}
-		}
+		adjacentPartNumbers := lib.Unique(lib.Filter(adjacentCells, partNumbers.Contains))
 
-		if adjacentPartNumbers.Size() == 2 {
-			gearRatios = append(gearRatios, lib.MulSlice(lib.Map(adjacentPartNumbers.Items(), Cell.num)))
+		if len(adjacentPartNumbers) == 2 {
+			gearRatios = append(gearRatios, lib.MulSlice(lib.Map(adjacentPartNumbers, Cell.num)))
 		}
 	}
 

@@ -40,8 +40,9 @@ var totalWorlds int
 var worldMap map[int]*World
 
 type World struct {
+	lib.SliceGrid[Tile]
+
 	minute int
-	valley [][]Tile
 }
 
 func (w *World) String() string {
@@ -49,7 +50,7 @@ func (w *World) String() string {
 
 	s.WriteString(fmt.Sprintf("Minute: %v\n", w.minute))
 
-	for _, row := range w.valley {
+	for _, row := range w.Grid {
 		for _, tile := range row {
 			if tile&Wall != 0 {
 				s.WriteByte('#')
@@ -112,8 +113,8 @@ func (n Node) Adjacent() []Node {
 
 	nextWorldMin := (n.w.minute + 1) % totalWorlds
 	nextWorld := worldMap[nextWorldMin]
-	for _, p := range lib.AdjacentPosBoundsGrid(false, n.p.Row, n.p.Col, nextWorld.valley) {
-		if nextWorld.valley[p.Row][p.Col]&Empty != 0 {
+	for _, p := range lib.AdjacentPos[Tile](false, n.p.Row, n.p.Col, nextWorld) {
+		if nextWorld.Grid[p.Row][p.Col]&Empty != 0 {
 			node := Node{
 				p: p,
 				w: nextWorld,
@@ -123,7 +124,7 @@ func (n Node) Adjacent() []Node {
 		}
 	}
 
-	if nextWorld.valley[n.p.Row][n.p.Col]&Empty != 0 {
+	if nextWorld.Grid[n.p.Row][n.p.Col]&Empty != 0 {
 		node := Node{
 			p: n.p,
 			w: nextWorld,
@@ -212,7 +213,9 @@ func solve(valley [][]Tile) int {
 
 	worldMap[0] = &World{
 		minute: 0,
-		valley: valley,
+		SliceGrid: lib.SliceGrid[Tile]{
+			Grid: valley,
+		},
 	}
 
 	//fmt.Println(worldMap[0])
@@ -222,7 +225,9 @@ func solve(valley [][]Tile) int {
 
 		worldMap[i] = &World{
 			minute: i,
-			valley: newValley,
+			SliceGrid: lib.SliceGrid[Tile]{
+				Grid: newValley,
+			},
 		}
 		//fmt.Println(worldMap[i])
 

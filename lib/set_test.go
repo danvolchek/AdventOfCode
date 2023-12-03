@@ -48,8 +48,7 @@ func TestSet(t *testing.T) {
 	var q lib.Set[int]
 
 	for i := 0; i < 5; i++ {
-		q.Add(i)
-		q.Add(i)
+		q.Add(i, i)
 	}
 
 	actual := q.Items()

@@ -117,6 +117,14 @@ func Filter[T any](items []T, filter func(T) bool) []T {
 	return result
 }
 
+// Unique returns de-duplicated items in items. The type must be comparable, and the comparison is by
+// value equality.
+func Unique[T comparable](items []T) []T {
+	var set Set[T]
+	set.Add(items...)
+	return set.Items()
+}
+
 // Reverse returns a new slice which is items in reverse order.
 func Reverse[T any](items []T) []T {
 	result := make([]T, len(items))
@@ -172,14 +180,60 @@ func MaxSlice[T constraints.Ordered](items []T) T {
 	return max
 }
 
-// Adjacent returns the adjacent items in a 2d grid of items.
+// Grid is an interface that represents a two-dimensional addressable grid.
+type Grid[T any] interface {
+	GRows() int
+	GCols(row int) int
+	Get(row, col int) (T, bool)
+}
+
+// SliceGrid is an implementation of Grid using a two-dimensional slice.
+type SliceGrid[T any] struct {
+	Grid [][]T
+}
+
+func (s SliceGrid[T]) GRows() int {
+	return len(s.Grid)
+}
+func (s SliceGrid[T]) GCols(row int) int {
+	return len(s.Grid[row])
+}
+
+func (s SliceGrid[T]) Get(row, col int) (T, bool) {
+	return s.Grid[row][col], true // bounds check?
+}
+
+// MapGrid is an implementation of Grid using a two-dimensional map.
+type MapGrid[T any] struct {
+	Rows, Cols int
+	Grid       map[int]map[int]T
+}
+
+func (m MapGrid[T]) GRows() int {
+	return m.Rows
+}
+func (m MapGrid[T]) GCols(row int) int {
+	return m.Cols
+}
+
+func (m MapGrid[T]) Get(row, col int) (T, bool) {
+	val, ok := m.Grid[row][col]
+	return val, ok
+}
+
+// Adjacent returns the adjacent items in a grid of items.
 // Diag controls whether diagonals are considered as adjacent.
-func Adjacent[T any](diag bool, row, col int, grid [][]T) []T {
-	return Map(
-		AdjacentPosBoundsGrid(diag, row, col, grid),
-		func(pos Pos) T {
-			return grid[pos.Row][pos.Col]
-		})
+func Adjacent[T any](diag bool, row, col int, grid Grid[T]) []T {
+	var result []T
+
+	for _, pos := range AdjacentPos(diag, row, col, grid) {
+		val, ok := grid.Get(pos.Row, pos.Col)
+		if ok {
+			result = append(result, val)
+		}
+	}
+
+	return result
 }
 
 // Pos represents a two-dimensional position.
@@ -187,7 +241,7 @@ type Pos struct {
 	Row, Col int
 }
 
-// Add returns a new Pos that's the sum of the two rows and cols.
+// Add returns a new Pos that's the sum of the two rws and cols.
 func (p Pos) Add(o Pos) Pos {
 	return Pos{Row: p.Row + o.Row, Col: p.Col + o.Col}
 }
@@ -202,9 +256,9 @@ func (p Pos) Max(o Pos) Pos {
 	return Pos{Row: Max(p.Row, o.Row), Col: Max(p.Col, o.Col)}
 }
 
-// AdjacentPos returns the adjacent positions in a 2d grid of items (excluding bounds checks).
+// AdjacentPosNoBoundsChecks returns the adjacent positions in a 2d grid of items (excluding bounds checks).
 // Diag controls whether diagonals are considered as adjacent.
-func AdjacentPos(diag bool, row, col int) []Pos {
+func AdjacentPosNoBoundsChecks(diag bool, row, col int) []Pos {
 	var results []Pos
 
 	for di := -1; di <= 1; di += 1 {
@@ -227,17 +281,11 @@ func AdjacentPos(diag bool, row, col int) []Pos {
 	return results
 }
 
-// AdjacentPosBoundsGrid returns the adjacent positions in a 2d grid of items within the given bounds.
-// Diag controls whether diagonals are considered as adjacent. Grid must be square.
-func AdjacentPosBoundsGrid[T any](diag bool, row, col int, grid [][]T) []Pos {
-	return AdjacentPosBounds(diag, row, col, len(grid), len(grid[0]))
-}
-
-// AdjacentPosBounds returns the adjacent positions in a 2d grid of items within the given bounds.
+// AdjacentPos returns the adjacent positions in a Grid of items.
 // Diag controls whether diagonals are considered as adjacent.
-func AdjacentPosBounds(diag bool, row, col, rows, cols int) []Pos {
-	return Filter(AdjacentPos(diag, row, col), func(pos Pos) bool {
-		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= rows || pos.Col >= cols)
+func AdjacentPos[T any](diag bool, row, col int, grid Grid[T]) []Pos {
+	return Filter(AdjacentPosNoBoundsChecks(diag, row, col), func(pos Pos) bool {
+		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= grid.GRows() || pos.Col >= grid.GCols(pos.Row))
 	})
 }
 
@@ -339,7 +387,12 @@ func Int(line string) int {
 
 // AsDigit returns the integer representation of value if it's a character from '0' to '9', or false if its not.
 func AsDigit(val byte) (int, bool) {
-	return int(val - '0'), val >= '0' && val <= '9'
+	return int(val - '0'), IsDigit(val)
+}
+
+// IsDigit returns whether val is a character from '0' to '9'
+func IsDigit(val byte) bool {
+	return val >= '0' && val <= '9'
 }
 
 // Pow is like math.Pow but for integers.

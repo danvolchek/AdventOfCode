@@ -3,13 +3,10 @@ package main
 import (
 	"bytes"
 	"github.com/danvolchek/AdventOfCode/lib"
-	"strconv"
-	"strings"
 )
 
 type Grid struct {
-	rows, cols int
-	cells      map[int]map[int]Cell
+	lib.MapGrid[Cell]
 
 	symbols []Cell
 }
@@ -19,6 +16,10 @@ type Cell struct {
 	symbol string
 
 	row, col int
+}
+
+func (c Cell) isNum() bool {
+	return c.number != 0
 }
 
 func (c Cell) num() int {
@@ -48,7 +49,7 @@ func parse(input []byte) Grid {
 				continue
 			}
 
-			if _, ok := lib.AsDigit(char); !ok {
+			if !lib.IsDigit(char) {
 				symbol := Cell{
 					symbol: string(char),
 					row:    row,
@@ -60,22 +61,18 @@ func parse(input []byte) Grid {
 			}
 
 			digitIndex := col
-			var digits []int
+			var digits string
 			for {
-				if digitIndex == len(line) {
-					break
-				}
-				digit, ok := lib.AsDigit(line[digitIndex])
-				if !ok {
+				if digitIndex == len(line) || !lib.IsDigit(line[digitIndex]) {
 					break
 				}
 
-				digits = append(digits, digit)
+				digits += string(line[digitIndex])
 				digitIndex++
 			}
 
 			cell := Cell{
-				number: lib.Atoi(strings.Join(lib.Map(digits, strconv.Itoa), "")),
+				number: lib.Atoi(digits),
 				row:    row,
 				col:    col,
 			}
@@ -89,9 +86,11 @@ func parse(input []byte) Grid {
 	}
 
 	return Grid{
-		rows:    len(rows),
-		cols:    len(rows[0]),
-		cells:   cells,
+		MapGrid: lib.MapGrid[Cell]{
+			Rows: len(rows),
+			Cols: len(rows[0]),
+			Grid: cells,
+		},
 		symbols: symbols,
 	}
 }
@@ -100,13 +99,11 @@ func solve(grid Grid) int {
 	var partNumbers lib.Set[Cell]
 
 	for _, symbol := range grid.symbols {
-		for _, adj := range lib.AdjacentPosBounds(true, symbol.row, symbol.col, grid.rows, grid.cols) {
-			adjCell := grid.cells[adj.Row][adj.Col]
+		adjacentCells := lib.Adjacent[Cell](true, symbol.row, symbol.col, grid)
 
-			if adjCell.number != 0 {
-				partNumbers.Add(adjCell)
-			}
-		}
+		adjacentPartNumbers := lib.Filter(adjacentCells, Cell.isNum)
+
+		partNumbers.Add(adjacentPartNumbers...)
 	}
 
 	partNums := lib.Map(partNumbers.Items(), Cell.num)

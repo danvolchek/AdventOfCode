@@ -66,7 +66,7 @@ func solve(grid [][]*Node) int {
 				start = node
 			}
 
-			adjacent := lib.Adjacent(false, y, x, grid)
+			adjacent := lib.Adjacent[*Node](false, y, x, lib.SliceGrid[*Node]{Grid: grid})
 			reachable := lib.Filter(adjacent, func(n *Node) bool {
 				return node.height >= n.height-1
 			})

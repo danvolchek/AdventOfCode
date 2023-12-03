@@ -101,7 +101,7 @@ func solve(grid Grid) int {
 				continue
 			}
 
-			for _, adj := range lib.AdjacentPosBounds(true, row, col, grid.rows, grid.cols) {
+			for _, adj := range adjacentPosBounds(true, row, col, grid.rows, grid.cols) {
 				adjCell := grid.cells[adj.Row][adj.Col]
 
 				if adjCell.number != 0 {
@@ -125,4 +125,11 @@ func main() {
 	solver.Expect("467..114..\n...*......\n..35..633.\n......#...\n617*......\n.....+.58.\n..592.....\n......755.\n...$.*....\n.664.598..", 4361)
 	solver.Incorrect(326862) // duplicate numbers were being combined in the partNumbers map, fixed by adding row and col to Cell struct
 	solver.Verify(517021)
+}
+
+// copied over from lib, as this was made private later
+func adjacentPosBounds(diag bool, row, col, rows, cols int) []lib.Pos {
+	return lib.Filter(lib.AdjacentPosNoBoundsChecks(diag, row, col), func(pos lib.Pos) bool {
+		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= rows || pos.Col >= cols)
+	})
 }

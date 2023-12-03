@@ -13,12 +13,14 @@ func (s *Set[T]) Contains(item T) bool {
 }
 
 // Add adds an item to the Set.
-func (s *Set[T]) Add(item T) {
+func (s *Set[T]) Add(items ...T) {
 	if s.items == nil {
 		s.items = make(map[T]struct{})
 	}
 
-	s.items[item] = struct{}{}
+	for _, item := range items {
+		s.items[item] = struct{}{}
+	}
 }
 
 // Remove removes an item from the Set. It returns whether the item was removed.
