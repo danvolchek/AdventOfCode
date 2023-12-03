@@ -182,9 +182,9 @@ func MaxSlice[T constraints.Ordered](items []T) T {
 
 // Grid is an interface that represents a two-dimensional addressable grid.
 type Grid[T any] interface {
-	GRows() int
-	GCols(row int) int
-	Get(pos Pos) (T, bool)
+	rows() int
+	cols(row int) int
+	get(pos Pos) (T, bool)
 }
 
 // SliceGrid is an implementation of Grid using a two-dimensional slice.
@@ -192,14 +192,14 @@ type SliceGrid[T any] struct {
 	Grid [][]T
 }
 
-func (s SliceGrid[T]) GRows() int {
+func (s SliceGrid[T]) rows() int {
 	return len(s.Grid)
 }
-func (s SliceGrid[T]) GCols(row int) int {
+func (s SliceGrid[T]) cols(row int) int {
 	return len(s.Grid[row])
 }
 
-func (s SliceGrid[T]) Get(pos Pos) (T, bool) {
+func (s SliceGrid[T]) get(pos Pos) (T, bool) {
 	return s.Grid[pos.Row][pos.Col], true // bounds check?
 }
 
@@ -209,14 +209,14 @@ type MapGrid[T any] struct {
 	Grid       map[int]map[int]T
 }
 
-func (m MapGrid[T]) GRows() int {
+func (m MapGrid[T]) rows() int {
 	return m.Rows
 }
-func (m MapGrid[T]) GCols(row int) int {
+func (m MapGrid[T]) cols(row int) int {
 	return m.Cols
 }
 
-func (m MapGrid[T]) Get(pos Pos) (T, bool) {
+func (m MapGrid[T]) get(pos Pos) (T, bool) {
 	val, ok := m.Grid[pos.Row][pos.Col]
 	return val, ok
 }
@@ -227,7 +227,7 @@ func Adjacent[T any](pos Pos, grid Grid[T], diag bool) []T {
 	var result []T
 
 	for _, pos := range AdjacentPos(diag, pos, grid) {
-		val, ok := grid.Get(pos)
+		val, ok := grid.get(pos)
 		if ok {
 			result = append(result, val)
 		}
@@ -285,7 +285,7 @@ func AdjacentPosNoBoundsChecks(pos Pos, diag bool) []Pos {
 // Diag controls whether diagonals are considered as adjacent.
 func AdjacentPos[T any](diag bool, pos Pos, grid Grid[T]) []Pos {
 	return Filter(AdjacentPosNoBoundsChecks(pos, diag), func(pos Pos) bool {
-		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= grid.GRows() || pos.Col >= grid.GCols(pos.Row))
+		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= grid.rows() || pos.Col >= grid.cols(pos.Row))
 	})
 }
 
