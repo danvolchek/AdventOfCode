@@ -176,7 +176,7 @@ func MaxSlice[T constraints.Ordered](items []T) T {
 // Diag controls whether diagonals are considered as adjacent.
 func Adjacent[T any](diag bool, row, col int, grid [][]T) []T {
 	return Map(
-		AdjacentPosBounds(diag, row, col, grid),
+		AdjacentPosBoundsGrid(diag, row, col, grid),
 		func(pos Pos) T {
 			return grid[pos.Row][pos.Col]
 		})
@@ -227,11 +227,17 @@ func AdjacentPos(diag bool, row, col int) []Pos {
 	return results
 }
 
+// AdjacentPosBoundsGrid returns the adjacent positions in a 2d grid of items within the given bounds.
+// Diag controls whether diagonals are considered as adjacent. Grid must be square.
+func AdjacentPosBoundsGrid[T any](diag bool, row, col int, grid [][]T) []Pos {
+	return AdjacentPosBounds(diag, row, col, len(grid), len(grid[0]))
+}
+
 // AdjacentPosBounds returns the adjacent positions in a 2d grid of items within the given bounds.
 // Diag controls whether diagonals are considered as adjacent.
-func AdjacentPosBounds[T any](diag bool, row, col int, grid [][]T) []Pos {
+func AdjacentPosBounds(diag bool, row, col, rows, cols int) []Pos {
 	return Filter(AdjacentPos(diag, row, col), func(pos Pos) bool {
-		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= len(grid) || pos.Col >= len(grid[row]))
+		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= rows || pos.Col >= cols)
 	})
 }
 
@@ -329,6 +335,11 @@ func Int(line string) int {
 	}
 
 	return ints[0]
+}
+
+// AsDigit returns the integer representation of value if it's a character from '0' to '9', or false if its not.
+func AsDigit(val byte) (int, bool) {
+	return int(val - '0'), val >= '0' && val <= '9'
 }
 
 // Pow is like math.Pow but for integers.
