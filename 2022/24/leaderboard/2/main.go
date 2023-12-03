@@ -112,7 +112,7 @@ func (n Node) Adjacent() []Node {
 
 	nextWorldMin := (n.w.minute + 1) % totalWorlds
 	nextWorld := worldMap[nextWorldMin]
-	for _, p := range lib.AdjacentPos[Tile](false, n.p.Row, n.p.Col, nextWorld) {
+	for _, p := range lib.AdjacentPos[Tile](n.p.Row, n.p.Col, false) {
 		if nextWorld.Grid[p.Row][p.Col]&Empty != 0 {
 			node := Node{
 				p: p,

@@ -226,7 +226,7 @@ func (m MapGrid[T]) get(pos Pos) (T, bool) {
 func Adjacent[T any](pos Pos, grid Grid[T], diag bool) []T {
 	var result []T
 
-	for _, pos := range AdjacentPos(diag, pos, grid) {
+	for _, pos := range AdjacentPos(pos, grid, diag) {
 		val, ok := grid.get(pos)
 		if ok {
 			result = append(result, val)
@@ -283,7 +283,7 @@ func AdjacentPosNoBoundsChecks(pos Pos, diag bool) []Pos {
 
 // AdjacentPos returns the adjacent positions in a Grid of items.
 // Diag controls whether diagonals are considered as adjacent.
-func AdjacentPos[T any](diag bool, pos Pos, grid Grid[T]) []Pos {
+func AdjacentPos[T any](pos Pos, grid Grid[T], diag bool) []Pos {
 	return Filter(AdjacentPosNoBoundsChecks(pos, diag), func(pos Pos) bool {
 		return !(pos.Row < 0 || pos.Col < 0 || pos.Row >= grid.rows() || pos.Col >= grid.cols(pos.Row))
 	})
