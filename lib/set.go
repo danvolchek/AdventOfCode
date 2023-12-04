@@ -6,6 +6,12 @@ type Set[T comparable] struct {
 	items map[T]struct{}
 }
 
+func NewSet[T comparable](items []T) Set[T] {
+	var set Set[T]
+	set.Add(items...)
+	return set
+}
+
 // Contains returns whether the Set contains the item.
 func (s *Set[T]) Contains(item T) bool {
 	_, ok := s.items[item]

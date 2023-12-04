@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"golang.org/x/exp/constraints"
 	"io"
 	"os"
 	"path/filepath"
@@ -336,6 +337,14 @@ func ParseChunksUnique[T any](parsers ...func(chunk string, val *T)) func(input 
 		}
 
 		return start
+	}
+}
+
+// SolveSum is a solve helper function that returns the sum of a slice of items. Useful with ParseLine, or any other
+// parse helper that returns a list of items.
+func SolveSum[T any, V constraints.Integer | constraints.Float](solve func(T) V) func(items []T) V {
+	return func(items []T) V {
+		return SumSlice(Map(items, solve))
 	}
 }
 
