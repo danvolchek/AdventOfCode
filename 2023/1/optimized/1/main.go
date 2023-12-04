@@ -2,22 +2,15 @@ package main
 
 import (
 	"github.com/danvolchek/AdventOfCode/lib"
-	"strings"
 )
 
 func parse(line string) int {
-	nums := lib.Map(strings.Split(line, ""), func(charStr string) int {
-		char := charStr[0]
-
-		if char < '0' || char > '9' {
-			return -1
-		}
-
-		return int(char) - '0'
+	rawNums := lib.Filter([]byte(line), func(char byte) bool {
+		return char >= '0' && char <= '9'
 	})
 
-	nums = lib.Filter(nums, func(v int) bool {
-		return v != -1
+	nums := lib.Map(rawNums, func(char byte) int {
+		return int(char) - '0'
 	})
 
 	return nums[0]*10 + nums[len(nums)-1]
