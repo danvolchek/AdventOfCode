@@ -323,6 +323,7 @@ func ParseChunks[T any](parse func(chunk string) T) func(input string) []T {
 }
 
 // ParseChunksUnique is like ParseChunks but uses a unique parser for every chunk.
+// If there are fewer parsers than chunks, the last parser is re-used for the remaining chunks.
 // It's different from all the other functions in that it passes in a T to the parse func to modify as needed.
 // The intended use is for each parser to be able to return a different type safe type - this couldn't work with generics -
 // so T is intended a container for the result of each parser.
@@ -330,10 +331,10 @@ func ParseChunksUnique[T any](parsers ...func(chunk string, val *T)) func(input 
 	return func(input string) T {
 		var start T
 
-		rawChunks := strings.Split(input, "\n\n")
+		rawChunks := strings.Split(strings.TrimSpace(input), "\n\n")
 
 		for i, chunk := range rawChunks {
-			parsers[i](chunk, &start)
+			parsers[min(i, len(parsers)-1)](chunk, &start)
 		}
 
 		return start
