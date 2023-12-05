@@ -15,13 +15,18 @@ type Range struct {
 	start, length int
 }
 
-// subtract returns the numbers in r that are not in others. others must be a subset of r.
-// E.G.
-// r  others       result
-// |    |
-// |    |     ->
-// |                 |
-// |    |
+// subtract returns the numbers in r that are not in others - the logical XOR.
+// Each range in others must be a subset of r.
+// Each range in others may overlap with other ranges in others - others need not all be unique subsets of r.
+//
+// For example:
+//
+//	  (2 other ranges)               (3 other ranges)
+//	r  other        result         r  other        result
+//	|   |                          |   ||
+//	|   |     ->                   |   |     ->
+//	|                 |            |   ||
+//	|   |                          |                 |
 func (r Range) subtract(others []Range) []Range {
 	missing := []Range{r}
 
@@ -47,17 +52,20 @@ func (r Range) subtract(others []Range) []Range {
 	return missing
 }
 
-// remove returns the numbers in r that are not in other. other must be a subset of r.
-// I.E.
-// r  other        result         r  other        result         r  other        result
-// |                 |            |   |                          |                 |
-// |    |     ->                  |   |      ->                  |         ->      |
-// |                 |            |                 |            |   |
-// |                 |            |                 |            |   |
+// remove returns the numbers in r that are not in other - the logical XOR. other must be a subset of r.
+//
+// The cases are:
+//
+//	 (r starts with other)           (r contains other)            (r ends with other)
+//	r  other        result         r  other        result         r  other        result
+//	|   |                          |                 |            |                 |
+//	|   |     ->                   |   |      ->                  |         ->      |
+//	|                |             |                 |            |   |
+//	|                |             |                 |            |   |
 func (r Range) remove(other Range) []Range {
 	var result []Range
 	if other.start > r.start {
-		//before other
+		//before
 
 		result = append(result, Range{
 			start:  r.start,
@@ -66,7 +74,8 @@ func (r Range) remove(other Range) []Range {
 	}
 
 	if other.start+other.length < r.start+r.length {
-		// after other
+		// after
+
 		result = append(result, Range{
 			start:  other.start + other.length,
 			length: (r.start + r.length) - (other.start + other.length),
@@ -76,18 +85,22 @@ func (r Range) remove(other Range) []Range {
 	return result
 }
 
-// intersect returns a range representing the numbers r and other share. other need not be a subset of r.
-// I.E.
-// r  other        result         r  other        result         r  other        result
+// intersect returns a range representing the numbers r and other share - the logical AND.
+// other need not be a subset of r.
+// True is returned if the intersection is non-empty, otherwise false.
 //
-//	|
+// The non-empty intersecting cases are:
 //
-// |                              |   |             |            |
-// |    |     ->     |            |   |      ->     |            |         ->
-// |                              |                              |   |             |
-// |                              |                              |   |             |
-//
-//	|
+//	  (other is before r)            (other is in r)                (other is after r)
+//	r  other        result         r  other        result         r  other        result
+//	     |
+//	|    |            |            |
+//	|    |            |            |   |             |            |
+//	|          ->                  |   |      ->     |            |         ->
+//	|                              |                              |
+//	|                              |                              |   |             |
+//	                                                              |   |             |
+//	                                                                  |
 func (r Range) intersect(other Range) (Range, bool) {
 	if other.start > r.start+r.length || other.start+other.length < r.start {
 		return Range{}, false
