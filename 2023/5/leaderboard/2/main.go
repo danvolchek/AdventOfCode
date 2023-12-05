@@ -11,6 +11,7 @@ type Almanac struct {
 	maps map[string]Map
 }
 
+// Range represents a numerical range - with a starting value and length.
 type Range struct {
 	start, length int
 }
@@ -116,6 +117,7 @@ func (r Range) intersect(other Range) (Range, bool) {
 	}, length > 0
 }
 
+// Map converts one category to another.
 type Map struct {
 	source, dest string
 
@@ -143,6 +145,7 @@ func (m Map) mapping(r Range) []Range {
 
 	}
 
+	// unmapped ranges map unchanged
 	destSpaceRanges = append(destSpaceRanges, r.subtract(sourceSpaceRanges)...)
 
 	return destSpaceRanges
